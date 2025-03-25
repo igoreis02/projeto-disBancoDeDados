@@ -89,10 +89,12 @@ img{
 .checkbox{
     display: flex;
     align-items: center;
+    flex-direction: column;
 }
 
 .check{
     width: 1em;
+    display: block;
 }
 
 
