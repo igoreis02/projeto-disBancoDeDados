@@ -10,29 +10,39 @@
     <div class="background"></div>
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo"/>
-        <h2>Cadastre-se</h2>
+        <h2>Insira seus dados:</h2>
         <form class="form">
 
-            <input class="titulo">Nome Completo:</span><input type="text" />
-
-            <!- parte de dados de cadastro do cliente--!>
-
-            <span class="titulo">Nome Completo:</span><input type="text" />
-            <span class="titulo">Data de Nascimento:</span><input type="date" >
-            <span class="titulo">Telefone:</span><input type="tel" >
-            <span class="titulo">Cpf:</span><input type="number">
-            <span class="titulo">Endereço</span><input type="text"/>
-            <span class="titulo">Setor</span><input type="text"/>
+            <span class="titulo">Nome Completo:</span><input type="text"  id="nome"/>
+            <span class="titulo">Data de Nascimento:</span><input type="date" id="dt_Nascimento" >
+            <span class="titulo">Endereço:</span><input type="text" id="endereco" placeholder="Rua/ Avenida/ Viela"/>
+            <div class="conteiner-quadra-lote">
+            <div class="form qd-lt">
+                <span class="titulo">Quadra:</span><input type="text" id="quadra">
+            </div>
+            <div class="form qd-lt">
+                <span class="titulo">Quadra:</span><input type="text" id="lote">
+            </div>
+            </div>
+            <span class="titulo">Setor:</span><input type="text"/ id="setor">
+            <span class="titulo">Complemento:</span><input type="text" id="complemento">
+            <span class="titulo">Cidade:</span><input type="text" id="cidade" >
+            <span class="titulo">Sexo:<br></span>
+            <div class="conteiner-quadra-lote">
             
+            <div class="masculino_feminino">
+                Masculino: <input type="radio" name="sexo" id="masculino">
+            </div>
+            <div class="masculino_feminino">
+                Feminino: <input type="radio" name="sexo" id="feminino">
+            </div>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" name="" id="privacidade" class="check">Li e aceito os <a href="termosDoSorteio.html" class="link" target="_blank"> 
+                     Termos do Sorteio</a>
+                </div>
+            <button type="submit">Finalizar</button>
             
-
-            Sexo:<br>
-            Masculino: <input type="radio" name="sexo" id="masculino">  
-            Feminino: <input type="radio" name="sexo" id="feminino">  
-
-            
-            <button type="submit">finalizar</button>
-            Li e aceito os termos e condições.
         </form>
     </div>
 </body>
