@@ -11,30 +11,30 @@
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo"/>
         <h2>Insira seus dados:</h2>
-        <form class="form">
+        <form class="form" id="formulario">
 
-            <span class="titulo">Nome Completo:</span><input type="text"  id="nome"/>
-            <span class="titulo">Data de Nascimento:</span><input type="date" id="dt_Nascimento" >
-            <span class="titulo">Endereço:</span><input type="text" id="endereco" placeholder="Rua/ Avenida/ Viela"/>
+            <span class="titulo">Nome Completo:</span><input type="text" name="nome" id="nome" required/>
+            <span class="titulo">Data de Nascimento:</span><input type="date" name="dt_nascimento" id="dt_Nascimento" required/>
+            <span class="titulo">Endereço:</span><input type="text" name="endereco" id="endereco" placeholder="Rua/ Avenida/ Viela" required/>
             <div class="conteiner-quadra-lote">
             <div class="form qd-lt">
-                <span class="titulo">Quadra:</span><input type="text" id="quadra">
+                <span class="titulo">Quadra:</span><input type="text" name="quadra" id="quadra" required/>
             </div>
             <div class="form qd-lt">
-                <span class="titulo">Lote:</span><input type="text" id="lote">
+                <span class="titulo">Lote:</span><input type="text"  name="lote" id="lote" required/>
             </div>
             </div>
-            <span class="titulo">Setor:</span><input type="text"/ id="setor">
-            <span class="titulo">Complemento:</span><input type="text" id="complemento">
-            <span class="titulo">Cidade:</span><input type="text" id="cidade" >
+            <span class="titulo">Setor:</span><input type="text" name="setor" id="setor" required/>
+            <span class="titulo">Complemento:</span><input type="text" name="complemento" id="complemento" required/>
+            <span class="titulo">Cidade:</span><input type="text" name="cidade" id="cidade"  required>
             <span class="titulo">Sexo:<br></span>
             <div class="conteiner-quadra-lote">
             
             <div class="masculino_feminino">
-                Masculino: <input type="radio" name="sexo" id="masculino">
+                Masculino: <input type="radio" name="sexo" id="sexo" value="Masculino">
             </div>
             <div class="masculino_feminino">
-                Feminino: <input type="radio" name="sexo" id="feminino">
+                Feminino: <input type="radio" name="sexo" id="sexo" value="Feminino">
             </div>
             </div>
             <div class="checkbox">

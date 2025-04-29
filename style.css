@@ -158,10 +158,16 @@ button{
 
 .form > input {
     border: 0;
-    padding: 0 ;
+    padding: 0 15px ;
     color: var(--cor-principal);
     background: #ededed;
 }
+
+#hidden{
+  display: none;
+}
+
+
 .form > input::placeholder{
     color: var(--cor-principal);
 }

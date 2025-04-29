@@ -1,28 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Souza Gás e Água</title>
 </head>
+
 <body>
     <div class="background"></div>
     <div class="card">
-        <img class="logo" src="imagens/logo.png" alt="Logo"/>
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h2 class="titulo-1">Sorteio</h2>
         <img class="imagem" src="imagens/boneco.png" alt="">
 
-        <form class="form">
-            <label for="" class="titulo-label">Faça seu cadastro:</label>
-            <input type="telefone" id="telefone"
-            placeholder="Telefone"/>
+        <form class="form" id="formulario">
+            <label class="titulo-label">Faça seu cadastro:</label>
+            <input type="telefone" name="telefone" id="telefone" placeholder="Telefone" required />
+            <input id="hidden" type="senha" name="senha" id="senha" placeholder="Senha" required />
+
             <div class="checkbox">
-            <input type="checkbox" name="" id="privacidade" class="check">Li e aceito a <a href="politicasDePrivacidadade.html" class="link" target="_blank"> 
-                 politica de privacidade</a>
+                <input type="checkbox" name="" id="privacidade" class="check">Li e aceito a <a
+                    href="politicasDePrivacidadade.html" class="link" target="_blank">
+                    politica de privacidade</a>
             </div>
-            <button class="botao">Próximo</button>
-        </form>   
+            <button class="botao" id="pesquisaTelefone">Próximo</button>
+        </form>
     </div>
+    <script src="script.js"></script>
 </body>
+
 </html>
