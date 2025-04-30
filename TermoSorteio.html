@@ -98,3 +98,91 @@
         .submit-button:hover {
             background-color: #cc3e0f;
         }
+    </style>
+</head>
+<body>
+
+    <!-- Contêiner principal -->
+    <div class="container">
+
+        <!-- Título da página -->
+        <h1>Termos e Condições do Sorteio – Souza Gás</h1>
+
+        <!-- Seções do regulamento -->
+        <h2>1. Objetivo</h2>
+        <p>Este sorteio visa premiar os clientes da Souza Gás em agradecimento pela fidelidade e preferência.</p>
+
+        <h2>2. Período da Promoção</h2>
+        <p>O sorteio é válido de <strong>01/05/2025</strong> até <strong>31/05/2025</strong>, com o sorteio realizado em <strong>01/06/2025</strong> às 15h.</p>
+
+        <h2>3. Quem pode participar</h2>
+        <ul>
+            <li>Pessoas físicas, maiores de 18 anos;</li>
+            <li>Residentes na cidade de Goiânia - GO;</li>
+            <li>Clientes que comprarem qualquer botijão de gás durante o período do sorteio.</li>
+        </ul>
+
+        <h2>4. Como participar</h2>
+        <p>Ao comprar um botijão de gás P13, o cliente recebe um cupom para preencher com:</p>
+        <ul>
+            <li>Nome completo</li>
+            <li>Telefone</li>
+            <li>Endereço</li>
+            <li>CPF (opcional)</li>
+            <li>Aceite dos termos do sorteio</li>
+        </ul>
+
+        <h2>5. Premiação</h2>
+        <ul>
+            <li>1º lugar: 1 botijão de gás grátis</li>
+            <li>2º lugar: Desconto de R$ 50 na próxima compra</li>
+        </ul>
+
+        <h2>6. Sorteio</h2>
+        <p>Será feito manualmente com testemunhas, podendo ser filmado ou transmitido ao vivo.</p>
+
+        <h2>7. Divulgação dos vencedores</h2>
+        <p>Contato por telefone e divulgação nas redes sociais da empresa.</p>
+
+        <h2>8. Disposições gerais</h2>
+        <p>
+            - Concordância automática ao participar;<br>
+            - Não nos responsabilizamos por dados errados;<br>
+            - Não está ligado a redes sociais;<br>
+            - Sorteio isento de autorização do governo (Portaria nº 41/2008).
+        </p>
+
+        <h2>9. Proteção de dados</h2>
+        <p>Os dados dos participantes serão protegidos conforme a LGPD (Lei 13.709/18).</p>
+
+        <!-- Área do checkbox para consentimento -->
+        <div class="consent-area">
+            <label class="consent-label">
+                <!-- Checkbox que o usuário deve marcar -->
+                <input type="checkbox" id="aceite">
+                Li e concordo com os termos do sorteio
+            </label>
+
+            <!-- Botão que só pode ser usado se o checkbox for marcado -->
+            <button class="submit-button" onclick="verificarConsentimento()">Participar do Sorteio</button>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="footer">
+            <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+        </div>
+    </div>
+
+    <!-- Script JS para checar se o checkbox foi marcado -->
+    <script>
+        function verificarConsentimento() {
+            const checkbox = document.getElementById("aceite");
+            if (!checkbox.checked) {
+                alert("Você precisa aceitar os termos para participar.");
+            } else {
+                alert("Obrigado por participar! Boa sorte 🍀");
+            }
+        }
+    </script>
+</body>
+</html>
