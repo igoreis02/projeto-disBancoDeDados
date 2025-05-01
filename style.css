@@ -53,6 +53,19 @@ body{
     color: var(--cor-principal);
 }
 
+.tamanho_termo{
+    width: 55%;
+}
+.card > ul{
+    margin-left: 60px;
+    list-style-position: inside;
+    text-align: left;
+}
+
+.card > p {
+    padding-left: 45px;
+    font-weight: 800;
+}
 .card::before{
     content: "";
     position: absolute;
@@ -95,11 +108,16 @@ body{
     width: 35%;
 }
 
-
+.paragrafo_descricao_sorteio{
+    text-align: left;
+}
 .titulo-2{
     padding: 0;
 }
 
+.titulo{
+    padding-left: 16px;
+}
 
 .checkbox{
     display: flex;
@@ -127,7 +145,8 @@ button{
 }
 
 .form{
-    margin: 0 0 0px;
+    border: 0;
+    margin: 10px 0 0px;
     display: grid; 
     gap: 15px; 
     justify-content: center;

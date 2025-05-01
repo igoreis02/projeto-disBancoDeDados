@@ -1,6 +1,7 @@
 const botaoPesquisaTelefone = document.querySelector("#pesquisaTelefone");
 const aparecerSenha = document.getElementById('hidden');
-const fomulario = document.querySelector("#formulario")
+const fomulario = document.querySelector("#formulario");
+const termoPrivacidade = document.getElementById('privacidade')
 
 const clientes = [];
 
@@ -10,9 +11,15 @@ botaoPesquisaTelefone.addEventListener('click', (event) => {
     console.log(clientes);
     const form = document.querySelector("#formulario");
 
-    const telefoneCliente = form.telefone.value
+    const telefoneCliente = form.telefone.value;
+
+    if (!termoPrivacidade.checked){
+        alert ("Você precisa aceitar os termos para participar.");
+    
+    }else {
 
     console.log(telefoneCliente);
+    
 
     if (telefoneCliente == 62993094343){
         aparecerSenha.style.display = 'block';
@@ -36,6 +43,7 @@ botaoPesquisaTelefone.addEventListener('click', (event) => {
         
         })
     }
+}
 })
 /*
     if (clientes.length  == 0) {
