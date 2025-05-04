@@ -3,15 +3,13 @@ const mensagemDiv = document.getElementById('mensagem');
 const telefoneInput = document.getElementById('telefone');
 const senhaInput = document.getElementById('hidden');
 const pesquisaTelefoneButton = document.getElementById('pesquisaTelefone');
+const termoPrivacidade = document.getElementById('termoPrivacidade');
+const privacidade = document.getElementById('privacidade').checked;
 
-
-
-
-
-// Adiciona o evento de clique no botão "Próximo"
 telefoneInput.addEventListener('input', function () {
     if (telefoneInput.value === '62993997054') {
         senhaInput.style.display = 'block';
+        termoPrivacidade.style.display = 'none';''
         pesquisaTelefoneButton.textContent = 'Entrar';
     } else {
         pesquisaTelefoneButton.textContent = 'Próximo';
@@ -21,7 +19,7 @@ telefoneInput.addEventListener('input', function () {
 verificarForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const telefone = telefoneInput.value;
-    const privacidade = document.getElementById('privacidade').checked;
+    
 
     if (!privacidade) {
         mensagemDiv.textContent = 'Aceite os termos de privacidade.';
@@ -45,47 +43,36 @@ verificarForm.addEventListener('submit', function (event) {
         return;
     }
 
-
     if (telefone === '62993997054' && senhaInput.style.display === 'block') {
         const senha = senhaInput.value;
-        console.log(senha);
         if (senha === '') {
             mensagemDiv.textContent = 'Por favor, insira a senha.';
             mensagemDiv.style.color = 'red';
             return;
         }
 
-
-       /* fetch('verificar_senha.php', {
+        fetch('verificar_senha.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `telefone=${telefone}&senha=${senha}`
+            body: `senha=${senha}`
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.senhaCorreta) {
-                    window.location.href = 'lista_clientes.php'; // Redirecionar para a lista
-                } else {
-                    mensagemDiv.textContent = 'Senha incorreta.';
-                    mensagemDiv.style.color = 'red';
-                }
-            })
-            .catch(error => {
-                console.error('Erro na requisição:', error);
-                mensagemDiv.textContent = 'Erro ao verificar a senha.';
+        .then(response => response.json())
+        .then(data => {
+            if (data.senhaCorreta) {
+                window.location.href = 'lista-clientes.html'; // Redirecionar para a lista
+            } else {
+                mensagemDiv.textContent = 'Senha incorreta.';
                 mensagemDiv.style.color = 'red';
-            });*/
-        // Simulação de verificação de senha (substitua pelo seu código real)      
-        if (senha === '749870') { // Substitua pela lógica real de verificação de senha
-            window.location.href = 'lista_clientes.php'; // Redirecionar para a lista
-        } else {
-            mensagemDiv.textContent = 'Senha incorreta.';
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            mensagemDiv.textContent = 'Erro ao verificar a senha.';
             mensagemDiv.style.color = 'red';
-        }
+        });
     } else {
-        // Restante do código para verificar o telefone e ir para cadastro.html
         fetch('verificar_telefone.php', {
             method: 'POST',
             headers: {
@@ -96,7 +83,8 @@ verificarForm.addEventListener('submit', function (event) {
             .then(response => response.json())
             .then(data => {
                 if (data.existe) {
-                    window.location.href = `sorteado.html`;
+                    // Redireciona para sorteado.html com nome e numeroSorteado
+                    window.location.href = `sorteado.html?nome=${encodeURIComponent(data.nome)}&numeroSorteado=${encodeURIComponent(data.numeroSorteado)}`;
                 } else {
                     window.location.href = `cadastro.html?telefone=${telefone}`;
                 }
@@ -108,7 +96,3 @@ verificarForm.addEventListener('submit', function (event) {
             });
     }
 });
-
-// A
-
-

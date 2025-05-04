@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Clientes</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+    <style>
+        .edit-btn,
+        .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .edit-btn {
+            color: var(--cor-principal);
+        }
+
+        .delete-btn {
+            color: #ff0000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="card  tamanho-tabela">
+        <h1 class="titulo-tabela">Lista de Clientes</h1>
+        <div class="table-container">
+            <table id="clientTable">
+                <thead>
+                    <tr>
+                        <th>Telefone</th>
+                        <th>Nome</th>
+                        <th>Data de Nascimento</th>
+                        <th>Endereço</th>
+                        <th>Quadra</th>
+                        <th>Lote</th>
+                        <th>Setor</th>
+                        <th>Complemento</th>
+                        <th>Cidade</th>
+                        <th>Sexo</th>
+                        <th>Termo Sorteio</th>
+                        <th>Ações</th> </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+    <script src="js/listar.js"></script>
+</body>
+
+</html>

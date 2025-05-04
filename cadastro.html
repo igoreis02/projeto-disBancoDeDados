@@ -65,75 +65,12 @@
             <button type="submit">Finalizar</button>
         </form>
         <div id="mensagem"></div>
-        <div class="footer">
-            <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
-        </div>
+
     </div>
-
-    <script >
-        
-        document.addEventListener('DOMContentLoaded', function () {
-            const formularioCadastro = document.getElementById('formularioCadastro');
-            const mensagemDiv = document.getElementById('mensagem');
-            const urlParams = new URLSearchParams(window.location.search);
-            const telefone = urlParams.get('telefone');
-            document.getElementById('telefoneCadastro').value = telefone;
-
-            // Opcional: Limpar campos se o cadastro falhar e voltar
-            if (urlParams.has('telefone')) {
-                document.getElementById('nome').value = '';
-                document.getElementById('dt_Nascimento').value = '';
-                document.getElementById('endereco').value = '';
-                document.getElementById('quadra').value = '';
-                document.getElementById('lote').value = '';
-                document.getElementById('setor').value = '';
-                document.getElementById('complemento').value = '';
-                document.getElementById('cidade').value = '';
-                document.getElementById('sexo_masculino').checked = false;
-                document.getElementById('sexo_feminino').checked = false;
-                document.getElementById('sorteio').checked = false; 
-            }
-
-          /*  formularioCadastro.addEventListener('submit', function (event) {
-                event.preventDefault(); // Impede o envio do formulário padrão  
-                const nomeInput = document.getElementById('nome');
-                const enderecoInput = document.getElementById('endereco');
-                const quadraInput = document.getElementById('quadra');
-                const loteInput = document.getElementById('lote');
-                const setorialInput = document.getElementById('setor');
-                const complementoInput = document.getElementById('complemento');
-                const cidadeInput = document.getElementById('cidade');
-                const sexoInput = document.querySelector('input[name="sexo"]:checked'); // Alterado para pegar o valor do sexo
-                const dataNascimentoInput = document.getElementById('dt_Nascimento');
-                const termosSorteioInput = document.getElementById('sorteio').checked;
-
-                if (!termosSorteioInput) {
-                    mensagemDiv.textContent = 'Você deve aceitar os termos do sorteio.';
-                    mensagemDiv.style.color = 'red';
-                    return;
-                }
-
-                // Adicionando lógica para verificar se o sexo foi selecionado
-                if (!sexoInput) {
-                    mensagemDiv.textContent = 'Por favor, selecione seu sexo.';
-                    mensagemDiv.style.color = 'red';
-                    return;
-                }
-                
-                if (nomeInput.value === '' || enderecoInput.value === '' || quadraInput.value === '' || loteInput.value === '' || setorialInput.value === '' || cidadeInput.value === '' || !sexoInput || dataNascimentoInput.value === '') {
-                    mensagemDiv.textContent = 'Por favor, preencha todos os campos.';
-                    mensagemDiv.style.color = 'red';
-                    return;
-                }
-                if(dataNascimentoInput.value > new Date().toISOString().split('T')[0]) {
-                    mensagemDiv.textContent = 'Data de nascimento inválida.';
-                    mensagemDiv.style.color = 'red';                
-                    return;
-                }
-            
-            });*/
-        });
-    </script>
+    <div class="footer">
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+    <script src="js/cadastro.js"></script>
 
 </body>
 

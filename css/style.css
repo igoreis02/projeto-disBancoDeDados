@@ -207,7 +207,7 @@ button{
     margin: 20px;
     font-weight: 800;
 }
-.numeroSorteado{
+#numeroSorteado{
     color: var(--cor-titulo);
 }
 .botao_Voltar{
@@ -243,10 +243,6 @@ button{
     padding: 10px;
 }
 
-.card > footer > a{
-    
-}
-
 a:link{
     color: var(--cor-principal);
     font-weight: 600;
@@ -254,4 +250,101 @@ a:link{
 a:visited{
     color: var(--cor-principal);
      font-weight: 600;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.tamanho-tabela{
+    width: 75%;
+    margin: 20px auto;
+    padding: auto;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.titulo-tabela{
+    text-align: center;
+    font-size: 24px;
+    color: var(--cor-titulo);
+    margin: 20px 0;
+}
+
+.table-container {
+    overflow-x: auto; /* Adiciona barra de rolagem horizontal em telas pequenas */
+}
+
+table {
+    width: 100%; /* Garante que a tabela ocupa 100% do container */
+    border-collapse: collapse;
+    margin: 10px 0; /* Adicionei um pouco de margem para espaçamento */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap; /* Impede que o texto quebre a linha */
+}
+
+th {
+    background-color: var(--cor-principal);
+    color: var(--cor-titulo);
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilos para telas menores */
+@media screen and (max-width: 600px) {
+    table {
+        border: 0;
+    }
+
+    table thead {
+        border: none;
+        clip: rect(0 0 0 0); /* Esconde o cabeçalho */
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    table tr {
+        border-bottom: 2px solid #ddd;
+        display: block;
+        margin-bottom: .625em;
+    }
+
+    table td {
+        border-bottom: 1px solid #ddd;
+        display: block;
+        font-size: .8em;
+        text-align: right;
+    }
+
+    table td::before {
+        /*
+        * Aria-label tem prioridade sobre o título.
+        * Um elemento pode ter apenas um rótulo aria
+        * (e rótulo aria sobrescreve título).
+        */
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        font-weight: bold;
+    }
 }

@@ -1,31 +1,61 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <title>Souza Gás e Água</title>
 </head>
+
 <body>
     <div class="background"></div>
     <div class="card">
-        <img class="logo" src="imagens/logo.png" alt="Logo"/>
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
         <img class="imagem" src="imagens/boneco.png" alt="">
 
 
         <div class="sorteio form">
-            <h1>Olá, <span>(nome)</span></h1>
-            <p>Você já está participando do nosso sorteio!</p>
+            <h1>Olá, <span id="nomeCadastrado"></span></h1>
             <div class="confirmacao_numero">
-            <p class="paragrafo">Seu número é:</p>
-            <span class="numeroSorteado">(número sorteado)</span>
+                <p>Você já está participando do nosso sorteio!</p>
+                <p class="paragrafo">Seu número da sorte é:</p>
+                <span  id="numeroSorteado"></span>
             </div>
-            <p>Agora é so esperar o dia do sorteio e torcer para você ganhar! 
+            <p>Agora é so esperar o dia do sorteio e torcer para você ganhar!
                 Até breve.</p>
             <button class="botao">Data dos sorteios</button>
             <div>
-            <a href="index.html"><img class="botao_Voltar" src="imagens/botao_volta.png" alt=""></a>
+                <a href="index.html"><img class="botao_Voltar" src="imagens/botao_volta.png" alt=""></a>
             </div>
-        </div>   
+        </div>
     </div>
+    <div class="footer">
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+    <script>
+        // Função para obter parâmetros da URL
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Exibir nome e número do sorteio
+        const nome = getParameterByName('nome');
+        const numeroSorteado = getParameterByName('numeroSorteado');
+
+        if (nome) {
+            document.getElementById('nomeCadastrado').textContent = nome;
+        }
+
+        if (numeroSorteado) {
+            document.getElementById('numeroSorteado').textContent = numeroSorteado;
+        }
+    </script>
 </body>
+
+</html>

@@ -1,5 +1,5 @@
 <?php
-$servername = "localhost";
+$servername = "localhost:3307";
 $username = "root";
 $password = "";
 $dbname = "cadastro";
@@ -10,49 +10,87 @@ $max = 10000;
 // Cria uma nova conexão mysqli
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verifica se a conexão foi estabelecida com sucesso
+// Verifica a conexão
 if ($conn->connect_error) {
-    die("Erro na conexão com o banco de dados: " . $conn->connect_error);
+    die("Erro na conexão: " . $conn->connect_error);
 }
 
-// Verifica se o método da requisição é POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recupera os dados do formulário
-    $telefone = $_POST['telefone'];
-    $nome = $_POST['nome'];
-    // Formata a data corretamente
+    $telefone = strtolower($_POST['telefone']);
+    $nome = strtolower(trim($_POST['nome']));
     $dt_nascimento = isset($_POST['dt_nascimento']) ? date('Y-m-d', strtotime($_POST['dt_nascimento'])) : null;
-    $endereco = $_POST['endereco'];
-    $quadra = $_POST['quadra'];
-    $lote = $_POST['lote'];
-    $setor = $_POST['setor'];
-    $complemento = $_POST['complemento'];
-    $cidade = $_POST['cidade'];
-    $sexo = $_POST['sexo'];
-    // Verifica se o termo foi aceito (checkbox)
-    $termoSorteio = isset($_POST['termoSorteio']) ? 1 : 0; // 1 para aceito, 0 para não aceito
+    $endereco = strtolower(trim($_POST['endereco']));
+    $quadra = strtolower(trim($_POST['quadra']));
+    $lote = strtolower(trim($_POST['lote']));
+    $setor = strtolower(trim($_POST['setor']));
+    $complemento = strtolower(trim($_POST['complemento']));
+    $cidade = strtolower(trim($_POST['cidade']));
+    $sexo = strtolower(trim($_POST['sexo']));
+    $termoSorteio = isset($_POST['termoSorteio']) ? 1 : 0;
+
+    // Validação (mantenha sua validação como está)
+    $erros = array();
+    if (empty($nome)) {
+        $erros[] = "Nome é obrigatório.";
+    }
+    if (empty($dt_nascimento)) {
+        $erros[] = "Data de nascimento é obrigatória.";
+    }
+    if (empty($endereco)) {
+        $erros[] = "Endereço é obrigatório.";
+    }
+    if (empty($quadra)) {
+        $erros[] = "Quadra é obrigatória.";
+    }
+    if (empty($lote)) {
+        $erros[] = "Lote é obrigatória.";
+    }
+    if (empty($setor)) {
+        $erros[] = "Setor é obrigatório.";
+    }
+    if (empty($cidade)) {
+        $erros[] = "Cidade é obrigatória.";
+    }
+    if (empty($sexo)) {
+        $erros[] = "Sexo é obrigatório.";
+    }
+    if ($termoSorteio == 0) {
+        $erros[] = "Você deve aceitar os termos do sorteio.";
+    }
+
+    if (!empty($erros)) {
+        $mensagem_erro = "<div style='font-family: sans-serif; background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px auto; max-width: 500px; text-align: center;'>";
+        $mensagem_erro .= "<b>Por favor, corrija os seguintes erros:</b><br>";
+        $mensagem_erro .= "<ul>";
+        foreach ($erros as $erro) {
+            $mensagem_erro .= "<li>$erro</li>";
+        }
+        $mensagem_erro .= "</ul>";
+        $mensagem_erro .= "</div>";
+        echo $mensagem_erro;
+        echo "<p style='font-family: sans-serif; text-align: center;'><a href='cadastro.html?telefone=" . $telefone . "'>Voltar ao formulário de cadastro</a></p>";
+        exit;
+    }
 
     // Sorteia um número único
     $numeroUnico = sortearNumeroUnico($conn, $min, $max);
 
-    // Prepara a query para inserir os dados do cliente
+    // Insere os dados do cliente
     $stmt_cliente = $conn->prepare("INSERT INTO clientes (telefone, nome, dt_nascimento, endereco, quadra, lote, setor, complemento, cidade, sexo, termoSorteio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    // Vincula os parâmetros com os tipos de dados corretos
     $stmt_cliente->bind_param("sssssssssss", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $termoSorteio);
 
-    // Executa a inserção dos dados do cliente
     if ($stmt_cliente->execute()) {
-        // Prepara a query para inserir o número sorteado na tabela de sorteio
-        $stmt_sorteio = $conn->prepare("INSERT INTO sorteio (numeroSorteado) VALUES (?)");
-        // Vincula o parâmetro com o tipo de dado correto
-        $stmt_sorteio->bind_param("i", $numeroUnico);
-        // Executa a inserção do número sorteado
+        $stmt_sorteio = $conn->prepare("INSERT INTO sorteio (numeroSorteado, id_cliente) VALUES (?, ?)"); // Added cliente_id
+        $cliente_id = $conn->insert_id; // Get the last inserted ID
+        $stmt_sorteio->bind_param("ii", $numeroUnico, $cliente_id); // Bind the customer ID
+
         if ($stmt_sorteio->execute()) {
-            echo "<div style='font-family: sans-serif; background-color: #d4edda; color: #155724; padding: 15px; border: 1px solid #c3e6cb; border-radius: 4px; margin: 20px auto; max-width: 500px; text-align: center;'>Cadastro realizado com sucesso! Número para sorteio: " . $numeroUnico . "</div>";
-            echo "<p style='font-family: sans-serif; text-align: center;'><a href='index.html'>Voltar para a página inicial</a></p>";
+            // Redireciona para sorteado.html com os dados
+            header("Location: sorteio.html?nome=" . urlencode($nome) . "&numeroSorteado=" . $numeroUnico);
+            exit; // Certifique-se de sair após o redirecionamento
         } else {
             // Se houver erro ao inserir no sorteio, exclui o cadastro do cliente (rollback)
-            $cliente_id = $conn->insert_id;
             $conn->query("DELETE FROM clientes WHERE id = $cliente_id");
             echo "<div style='font-family: sans-serif; background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px auto; max-width: 500px; text-align: center;'>Erro ao cadastrar número para sorteio: " . $stmt_sorteio->error . " Cadastro do cliente desfeito.</div>";
             echo "<p style='font-family: sans-serif; text-align: center;'><a href='cadastro.html?telefone=" . $telefone . "'>Voltar ao formulário de cadastro</a></p>";
@@ -77,12 +115,12 @@ function sortearNumeroUnico($conn, $min, $max) {
     $stmt->close();
 
     if ($count > 0) {
-        return sortearNumeroUnico($conn, $min, $max); // Chama recursivamente até encontrar um número único
+        return sortearNumeroUnico($conn, $min, $max);
     } else {
         return $numero;
     }
 }
 
-// Fecha a conexão com o banco de dados
+// Fecha a conexão
 $conn->close();
 ?>
