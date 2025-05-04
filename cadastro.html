@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <title>Cadastro</title>
 </head>
+
 <body>
     <div class="background"></div>
     <div class="card">
-        <img class="logo" src="imagens/logo.png" alt="Logo"/>
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h2>Insira seus dados:</h2>
         <form class="form" id="formularioCadastro" action="cadastrar_usuario.php" method="POST">
             <input type="hidden" id="telefoneCadastro" name="telefone" readonly>
 
             <label for="nome" class="titulo">Nome Completo:</label>
-            <input type="text" name="nome" id="nome" required/>
+            <input type="text" name="nome" id="nome" required />
 
             <label for="dt_nascimento" class="titulo">Data de Nascimento:</label>
-            <input type="date" name="dt_nascimento" id="dt_Nascimento" required/>
+            <input type="date" name="dt_nascimento" id="dt_Nascimento" required />
 
             <label for="endereco" class="titulo">Endereço:</label>
-            <input type="text" name="endereco" id="endereco" placeholder="Rua/ Avenida/ Viela" required/>
+            <input type="text" name="endereco" id="endereco" placeholder="Rua/ Avenida/ Viela" required />
 
             <div class="conteiner-quadra-lote">
                 <div class="form qd-lt">
                     <label for="quadra" class="titulo">Quadra:</label>
-                    <input type="text" name="quadra" id="quadra" required/>
+                    <input type="text" name="quadra" id="quadra" required />
                 </div>
                 <div class="form qd-lt">
                     <label for="lote" class="titulo">Lote:</label>
-                    <input type="text" name="lote" id="lote" required/>
+                    <input type="text" name="lote" id="lote" required />
                 </div>
             </div>
 
             <label for="setor" class="titulo">Setor:</label>
-            <input type="text" name="setor" id="setor" required/>
+            <input type="text" name="setor" id="setor" required />
 
             <label for="complemento" class="titulo">Complemento:</label>
-            <input type="text" name="complemento" id="complemento" required/>
+            <input type="text" name="complemento" id="complemento" />
 
             <label for="cidade" class="titulo">Cidade:</label>
             <input type="text" name="cidade" id="cidade" required>
@@ -46,11 +48,11 @@
             <label for="sexo" class="titulo">Sexo:<br></label>
             <div class="conteiner-quadra-lote">
                 <div class="masculino_feminino">
-                    <span>Masculino:</span>
+                    <label for="sexo_masculino">Masculino:</label>
                     <input type="radio" name="sexo" id="sexo_masculino" value="Masculino">
                 </div>
                 <div class="masculino_feminino">
-                    <span>Feminino:</span>
+                    <label for="sexo_feminino">Feminino:</label>
                     <input type="radio" name="sexo" id="sexo_feminino" value="Feminino">
                 </div>
             </div>
@@ -62,13 +64,17 @@
             <span id="error"></span>
             <button type="submit">Finalizar</button>
         </form>
+        <div id="mensagem"></div>
         <div class="footer">
             <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    <script >
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const formularioCadastro = document.getElementById('formularioCadastro');
+            const mensagemDiv = document.getElementById('mensagem');
             const urlParams = new URLSearchParams(window.location.search);
             const telefone = urlParams.get('telefone');
             document.getElementById('telefoneCadastro').value = telefone;
@@ -85,9 +91,50 @@
                 document.getElementById('cidade').value = '';
                 document.getElementById('sexo_masculino').checked = false;
                 document.getElementById('sexo_feminino').checked = false;
-                document.getElementById('sorteio').checked = false;
+                document.getElementById('sorteio').checked = false; 
             }
+
+          /*  formularioCadastro.addEventListener('submit', function (event) {
+                event.preventDefault(); // Impede o envio do formulário padrão  
+                const nomeInput = document.getElementById('nome');
+                const enderecoInput = document.getElementById('endereco');
+                const quadraInput = document.getElementById('quadra');
+                const loteInput = document.getElementById('lote');
+                const setorialInput = document.getElementById('setor');
+                const complementoInput = document.getElementById('complemento');
+                const cidadeInput = document.getElementById('cidade');
+                const sexoInput = document.querySelector('input[name="sexo"]:checked'); // Alterado para pegar o valor do sexo
+                const dataNascimentoInput = document.getElementById('dt_Nascimento');
+                const termosSorteioInput = document.getElementById('sorteio').checked;
+
+                if (!termosSorteioInput) {
+                    mensagemDiv.textContent = 'Você deve aceitar os termos do sorteio.';
+                    mensagemDiv.style.color = 'red';
+                    return;
+                }
+
+                // Adicionando lógica para verificar se o sexo foi selecionado
+                if (!sexoInput) {
+                    mensagemDiv.textContent = 'Por favor, selecione seu sexo.';
+                    mensagemDiv.style.color = 'red';
+                    return;
+                }
+                
+                if (nomeInput.value === '' || enderecoInput.value === '' || quadraInput.value === '' || loteInput.value === '' || setorialInput.value === '' || cidadeInput.value === '' || !sexoInput || dataNascimentoInput.value === '') {
+                    mensagemDiv.textContent = 'Por favor, preencha todos os campos.';
+                    mensagemDiv.style.color = 'red';
+                    return;
+                }
+                if(dataNascimentoInput.value > new Date().toISOString().split('T')[0]) {
+                    mensagemDiv.textContent = 'Data de nascimento inválida.';
+                    mensagemDiv.style.color = 'red';                
+                    return;
+                }
+            
+            });*/
         });
     </script>
+
 </body>
+
 </html>

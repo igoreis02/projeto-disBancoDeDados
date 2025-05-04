@@ -11,12 +11,12 @@ try {
  die("Erro na conexão com o banco de dados: " . $e->getMessage());
 }
 
-if (isset($_POST['telefone']) && isset($_POST['senha'])) {
- $telefone = $_POST['telefone'];
+if (isset($_POST['senha'])) {
+
  $senha = $_POST['senha'];
 
- $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE telefone = ? AND senha = ?"); // Supondo que sua tabela de usuários tenha uma coluna 'senha'
- $stmt->execute([$telefone, $senha]);
+ $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE senha = ?"); // Supondo que sua tabela de usuários tenha uma coluna 'senha'
+ $stmt->execute([$senha]);
  $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
  $response = array('senhaCorreta' => ($usuario !== false));
