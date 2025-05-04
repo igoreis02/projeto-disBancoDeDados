@@ -1,266 +1,339 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500&display=swap');
 
-:root{
-    --font-family:"Montserrat", sans-serif;
-    --cor-principal: #4c8479;
-    --cor-secundaria: #2b5f56;
-    --cor-titulo:#eb9f25;
-}
-
-body{
-    display: grid;
-    place-items: center;
-    gap: 30px;
-    margin: 0;
-    height: 20%;
-    padding: 0 32px;
-    background: #eff9ff;
-    font-family: var(--font-family);
-}
-
-@media(width >= 500px){
-    body{padding: 0;}
-
-    .card{
-        margin: 0;
-        width: 360px;
+    :root {
+        --font-family: "Montserrat", sans-serif;
+        --cor-principal: #4c8479;
+        --cor-secundaria: #2b5f56;
+        --cor-titulo: #eb9f25;
     }
-}
 
-.background{
-    position: fixed;
-    top: -50vmin;
-    left: -50vmin;
-    width: 100vmin;
-    height: 100vmin;
-    border-radius: 
-    47% 53% 61% 39% /
-    45% 51% 49% 55%;
-    background: var(--cor-secundaria);
-}
+    body {
+        display: grid;
+        place-items: center;
+        gap: 20px; /* Espaçamento menor em celulares */
+        margin: 0;
+        padding: 0 16px; /* Menos padding lateral */
+        background: #eff9ff;
+        font-family: var(--font-family);
+        min-height: 100vh;
+    }
 
-.card{
-    overflow: hidden;
-    position: relative;
-    z-index: 3;
-    margin:2% 22px;
-    padding: 140px 65px 50px ;
-    border-radius: 24px;
-    background: #ffffff;
-    text-align: center;
-    box-shadow: 0 100px 100px
-                rgb(0 0 0 / 10%);
-    color: var(--cor-principal);
-}
+    .background {
+        position: fixed;
+        top: -40vmin; /* Ajuste para celulares */
+        left: -40vmin; /* Ajuste para celulares */
+        width: 80vmin; /* Ajuste para celulares */
+        height: 80vmin; /* Ajuste para celulares */
+        border-radius: 50%; /* Arredondar mais em celulares */
+        background: var(--cor-secundaria);
+        z-index: -1;
+    }
 
-.tamanho_termo{
-    width: 55%;
-}
-.card > ul{
-    margin-left: 60px;
-    list-style-position: inside;
-    text-align: left;
-}
+    .card {
+        overflow: hidden;
+        position: relative;
+        z-index: 3;
+        margin: 20px auto; /* Centralizar e margem vertical */
+        padding: 16px; /* Padding menor */
+        border-radius: 16px; /* Borda menor */
+        background: #ffffff;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+        width: 95%; /* Ocupar mais largura */
+        max-width: 400px; /* Largura máxima */
+    }
 
-.card > p {
-    padding-left: 45px;
-    font-weight: 800;
-}
-.card::before{
-    content: "";
-    position: absolute;
-    top: -880px;
-    left: 50%;
-    translate: -50% 20px;
-    width: 1000px;
-    height: 1000px;
-    border-radius: 50%;
-    background: var(--cor-principal);
-}
+    .card::before {
+        content: "";
+        position: absolute;
+        top: -600px; /* Ajuste para celulares */
+        left: 50%;
+        transform: translate(-50%, 20px);
+        width: 800px; /* Ajuste para celulares */
+        height: 800px; /* Ajuste para celulares */
+        border-radius: 50%;
+        background: var(--cor-principal);
+    }
 
-.background::after{
-    content: "";
-    position: inherit;
-    right: -50vmin;
-    bottom: -55vmin;
-    width: inherit;
-    height: inherit;
-    border-radius: inherit;
-    background: var(--cor-secundaria);
-}
-.card.logo{
-    position: absolute;
-    left: 50%;
-    translate: -50% 0;
-    width: 64px;
-    height: 64px;
-}
-.logo{
-    width: 40%;
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    translate: -50% 0;
-    
-}
+    .logo {
+        width: 50%; /* Logo maior em celulares */
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
 
-.imagem{
-    width: 35%;
-}
+    .imagem {
+        width: 60%; /* Imagem maior em celulares */
+        max-width: 200px; /* Limitar tamanho */
+        height: auto;
+    }
 
-.paragrafo_descricao_sorteio{
-    text-align: left;
-}
-.titulo-2{
-    padding: 0;
-}
+    .titulo-1,
+    .titulo-2 {
+        font-size: 1.5em; /* Tamanho menor */
+        margin-bottom: 0.4em;
+        color: var(--cor-titulo);
+    }
 
-.titulo{
-    padding-left: 16px;
-}
+    .titulo-label,
+    .titulo {
+        text-align: left;
+        display: block;
+        margin-bottom: 0.2em;
+        font-size: 0.9em; /* Tamanho menor */
+        color: var(--cor-principal);
+    }
 
-.checkbox{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--cor-principal);
-}
+    .form {
+        display: grid;
+        gap: 0.6em; /* Espaçamento menor */
+    }
 
-.check{
-    height: 0px;
+    .form :is(input, button, select) {
+        padding: 0.6em; /* Padding menor */
+        border-radius: 0.4em; /* Borda menor */
+        border: 1px solid #ddd;
+        font-size: 0.9em; /* Tamanho menor */
+        font-family: inherit;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-}
+    .form button {
+        background-color: var(--cor-principal);
+        color: white;
+        cursor: pointer;
+        border: none;
+    }
 
-button{
-    color: var(--cor-principal);
-}
+    .form button:hover {
+        background-color: var(--cor-secundaria);
+    }
 
+    .conteiner-quadra-lote {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4em; /* Espaçamento menor */
+    }
 
+    .qd-lt {
+        width: 100%;
+    }
 
-.card > h2{
-    font-size: 35px;
-    font-weight: 800;
-    margin: 20px 0 20px;
-    color: var(--cor-titulo);
-}
+    .masculino_feminino {
+        display: flex;
+        align-items: center;
+        margin-right: 0.5em; /* Espaçamento menor */
+    }
 
-.form{
-    border: 0;
-    margin: 10px 0 0px;
-    display: grid; 
-    gap: 15px; 
-    justify-content: center;
-}
-.conteiner-quadra-lote {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
+    .checkbox {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.8em; /* Espaçamento menor */
+    }
 
-.masculino_feminino{
-    display: flex;
-    align-items: center;
-    
-}
-.titulo{
-    text-align: left;
-}
+    .checkbox label {
+        margin-left: 0.3em; /* Espaçamento menor */
+        font-size: 0.8em; /* Tamanho menor */
+    }
 
-.form
-:is(input,button){
-    height: 56px;
-    border-radius: 28px;
-    font-size: 16px;
-    font-family: var(--font-family);
-}
+    #senhaContainer{
+        display: none;
+    }
 
-.form > input {
-    border: 0;
-    padding: 0 15px ;
-    color: var(--cor-principal);
-    background: #ededed;
-}
+    #hidden{
+        display: none;
+    }
+    .sorteio {
+        width: 90%; /* Mais largo em celulares */
+        margin: 0 auto;
+        padding: 0.8em; /* Padding menor */
+    }
 
-#hidden{
-  display: none;
-}
+    .confirmacao_numero {
+        margin: 0.8em 0; /* Espaçamento menor */
+    }
 
+    .numeroSorteado {
+        color: var(--cor-titulo);
+        font-size: 1em; /* Tamanho menor */
+    }
 
-.form > input::placeholder{
-    color: var(--cor-principal);
-}
+    .botao_Voltar {
+        width: 1.5em; /* Botão menor */
+    }
 
-.form > h1{
-    margin: 0.6em 0 0 ;
-}
+    .footer {
+        margin-top: 1.5em; /* Espaçamento menor */
+        padding: 0.8em; /* Padding menor */
+        text-align: center;
+        color: #888;
+        font-size: 0.7em; /* Tamanho menor */
+    }
 
-.form > p{
-    display: flex;
-    margin: 0;
-    justify-content: center;
-    font-size: 15px;
-}
-.paragrafo{
-    font-size: 15px;
-    margin: 0;
-    font-weight: 800;
-}
-.sorteio{
-    width: 55%;
-    margin: 0 25%;
-    gap: 9px;
-}
-.confirmacao_numero{
-    display: grid;
-    margin: 20px;
-    font-weight: 800;
-}
-.numeroSorteado{
-    color: var(--cor-titulo);
-}
-.botao_Voltar{
-    width: 25px;
-}
-.form > button{
-    border: 0;
-    color: #f9f9f9;
-    background: var(--cor-principal);
-    display: grid;
-    place-items: center;
-    font-weight: 500;
-    cursor: pointer;
-}
-button{
-    height: 56px;
-    border-radius: 10px;
-    font-size: 16px;
-    font-family: inherit;
-    color: #f9f9f9;
-    background:var(--cor-principal);
-    border: 0;
-    margin: 10px;
-    cursor: pointer;
-}
+    .tamanho_termo {
+        width: 95%;
+        max-width: none; /* Sem largura máxima em celulares */
+        margin: 1em auto;
+        padding: 1em;
+    }
 
-.botao{
-    margin: 40px 0;
-}
+    /* Media Query para telas maiores que 500px */
+    @media (min-width: 500px) {
+        body {
+            padding: 0;
+            gap: 30px;
+        }
 
-.card > footer{
-    color: #a1a1a1;
-    padding: 10px;
-}
+        .card {
+            width: 360px;
+            margin: 2em auto;
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
 
-.card > footer > a{
-    
-}
+        .background {
+            top: -50vmin;
+            left: -50vmin;
+            width: 100vmin;
+            height: 100vmin;
+            border-radius: 47% 53% 61% 39% / 45% 51% 49% 55%;
+        }
 
-a:link{
-    color: var(--cor-principal);
-    font-weight: 600;
-}
-a:visited{
-    color: var(--cor-principal);
-     font-weight: 600;
-}
+        .logo {
+            width: 40%;
+            top: 15px;
+        }
+
+        .imagem {
+            width: 35%;
+            max-width: 150px;
+        }
+
+        .titulo-1,
+        .titulo-2 {
+            font-size: 1.8em;
+        }
+
+        .titulo-label,
+        .titulo {
+            font-size: 1em;
+        }
+
+        .form {
+            gap: 0.8em;
+        }
+
+        .form :is(input, button, select) {
+            padding: 0.8em;
+            border-radius: 0.5em;
+            font-size: 1em;
+        }
+
+        .conteiner-quadra-lote {
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 0.5em;
+        }
+
+        .qd-lt {
+            width: 48%;
+        }
+
+        .sorteio {
+            width: 60%;
+            padding: 1em;
+        }
+
+        .confirmacao_numero {
+            margin: 1em 0;
+        }
+
+        .numeroSorteado {
+            font-size: 1.2em;
+        }
+
+        .botao_Voltar {
+            width: 2em;
+        }
+
+        .footer {
+            margin-top: 2em;
+            padding: 1em;
+            font-size: 0.8em;
+        }
+
+        .tamanho_termo {
+            width: 90%;
+            max-width: 600px;
+        }
+    }
+
+    /* Media Query para telas maiores que 800px (desktops) */
+    @media (min-width: 800px) {
+        .card {
+            width: 500px;
+        }
+
+        .form {
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+                "nome nome"
+                "dt_nascimento dt_nascimento"
+                "endereco endereco"
+                "quadra lote"
+                "setor setor"
+                "complemento complemento"
+                "cidade cidade"
+                "sexo sexo"
+                "termo termo"
+                "botao botao";
+        }
+
+        #nome {
+            grid-area: nome;
+        }
+
+        #dt_nascimento {
+            grid-area: dt_nascimento;
+        }
+
+        #endereco {
+            grid-area: endereco;
+        }
+
+        #quadra {
+            grid-area: quadra;
+        }
+
+        #lote {
+            grid-area: lote;
+        }
+
+        #setor {
+            grid-area: setor;
+        }
+
+        #complemento {
+            grid-area: complemento;
+        }
+
+        #cidade {
+            grid-area: cidade;
+        }
+
+        #sexo {
+            grid-area: sexo;
+        }
+
+        #termo {
+            grid-area: termo;
+        }
+
+        #botao {
+            grid-area: botao;
+        }
+    }

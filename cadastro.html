@@ -11,42 +11,83 @@
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo"/>
         <h2>Insira seus dados:</h2>
-        <form class="form" id="formulario">
+        <form class="form" id="formularioCadastro" action="cadastrar_usuario.php" method="POST">
+            <input type="hidden" id="telefoneCadastro" name="telefone" readonly>
 
-             <label for="" class="titulo">Nome Completo:</label><input type="text" name="nome" id="nome" required/>
-            <label for="" class="titulo">Data de Nascimento:</label><input type="date" name="dt_nascimento" id="dt_Nascimento" required/>
-            <label for="" class="titulo">Endereço:</label><input type="text" name="endereco" id="endereco" placeholder="Rua/ Avenida/ Viela" required/>
+            <label for="nome" class="titulo">Nome Completo:</label>
+            <input type="text" name="nome" id="nome" required/>
+
+            <label for="dt_nascimento" class="titulo">Data de Nascimento:</label>
+            <input type="date" name="dt_nascimento" id="dt_Nascimento" required/>
+
+            <label for="endereco" class="titulo">Endereço:</label>
+            <input type="text" name="endereco" id="endereco" placeholder="Rua/ Avenida/ Viela" required/>
+
             <div class="conteiner-quadra-lote">
-            <div class="form qd-lt">
-                <label for="" class="titulo">Quadra:</label><input type="text" name="quadra" id="quadra" required/>
-            </div>
-            <div class="form qd-lt">
-                <label for="" class="titulo">Lote:</label><input type="text"  name="lote" id="lote" required/>
-            </div>
-            </div>
-            <label for="" class="titulo">Setor:</label><input type="text" name="setor" id="setor" required/>
-            <label for="" class="titulo">Complemento:</label><input type="text" name="complemento" id="complemento" required/>
-            <label for="" class="titulo">Cidade:</label><input type="text" name="cidade" id="cidade"  required>
-            <label for="" class="titulo">Sexo:<br></label>
-            <div class="conteiner-quadra-lote">
-            
-            <div class="masculino_feminino">
-                Masculino: <input type="radio" name="sexo" id="sexo" value="Masculino">
-            </div>
-            <div class="masculino_feminino">
-                Feminino: <input type="radio" name="sexo" id="sexo" value="Feminino">
-            </div>
-            </div>
-            <div class="checkbox">
-                <input type="checkbox" name="" id="sorteio" class="check">Li e aceito os &nbsp<a href="TermoSorteio.html" class="link" target="_blank"> 
-                     Termos do Sorteio</a>
+                <div class="form qd-lt">
+                    <label for="quadra" class="titulo">Quadra:</label>
+                    <input type="text" name="quadra" id="quadra" required/>
                 </div>
+                <div class="form qd-lt">
+                    <label for="lote" class="titulo">Lote:</label>
+                    <input type="text" name="lote" id="lote" required/>
+                </div>
+            </div>
+
+            <label for="setor" class="titulo">Setor:</label>
+            <input type="text" name="setor" id="setor" required/>
+
+            <label for="complemento" class="titulo">Complemento:</label>
+            <input type="text" name="complemento" id="complemento" required/>
+
+            <label for="cidade" class="titulo">Cidade:</label>
+            <input type="text" name="cidade" id="cidade" required>
+
+            <label for="sexo" class="titulo">Sexo:<br></label>
+            <div class="conteiner-quadra-lote">
+                <div class="masculino_feminino">
+                    <span>Masculino:</span>
+                    <input type="radio" name="sexo" id="sexo_masculino" value="Masculino">
+                </div>
+                <div class="masculino_feminino">
+                    <span>Feminino:</span>
+                    <input type="radio" name="sexo" id="sexo_feminino" value="Feminino">
+                </div>
+            </div>
+
+            <div class="checkbox">
+                <input type="checkbox" name="termoSorteio" id="sorteio" class="check" value="1">
+                Li e aceito os &nbsp;<a href="TermoSorteio.html" class="link" target="_blank">Termos do Sorteio</a>
+            </div>
+            <span id="error"></span>
             <button type="submit">Finalizar</button>
-            
         </form>
         <div class="footer">
             <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const telefone = urlParams.get('telefone');
+            document.getElementById('telefoneCadastro').value = telefone;
+
+            // Opcional: Limpar campos se o cadastro falhar e voltar
+            if (urlParams.has('telefone')) {
+                document.getElementById('nome').value = '';
+                document.getElementById('dt_Nascimento').value = '';
+                document.getElementById('endereco').value = '';
+                document.getElementById('quadra').value = '';
+                document.getElementById('lote').value = '';
+                document.getElementById('setor').value = '';
+                document.getElementById('complemento').value = '';
+                document.getElementById('cidade').value = '';
+                document.getElementById('sexo_masculino').checked = false;
+                document.getElementById('sexo_feminino').checked = false;
+                document.getElementById('sorteio').checked = false;
+            }
+        });
+    </script>
 </body>
 </html>

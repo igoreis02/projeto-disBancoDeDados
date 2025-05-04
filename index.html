@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Souza Gás e Água</title>
 </head>
-
 <body>
     <div class="background"></div>
     <div class="card">
-        <img class="logo" src="imagens/logo.png" alt="Logo" />
-        <h2 class="titulo-1">Sorteio</h2>
-        <img class="imagem" src="imagens/boneco.png" alt="">
-
-        <form class="form" id="formulario">
-            <label class="titulo-label">Faça seu cadastro:</label>
-            <input type="telefone" name="telefone" id="telefone" placeholder="Telefone" required />
-            <input id="hidden" type="senha" name="senha" id="senha" placeholder="Senha" required />
-
-            <div class="checkbox">
-                <input type="checkbox" name="" id="privacidade" class="check">Li e aceito a &nbsp
-                <a href="TermoPrivacidade.html" class="link" target="_blank">
-                    politica de privacidade</a>
-            </div>
-            <button class="botao" id="pesquisaTelefone">Próximo</button>
-        </form>
-        <div class="footer">
-            <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
-        </div>
+    <img class="logo" src="imagens/logo.png" alt="Logo" />
+    <h2 class="titulo-1">Sorteio</h2>
+    <img class="imagem" src="imagens/boneco.png" alt="">
+   
+    <form class="form" id="formulario">
+    <label class="titulo-label" for="telefone">Faça seu cadastro:</label>
+    <input type="tel" name="telefone" id="telefone" placeholder="Telefone" required />
+    <input id="hidden" type="password" name="senha" placeholder="Senha"/>
+    <div class="checkbox">
+    <input type="checkbox" id="privacidade" class="check">
+    <label for="privacidade">Li e aceito a &nbsp;<a href="TermoPrivacidade.html" class="link"
+      target="_blank">política de privacidade</a></label>
+    </div>
+    <button class="botao" type="submit" id="pesquisaTelefone">Próximo</button>
+    </form>
+    <div id="mensagem"></div>
+    <div class="footer">
+    <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
     </div>
     <script src="script.js"></script>
 </body>
-
 </html>
