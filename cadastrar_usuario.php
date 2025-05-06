@@ -7,7 +7,7 @@ $dbname = "cadastro";
 $min = 100;
 $max = 10000;
 
-// Cria uma nova conexão mysqli
+// nova conexão mysqli
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verifica a conexão
@@ -81,14 +81,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt_cliente->bind_param("sssssssssss", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $termoSorteio);
 
     if ($stmt_cliente->execute()) {
-        $stmt_sorteio = $conn->prepare("INSERT INTO sorteio (numeroSorteado, id_cliente) VALUES (?, ?)"); // Added cliente_id
-        $cliente_id = $conn->insert_id; // Get the last inserted ID
-        $stmt_sorteio->bind_param("ii", $numeroUnico, $cliente_id); // Bind the customer ID
+        $stmt_sorteio = $conn->prepare("INSERT INTO sorteio (numeroSorteado, id_cliente) VALUES (?, ?)");   // Prepara a inserção no sorteio
+        $cliente_id = $conn->insert_id;     // Obtém o ID do cliente inserido
+        $stmt_sorteio->bind_param("ii", $numeroUnico, $cliente_id);     // Usa o ID do cliente inserido
 
         if ($stmt_sorteio->execute()) {
             // Redireciona para sorteado.html com os dados
             header("Location: sorteio.html?nome=" . urlencode($nome) . "&numeroSorteado=" . $numeroUnico);
-            exit; // Certifique-se de sair após o redirecionamento
+            exit; // sai após o redirecionamento
         } else {
             // Se houver erro ao inserir no sorteio, exclui o cadastro do cliente (rollback)
             $conn->query("DELETE FROM clientes WHERE id = $cliente_id");
@@ -101,23 +101,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<p style='font-family: sans-serif; text-align: center;'><a href='cadastro.html?telefone=" . $telefone . "'>Voltar ao formulário de cadastro</a></p>";
     }
 
-    // Fecha as statements
+    // Fecha as declarações
     $stmt_cliente->close();
 }
 
 function sortearNumeroUnico($conn, $min, $max) {
-    $numero = rand($min, $max);
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM sorteio WHERE numeroSorteado = ?");
-    $stmt->bind_param("i", $numero);
-    $stmt->execute();
-    $stmt->bind_result($count);
-    $stmt->fetch();
-    $stmt->close();
+    // Gera um número aleatório entre $min e $max
+    // Verifica se o número já foi sorteado
+    // Se já foi, gera outro número até encontrar um que não tenha sido sorteado
+    // Retorna o número sorteado
+    while (true) {
+        $numero = rand($min, $max);
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM sorteio WHERE numeroSorteado = ?");
+        $stmt->bind_param("i", $numero);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
 
-    if ($count > 0) {
-        return sortearNumeroUnico($conn, $min, $max);
-    } else {
-        return $numero;
+        if ($count == 0) {
+            return $numero;
+        }
     }
 }
 

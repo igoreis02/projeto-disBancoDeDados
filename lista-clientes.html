@@ -6,24 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Clientes</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
-    <style>
-        .edit-btn,
-        .delete-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .edit-btn {
-            color: var(--cor-principal);
-        }
-
-        .delete-btn {
-            color: #ff0000;
-        }
-    </style>
 </head>
 
 <body>
@@ -45,17 +27,52 @@
                         <th>Cidade</th>
                         <th>Sexo</th>
                         <th>Termo Sorteio</th>
-                        <th>Ações</th> </tr>
+                        <th>Número Sorteado</th>
+                        <th>Ações</th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
         </div>
-        
+        <a href="index.html" class="voltar-btn">Voltar</a>
     </div>
     <div class="footer">
         <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
     </div>
+
+    <div id="editModal" class="modal">
+        <div class="card">
+            <span class="close">&times;</span>
+            <h2>Editar Cliente</h2>
+            <form id="editForm" class="form">
+                <input type="hidden" id="editId">
+                <label for="editTelefone">Telefone:</label><input type="text" id="editTelefone" name="editTelefone"><br>
+                <label for="editNome">Nome:</label><input type="text" id="editNome" name="editNome"><br>
+                <label for="editDt_nascimento">Data de Nascimento:</label><input type="date" id="editDt_nascimento"
+                    name="editDt_nascimento"><br>
+                <label for="editEndereco">Endereço:</label><input type="text" id="editEndereco" name="editEndereco"><br>
+                <label for="editQuadra">Quadra:</label><input type="text" id="editQuadra" name="editQuadra"><br>
+                <label for="editLote">Lote:</label><input type="text" id="editLote" name="editLote"><br>
+                <label for="editSetor">Setor:</label><input type="text" id="editSetor" name="editSetor"><br>
+                <label for="editComplemento">Complemento:</label><input type="text" id="editComplemento"
+                    name="editComplemento"><br>
+                <label for="editCidade">Cidade:</label><input type="text" id="editCidade" name="editCidade"><br>
+                <label for="editSexo">Sexo:</label>
+                <select id="editSexo" name="editSexo">
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                </select><br>
+                <label for="editTermoSorteio">Termo Sorteio:</label>
+                <select id="editTermoSorteio" name="editTermoSorteio">
+                    <option value="1">Sim</option>
+                    <option value="0">Não</option>
+                </select><br>
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+    </div>
+
     <script src="js/listar.js"></script>
 </body>
 

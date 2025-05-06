@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500&display=swap');
 
-:root{
-    --font-family:"Montserrat", sans-serif;
+:root {
+    --font-family: "Montserrat", sans-serif;
     --cor-principal: #4c8479;
     --cor-secundaria: #2b5f56;
-    --cor-titulo:#eb9f25;
+    --cor-titulo: #eb9f25;
 }
 
-body{
+body {
     display: grid;
     place-items: center;
     gap: 30px;
@@ -18,42 +18,44 @@ body{
     font-family: var(--font-family);
 }
 
-@media(width >= 500px){
-    body{padding: 0;}
+@media (width >= 500px) {
+    body {
+        padding: 0;
+    }
 
-    .card{
+    .card {
         margin: 0;
         width: 360px;
     }
 }
 
-.background{
+.background {
     position: fixed;
     top: -50vmin;
     left: -50vmin;
     width: 100vmin;
     height: 100vmin;
-    border-radius: 
-    47% 53% 61% 39% /
-    45% 51% 49% 55%;
+    border-radius:
+        47% 53% 61% 39% /
+        45% 51% 49% 55%;
     background: var(--cor-secundaria);
 }
 
-.card{
+.card {
     overflow: hidden;
     position: relative;
     z-index: 3;
-    margin:2% 22px;
-    padding: 140px 65px 50px ;
+    margin: 2% 22px;
+    padding: 140px 65px 50px;
     border-radius: 24px;
     background: #ffffff;
     text-align: center;
     box-shadow: 0 100px 100px
-                rgb(0 0 0 / 10%);
+        rgb(0 0 0 / 10%);
     color: var(--cor-principal);
 }
 
-.card::before{
+.card::before {
     content: "";
     position: absolute;
     top: -880px;
@@ -65,7 +67,7 @@ body{
     background: var(--cor-principal);
 }
 
-.background::after{
+.background::after {
     content: "";
     position: inherit;
     right: -50vmin;
@@ -75,67 +77,69 @@ body{
     border-radius: inherit;
     background: var(--cor-secundaria);
 }
-.card.logo{
+
+.card.logo {
     position: absolute;
     left: 50%;
     translate: -50% 0;
     width: 64px;
     height: 64px;
 }
-.logo{
+
+.logo {
     width: 40%;
     position: absolute;
     top: 15px;
     left: 50%;
     translate: -50% 0;
-    
+
 }
 
-.imagem{
+.imagem {
     width: 35%;
 }
 
 
-.titulo-2{
+.titulo-2 {
     padding: 0;
 }
 
-.titulo{
+.titulo {
     padding-left: 16px;
 }
 
-.checkbox{
+.checkbox {
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--cor-principal);
 }
 
-.check{
+.check {
     height: 0px;
 
 }
 
-button{
+button {
     color: var(--cor-principal);
 }
 
 
-
-.card > h2{
+.card>h2 {
     font-size: 35px;
     font-weight: 800;
     margin: 20px 0 20px;
     color: var(--cor-titulo);
 }
 
-.form{
+.form {
     border: 0;
     margin: 10px 0 0px;
-    display: grid; 
-    gap: 15px; 
+    display: grid;
+    gap: 15px;
     justify-content: center;
 }
+
 .conteiner-quadra-lote {
     display: flex;
     justify-content: center;
@@ -143,48 +147,51 @@ button{
     gap: 10px;
 }
 
-.masculino_feminino{
+.masculino_feminino {
     display: flex;
     align-items: center;
-    
+
 }
-.titulo{
+
+.titulo {
     text-align: left;
 }
 
-.form
-:is(input,button){
+.form :is(input, button) {
     height: 56px;
     border-radius: 28px;
     font-size: 16px;
     font-family: var(--font-family);
 }
 
-.form > input {
+.form>input {
     border: 0;
     padding: 0 15px;
     color: var(--cor-principal);
     background: #ededed;
-    border-radius: 8px; /* Adicionado para consistência visual */
+    border-radius: 8px;
+    /* Adicionado para consistência visual */
     font-size: 16px;
 }
 
-#hidden{
-  display: none;
+#hidden {
+    display: none;
 }
 
-.form > input::placeholder{
+.form>input::placeholder {
     color: var(--cor-principal);
-    opacity: 0.7; /* Melhor visibilidade do placeholder */
+    opacity: 0.7;
+    /* Melhor visibilidade do placeholder */
 }
 
-.form > h1{
-    margin: 0.6em 0 0 ;
-    font-size: 24px; /* Ajuste de tamanho para maior destaque */
+.form>h1 {
+    margin: 0.6em 0 0;
+    font-size: 24px;
+    /* Ajuste de tamanho para maior destaque */
     color: var(--cor-titulo);
 }
 
-.form > p{
+.form>p {
     display: flex;
     margin: 0;
     justify-content: center;
@@ -192,28 +199,33 @@ button{
     color: var(--cor-principal);
 }
 
-.paragrafo{
+.paragrafo {
     font-size: 15px;
     margin: 0;
     font-weight: 800;
 }
-.sorteio{
+
+.sorteio {
     width: 55%;
     margin: 0 25%;
     gap: 9px;
 }
-.confirmacao_numero{
+
+.confirmacao_numero {
     display: grid;
     margin: 20px;
     font-weight: 800;
 }
-#numeroSorteado{
+
+#numeroSorteado {
     color: var(--cor-titulo);
 }
-.botao_Voltar{
+
+.botao_Voltar {
     width: 25px;
 }
-.form > button{
+
+.form>button {
     border: 0;
     color: #f9f9f9;
     background: var(--cor-principal);
@@ -222,36 +234,37 @@ button{
     font-weight: 500;
     cursor: pointer;
 }
-button{
+
+button {
     height: 56px;
     border-radius: 10px;
     font-size: 16px;
     font-family: inherit;
     color: #f9f9f9;
-    background:var(--cor-principal);
+    background: var(--cor-principal);
     border: 0;
     margin: 10px;
     cursor: pointer;
 }
 
-.botao{
+.botao {
     margin: 40px 0;
 }
 
-.card > footer{
+.card>footer {
     color: #a1a1a1;
     padding: 10px;
 }
 
-a:link{
+a:link {
     color: var(--cor-principal);
     font-weight: 600;
 }
-a:visited{
-    color: var(--cor-principal);
-     font-weight: 600;
-}
 
+a:visited {
+    color: var(--cor-principal);
+    font-weight: 600;
+}
 
 .container {
     max-width: 1200px;
@@ -261,7 +274,8 @@ a:visited{
     border-radius: 8px;
     overflow: hidden;
 }
-.tamanho-tabela{
+
+.tamanho-tabela {
     width: 75%;
     margin: 20px auto;
     padding: auto;
@@ -269,7 +283,7 @@ a:visited{
     overflow: hidden;
 }
 
-.titulo-tabela{
+.titulo-tabela {
     text-align: center;
     font-size: 24px;
     color: var(--cor-titulo);
@@ -277,20 +291,25 @@ a:visited{
 }
 
 .table-container {
-    overflow-x: auto; /* Adiciona barra de rolagem horizontal em telas pequenas */
+    overflow-x: auto;
+    /* Adiciona barra de rolagem horizontal em telas pequenas */
 }
 
 table {
-    width: 100%; /* Garante que a tabela ocupa 100% do container */
+    width: 100%;
+    /* Garante que a tabela ocupa 100% do container */
     border-collapse: collapse;
-    margin: 10px 0; /* Adicionei um pouco de margem para espaçamento */
+    margin: 10px 0;
+    /* Adicionei um pouco de margem para espaçamento */
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
-    white-space: nowrap; /* Impede que o texto quebre a linha */
+    white-space: nowrap;
+    /* Impede que o texto quebre a linha */
 }
 
 th {
@@ -306,6 +325,21 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
+.voltar-btn {
+    display: inline-block;
+    margin-top: 50px;
+    bottom: 20px;
+    left: 20px;
+    background-color: var(--cor-titulo);
+    color: var(--cor-titulo);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+}
+
+
 /* Estilos para telas menores */
 @media screen and (max-width: 600px) {
     table {
@@ -314,7 +348,8 @@ tr:hover {
 
     table thead {
         border: none;
-        clip: rect(0 0 0 0); /* Esconde o cabeçalho */
+        clip: rect(0 0 0 0);
+        /* Esconde o cabeçalho */
         height: 1px;
         margin: -1px;
         overflow: hidden;
@@ -347,4 +382,43 @@ tr:hover {
         left: 6px;
         font-weight: bold;
     }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

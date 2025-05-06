@@ -4,7 +4,6 @@ const telefoneInput = document.getElementById('telefone');
 const senhaInput = document.getElementById('hidden');
 const pesquisaTelefoneButton = document.getElementById('pesquisaTelefone');
 const termoPrivacidade = document.getElementById('termoPrivacidade');
-const privacidade = document.getElementById('privacidade').checked;
 
 telefoneInput.addEventListener('input', function () {
     if (telefoneInput.value === '62993997054') {
@@ -19,7 +18,7 @@ telefoneInput.addEventListener('input', function () {
 verificarForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const telefone = telefoneInput.value;
-    
+    const privacidade = document.getElementById('privacidade').checked;
 
     if (!privacidade) {
         mensagemDiv.textContent = 'Aceite os termos de privacidade.';
