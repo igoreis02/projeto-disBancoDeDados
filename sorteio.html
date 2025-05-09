@@ -25,7 +25,7 @@
                 Até breve.</p>
             <button class="botao">Data dos sorteios</button>
             <div>
-                <a href="index.html"><img class="botao_Voltar" src="imagens/botao_volta.png" alt=""></a>
+                <a href="index.html" class="">Volta para o inicio</a>
             </div>
         </div>
     </div>
@@ -34,7 +34,8 @@
     </div>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const nome = urlParams.get('nome');
+        const nome = urlParams.get('nome').toLocaleUpperCase(); 
+        const primeiroNome = nome ? nome.split(' ')[0] : 'Cliente'; // Obtém o primeiro nome
         const numeroSorteado = urlParams.get('numeroSorteado');
         
         // Verifica se os parâmetros estão presentes na URL
@@ -42,8 +43,20 @@
             alert('Parâmetros inválidos!');
             window.location.href = 'index.html'; // Redireciona para a página inicial
         }
-        document.getElementById('nomeCadastrado').textContent = nome;
-        document.getElementById('numeroSorteado').textContent = numeroSorteado;
+        // Atualizado para exibir o primeiro nome
+        document.getElementById('nomeCadastrado').textContent = primeiroNome; 
+        // Atualiza o conteúdo do elemento com o número sorteado
+        document.getElementById('numeroSorteado').textContent = numeroSorteado; // Atualizado para exibir o número sorteado
+        // Adiciona um evento ao botão para mostrar a data dos sorteios
+        document.querySelector('.botao').addEventListener('click', function() {
+            alert('A data dos sorteios será divulgada em breve!');
+        });
+        // Atualiza o conteúdo do elemento com o número sorteado
+        document.getElementById('numeroSorteado').textContent = numeroSorteado; // Atualizado para exibir o número sorteado
+        // Adiciona um evento ao botão para redirecionar para a página inicial
+        document.querySelector('.botao_Voltar').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
     </script>
 </body>
 

@@ -3,16 +3,36 @@ const mensagemDiv = document.getElementById('mensagem');
 const telefoneInput = document.getElementById('telefone');
 const senhaInput = document.getElementById('hidden');
 const pesquisaTelefoneButton = document.getElementById('pesquisaTelefone');
+const botaoVoltar = document.getElementsByClassName('voltar-inicio')
 const termoPrivacidade = document.getElementById('termoPrivacidade');
 
 telefoneInput.addEventListener('input', function () {
-    if (telefoneInput.value === '62993997054') {
-        senhaInput.style.display = 'block';
-        termoPrivacidade.style.display = 'none';''
-        pesquisaTelefoneButton.textContent = 'Entrar';
-    } else {
-        pesquisaTelefoneButton.textContent = 'Próximo';
-    }
+    const telefoneDigitado = telefoneInput.value;
+
+    fetch('verificar_telefone-usuario.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `telefone=${telefoneDigitado}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.existe) {
+            senhaInput.style.display = 'block';
+            termoPrivacidade.style.display = 'none';
+            pesquisaTelefoneButton.textContent = 'Entrar';
+        } else {
+            senhaInput.style.display = 'none';
+            termoPrivacidade.style.display = 'block';
+            pesquisaTelefoneButton.textContent = 'Próximo';
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        mensagemDiv.textContent = 'Erro ao verificar o telefone.';
+        mensagemDiv.style.color = 'red';
+    });
 });
 
 verificarForm.addEventListener('submit', function (event) {
@@ -42,7 +62,7 @@ verificarForm.addEventListener('submit', function (event) {
         return;
     }
 
-    if (telefone === '62993997054' && senhaInput.style.display === 'block') {
+    if (senhaInput.style.display === 'block') {
         const senha = senhaInput.value;
         if (senha === '') {
             mensagemDiv.textContent = 'Por favor, insira a senha.';
@@ -71,6 +91,8 @@ verificarForm.addEventListener('submit', function (event) {
             mensagemDiv.textContent = 'Erro ao verificar a senha.';
             mensagemDiv.style.color = 'red';
         });
+        //criar botao voltar
+        
     } else {
         fetch('verificar_telefone.php', {
             method: 'POST',

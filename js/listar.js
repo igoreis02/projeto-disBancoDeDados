@@ -43,14 +43,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => console.error('Erro ao buscar clientes:', error));
-
-    // Get the modal
+    
+    
     var modal = document.getElementById("editModal");
 
     // Get the <span> element that closes the modal
     var span = document.getElementsByClassName("close")[0];
 
-    // When the user clicks on <span> (x), close the modal
+
     span.onclick = function() {
         modal.style.display = "none";
     }

@@ -74,4 +74,5 @@ document.addEventListener('DOMContentLoaded', function () {
             formularioCadastro.submit(); // Envia o formulário se tudo estiver válido
         }
     });
+
 });

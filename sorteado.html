@@ -18,7 +18,7 @@
         <div class="sorteio form">
             <h1>Olá, <span id="nomeCadastrado"></span></h1>
             <div class="confirmacao_numero">
-                <p>Você já está participando do nosso sorteio!</p>
+                <p class="paragrafo-sorteio">Você já está participando do nosso sorteio!</p>
                 <p class="paragrafo">Seu número da sorte é:</p>
                 <span  id="numeroSorteado"></span>
             </div>
@@ -26,7 +26,7 @@
                 Até breve.</p>
             <button class="botao">Data dos sorteios</button>
             <div>
-                <a href="index.html"><img class="botao_Voltar" src="imagens/botao_volta.png" alt=""></a>
+                <a href="index.html" class="">Volta para o inicio</a>
             </div>
         </div>
     </div>
@@ -45,16 +45,23 @@
         }
 
         // Exibir nome e número do sorteio
-        const nome = getParameterByName('nome');
+        const nome = getParameterByName('nome').toLocaleUpperCase();
+        const primeiroNome = nome ? nome.split(' ')[0] : 'Cliente';    
         const numeroSorteado = getParameterByName('numeroSorteado');
 
         if (nome) {
-            document.getElementById('nomeCadastrado').textContent = nome;
+            document.getElementById('nomeCadastrado').textContent = primeiroNome; // Atualizado para exibir o primeiro nome
         }
 
         if (numeroSorteado) {
             document.getElementById('numeroSorteado').textContent = numeroSorteado;
-        }
+        }   
+        
+        // Adiciona um evento ao botão para mostrar a data dos sorteios
+        document.querySelector('.botao').addEventListener('click', function() {
+            alert('A data dos sorteios será divulgada em breve!');
+        });      
+
     </script>
 </body>
 

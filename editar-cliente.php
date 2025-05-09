@@ -11,6 +11,7 @@ if ($conn->connect_error) {
 }
  
 // Verifica se o ID foi enviado via POST
+
 if (isset($_POST['id'])) {
     $id = $_POST['id'];
     $telefone = $_POST['telefone'];
