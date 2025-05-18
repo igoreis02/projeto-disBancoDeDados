@@ -47,22 +47,49 @@
             <h2>Editar Cliente</h2>
             <form id="editForm" class="form">
                 <input type="hidden" id="editId">
-                <label for="editTelefone">Telefone:</label><input type="text" id="editTelefone" name="editTelefone"><br>
-                <label for="editNome">Nome:</label><input type="text" id="editNome" name="editNome"><br>
+
+                <label for="editTelefone">Telefone:</label><input type="text" id="editTelefone" name="editTelefone">
+
+                <label for="editNome">Nome:</label><input type="text" id="editNome" name="editNome">
+
+
                 <label for="editDt_nascimento">Data de Nascimento:</label><input type="date" id="editDt_nascimento"
-                    name="editDt_nascimento"><br>
-                <label for="editEndereco">Endereço:</label><input type="text" id="editEndereco" name="editEndereco"><br>
-                <label for="editQuadra">Quadra:</label><input type="text" id="editQuadra" name="editQuadra"><br>
-                <label for="editLote">Lote:</label><input type="text" id="editLote" name="editLote"><br>
-                <label for="editSetor">Setor:</label><input type="text" id="editSetor" name="editSetor"><br>
+                    name="editDt_nascimento">
+
+                <label for="editEndereco">Endereço:</label><input type="text" id="editEndereco" name="editEndereco">
+
+                <div class="conteiner-quadra-lote">
+                    <div class="form qd-lt">
+                        <label for="editQuadra">Quadra:</label><input type="text" id="editQuadra" name="editQuadra">
+                    </div>
+                    <div class="form qd-lt">
+                        <label for="editLote">Lote:</label><input type="text" id="editLote" name="editLote">
+                    </div>
+                </div>
+
+
+
+
+                <label for="editSetor">Setor:</label><input type="text" id="editSetor" name="editSetor">
                 <label for="editComplemento">Complemento:</label><input type="text" id="editComplemento"
-                    name="editComplemento"><br>
-                <label for="editCidade">Cidade:</label><input type="text" id="editCidade" name="editCidade"><br>
+                    name="editComplemento">
+                <label for="editCidade">Cidade:</label><input type="text" id="editCidade" name="editCidade">
+
+
                 <label for="editSexo">Sexo:</label>
-                <select id="editSexo" name="editSexo">
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
-                </select><br>
+            <div class="conteiner-quadra-lote">
+                <div class="masculino_feminino">
+                    <label for="editSexo">Masculino:</label>
+                    <input type="radio" name="editSexo" id="editSexo" value="Masculino">
+                </div>
+                <div class="masculino_feminino">
+                    <label for="editSexo">Feminino:</label>
+                    <input type="radio" name="editSexo" id="editSexo" value="Feminino">
+                </div>
+            </div>
+
+                
+                
                 <label for="editTermoSorteio">Termo Sorteio:</label>
                 <select id="editTermoSorteio" name="editTermoSorteio">
                     <option value="1">Sim</option>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Endereço</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="background"></div>
+    <div class="card">
+    
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
+        <h2>Editar Endereço</h2>
+        <form class="form" action="atualizar_endereco.php" method="POST">
+            <input type="hidden" name="telefone" value="<?php echo htmlspecialchars($telefone); ?>">
+            <label class="titulo" for="nome">Nome:</label>
+            <input type="text" name="nome" id="nome" value="<?php echo htmlspecialchars($nome); ?>" readonly>
+
+            <label class="titulo" for="endereco">Endereço:</label>
+            <input type="text" name="endereco" id="endereco" value="<?php echo htmlspecialchars($endereco); ?>" required>
+
+            <div class="conteiner-quadra-lote">
+                <div class="form qd-lt">
+                    <label class="titulo" for="quadra">Quadra:</label>
+            <input type="text" name="quadra" id="quadra" value="<?php echo htmlspecialchars($quadra); ?>" required>
+                </div>
+                <div class="form qd-lt">
+                    <label class="titulo" for="lote">Lote:</label>
+                    <input type="text" name="lote" id="lote" value="<?php echo htmlspecialchars($lote); ?>" required>
+                </div>
+            </div>
+
+            <label class="titulo" for="setor">Setor:</label>
+            <input type="text" name="setor" id="setor" value="<?php echo htmlspecialchars($setor); ?>" required>
+
+            <label class="titulo" for="complemento">Complemento:</label>
+            <input type="text" name="complemento" id="complemento" value="<?php echo htmlspecialchars($complemento); ?>">
+
+            <label class="titulo" for="cidade">Cidade:</label>
+            <input type="text" name="cidade" id="cidade" value="<?php echo htmlspecialchars($cidade); ?>" required>
+
+            <button type="submit" id="atualizarEndereco">Atualizar Endereço</button>
+        </form>
+         <a href="index.html" class="">Volta para o inicio</a>
+    </div>
+    
+</body>
+</html>

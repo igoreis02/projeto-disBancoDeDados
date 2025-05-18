@@ -4,7 +4,8 @@ const telefoneInput = document.getElementById('telefone');
 const senhaInput = document.getElementById('hidden');
 const pesquisaTelefoneButton = document.getElementById('pesquisaTelefone');
 const botaoVoltar = document.getElementsByClassName('voltar-inicio')
-const termoPrivacidade = document.getElementById('termoPrivacidade');
+const privacidade = document.getElementById('privacidade');
+const privacidadeInput = document.querySelector('.checkbox');
 
 telefoneInput.addEventListener('input', function () {
     const telefoneDigitado = telefoneInput.value;
@@ -20,11 +21,12 @@ telefoneInput.addEventListener('input', function () {
     .then(data => {
         if (data.existe) {
             senhaInput.style.display = 'block';
-            termoPrivacidade.style.display = 'none';
+            privacidadeInput.style.display = 'none';
+            privacidade.checked = true; // Marcar o checkbox
             pesquisaTelefoneButton.textContent = 'Entrar';
         } else {
             senhaInput.style.display = 'none';
-            termoPrivacidade.style.display = 'block';
+            privacidadeInput.style.display = 'block';
             pesquisaTelefoneButton.textContent = 'Próximo';
         }
     })
@@ -104,8 +106,8 @@ verificarForm.addEventListener('submit', function (event) {
             .then(response => response.json())
             .then(data => {
                 if (data.existe) {
-                    // Redireciona para sorteado.html com nome e numeroSorteado
-                    window.location.href = `sorteado.html?nome=${encodeURIComponent(data.nome)}&numeroSorteado=${encodeURIComponent(data.numeroSorteado)}`;
+                  // Redireciona para confirmar_endereco.php com os dados do usuário
+                    window.location.href = `confirmar_endereco.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}&endereco=${encodeURIComponent(data.endereco)}&quadra=${encodeURIComponent(data.quadra)}&lote=${encodeURIComponent(data.lote)}&setor=${encodeURIComponent(data.setor)}&complemento=${encodeURIComponent(data.complemento)}&cidade=${encodeURIComponent(data.cidade)}`;
                 } else {
                     window.location.href = `cadastro.html?telefone=${telefone}`;
                 }
@@ -117,3 +119,4 @@ verificarForm.addEventListener('submit', function (event) {
             });
     }
 });
+

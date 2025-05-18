@@ -45,7 +45,7 @@ body {
     overflow: hidden;
     position: relative;
     z-index: 3;
-    margin: 2% 22px;
+    margin: 0.5% 20px;
     padding: 140px 65px 50px;
     border-radius: 24px;
     background: #ffffff;
@@ -58,7 +58,7 @@ body {
 .card::before {
     content: "";
     position: absolute;
-    top: -880px;
+    top: -900px;
     left: 50%;
     translate: -50% 20px;
     width: 1000px;
@@ -104,9 +104,7 @@ body {
     padding: 0;
 }
 
-.titulo {
-    padding-left: 16px;
-}
+
 
 .checkbox {
     display: flex;
@@ -160,8 +158,9 @@ button {
 .form :is(input, button) {
     height: 56px;
     border-radius: 28px;
-    font-size: 16px;
+    font-size: 10px;
     font-family: var(--font-family);
+    
 }
 
 .form>input {
@@ -171,7 +170,11 @@ button {
     background: #ededed;
     border-radius: 8px;
     /* Adicionado para consistência visual */
-    font-size: 16px;
+    font-size: 10px;
+}
+
+label {
+    font-weight: bold;
 }
 
 #hidden {
@@ -248,7 +251,7 @@ button {
 }
 
 .botao {
-    margin: 40px 0;
+    margin: 15px 0;
 }
 
 .card>footer {
@@ -422,3 +425,4 @@ tr:hover {
     text-decoration: none;
     cursor: pointer;
 }
+

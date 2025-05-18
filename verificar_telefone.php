@@ -4,36 +4,28 @@ $username = "root";
 $password = "";
 $dbname = "cadastro";
 
-try {
-    $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Erro na conexão: " . $conn->connect_error);
 }
 
-if (isset($_POST['telefone'])) {
-    $telefone = $_POST['telefone'];
+$telefone = $_POST['telefone'];
 
-    // Verificar se o telefone existe na tabela clientes
-    $stmt_clientes = $pdo->prepare("SELECT id, nome FROM clientes WHERE telefone = ?");
-    $stmt_clientes->execute([$telefone]);
-    $cliente = $stmt_clientes->fetch(PDO::FETCH_ASSOC);
+$sql = "SELECT nome, endereco, quadra, lote, setor, complemento, cidade FROM clientes WHERE telefone = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $telefone);
+$stmt->execute();
+$stmt->store_result();
 
-    if ($cliente) {
-        // Se o cliente existe, buscar o número do sorteio
-        $stmt_sorteio = $pdo->prepare("SELECT numeroSorteado FROM sorteio WHERE id_cliente = ?");
-        $stmt_sorteio->execute([$cliente['id']]);
-        $sorteio = $stmt_sorteio->fetch(PDO::FETCH_ASSOC);
-
-        $response = array(
-            'existe' => true,
-            'nome' => $cliente['nome'],
-            'numeroSorteado' => $sorteio ? $sorteio['numeroSorteado'] : null // Verifica se há número sorteado
-        );
-    } else {
-        $response = array('existe' => false);
-    }
-
-    echo json_encode($response);
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($nome, $endereco, $quadra, $lote, $setor, $complemento, $cidade);
+    $stmt->fetch();
+    echo json_encode(['existe' => true, 'nome' => $nome, 'endereco' => $endereco, 'quadra' => $quadra, 'lote' => $lote, 'setor' => $setor, 'complemento' => $complemento, 'cidade' => $cidade]);
+} else {
+    echo json_encode(['existe' => false]);
 }
+
+$stmt->close();
+$conn->close();
 ?>

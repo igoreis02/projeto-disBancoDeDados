@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Endereço</title>
+    <link rel="stylesheet" href="css/style.css">  
+</head>
+<body>
+    <div class="background"></div>
+    <div class="card">
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
+        <h2>Confirme seu Endereço</h2>
+        <p><strong>Nome:</strong> <?php echo htmlspecialchars($nome); ?></p>
+        <p><strong>Endereço:</strong> <?php echo htmlspecialchars($endereco); ?></p>
+        <p><strong>Quadra:</strong> <?php echo htmlspecialchars($quadra); ?></p>
+        <p><strong>Lote:</strong> <?php echo htmlspecialchars($lote); ?></p>
+        <p><strong>Setor:</strong> <?php echo htmlspecialchars($setor); ?></p>
+        <p><strong>Complemento:</strong> <?php echo htmlspecialchars($complemento); ?></p>
+        <p><strong>Cidade:</strong> <?php echo htmlspecialchars($cidade); ?></p>
+
+        <div class="form-buttons">
+            <form action="editar_endereco.php" method="GET">
+                <input type="hidden" name="telefone" value="<?php echo htmlspecialchars($telefone); ?>">
+                <button type="submit">Editar Endereço</button>
+            </form>
+            <form action="pedido.php" method="GET">
+                <button type="submit">Confirmar Endereço</button>
+            </form>
+        </div>
+         <a href="index.html" class="">Volta para o inicio</a>
+    </div>
+</body>
+</html>
