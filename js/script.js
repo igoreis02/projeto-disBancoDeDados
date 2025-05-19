@@ -82,7 +82,7 @@ verificarForm.addEventListener('submit', function (event) {
         .then(response => response.json())
         .then(data => {
             if (data.senhaCorreta) {
-                window.location.href = 'lista-clientes.html'; // Redirecionar para a lista
+                window.location.href = 'menu.html'; // Redirecionar para o menu
             } else {
                 mensagemDiv.textContent = 'Senha incorreta.';
                 mensagemDiv.style.color = 'red';

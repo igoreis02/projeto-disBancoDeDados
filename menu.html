@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Menu</title>
+    <style>
+        .menu-buttons {
+            display: flex;
+            justify-content: space-between;
+            /* Espalha os botões horizontalmente */
+            align-items: center;
+            /* Alinha os botões verticalmente */
+            width: 100%;
+            /* Garante que ocupa a largura total do card */
+        }
+
+        .menu-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            /* Adicionei um border-radius para combinar com o estilo */
+            background-color: #f0f0f0;
+            /* Um fundo cinza claro */
+            color: #333;
+            /* Texto um pouco mais escuro */
+        }
+
+        .menu-button:hover {
+            background-color: #e0e0e0;
+            /* Escurece um pouco no hover */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="card">
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
+        <h2>Menu Principal</h2>
+        <div class="menu-buttons">
+            <button class="menu-button" id="clientes">Clientes</button>
+            <button class="menu-button" id="produtos">Produtos</button>
+        </div>
+        <a href="index.html" class="voltar-btn">Voltar</a>
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+    <script>
+        document.getElementById('clientes').addEventListener('click', function() {
+            //  Redirecionar para a página de clientes
+            window.location.href = 'lista-clientes.html'; //  Mude para o caminho correto
+        });
+
+        document.getElementById('produtos').addEventListener('click', function() {
+            //  Redirecionar para a página de produtos
+            window.location.href = 'lista-produto.html'; //  Mude para o caminho correto
+        });
+    </script>
+</body>
+
+</html>
