@@ -11,23 +11,20 @@
     <div class="background"></div>
     <div class="card tamanho-tabela">
         <h1 class="titulo-tabela">Realizar Pedido</h1>
-        
-        <!-- Spring Slider Container -->
+
         <div class="spring-slider-container">
             <div class="spring-slider">
                 <button class="slider-btn prev-btn">&lt;</button>
-                
+
                 <div class="slider-track" id="productSliderTrack">
-                    <!-- Produtos serão inseridos aqui via JavaScript -->
-                </div>
-                
+                    </div>
+
                 <button class="slider-btn next-btn">&gt;</button>
             </div>
-            
-            <!-- Indicadores do slider -->
+
             <div class="slider-dots" id="sliderDots"></div>
         </div>
-        
+
         <div id="total-pedido">Total do Pedido: R$ 0.00</div>
         <div class="payment-options">
             <h3>Selecione a Forma de Pagamento:</h3>
@@ -35,11 +32,17 @@
             <label><input type="radio" name="payment" value="debito" required>Cartão de Débito</label>
             <label><input type="radio" name="payment" value="credito" required>Cartão de Crédito</label>
             <label><input type="radio" name="payment" value="pix" required>Pix</label>
+
+            <div id="troco-field" style="display: none; margin-top: 15px;">
+                <label for="valor-pago">Valor Pago (para troco):</label>
+                <input type="number" id="valor-pago" step="0.01" min="0" placeholder="R$ 0.00">
+                <p id="valor-troco">Troco: R$ 0.00</p>
+            </div>
         </div>
         <button id="confirmarPedido">Confirmar Pedido</button>
         <a href="index.html" class="voltar-btn">Voltar</a>
     </div>
 
-    <script src="js/slider.js"></script>
+    <script src="js/pedido.js"></script>
 </body>
 </html>

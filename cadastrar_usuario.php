@@ -74,12 +74,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Sorteia um número único
-    $numeroUnico = sortearNumeroUnico($conn, $min, $max);
+    //$numeroUnico = sortearNumeroUnico($conn, $min, $max);
 
     // Insere os dados do cliente
     $stmt_cliente = $conn->prepare("INSERT INTO clientes (telefone, nome, dt_nascimento, endereco, quadra, lote, setor, complemento, cidade, sexo, termoSorteio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt_cliente->bind_param("sssssssssss", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $termoSorteio);
-
+    $stmt_cliente->execute();
+    // Verifica se a inserção foi bem-sucedida
+    if ($stmt_cliente->error) {
+        echo "<div style='font-family: sans-serif; background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px auto; max-width: 500px; text-align: center;'>Erro ao cadastrar cliente: " . $stmt_cliente->error . "</div>";
+        echo "<p style='font-family: sans-serif; text-align: center;'><a href='cadastro.html?telefone=" . $telefone . "'>Voltar ao formulário de cadastro</a></p>";
+        exit;
+    }else {
+         header("Location: pedido.html");
+    }
+  
+/*
     if ($stmt_cliente->execute()) {
         $stmt_sorteio = $conn->prepare("INSERT INTO sorteio (numeroSorteado, id_cliente) VALUES (?, ?)");   // Prepara a inserção no sorteio
         $cliente_id = $conn->insert_id;     // Obtém o ID do cliente inserido
@@ -123,6 +133,7 @@ function sortearNumeroUnico($conn, $min, $max) {
             return $numero;
         }
     }
+        */
 }
 
 // Fecha a conexão
