@@ -1,133 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realizar Pedido</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .product-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            /* Centraliza horizontalmente */
-            margin-bottom: 20px;
-        }
-
-        .product-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Centraliza verticalmente */
-            text-align: center;
-            /* Centraliza texto horizontalmente */
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 200px;
-        }
-
-        .product-item img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        .product-item label {
-            margin-bottom: 5px;
-        }
-
-        .quantity-input-group {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .quantity-input-group input {
-            width: 50px;
-            height: 30px;
-            text-align: center;
-            border: none;
-            outline: none;
-            -moz-appearance: textfield;
-        }
-
-        .quantity-input-group input::-webkit-outer-spin-button,
-        .quantity-input-group input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .quantity-input-group button {
-            background-color: #f0f0f0;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            width: 30px;
-            border-radius: 50%;
-        }
-
-        .quantity-input-group button:hover {
-            background-color: #e0e0e0;
-        }
-
-        #total-pedido {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .payment-options {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .payment-options h3 {
-            margin-bottom: 10px;
-        }
-
-        .payment-options label {
-            margin: 0 10px;
-        }
-
-        #confirmarPedido {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: var(--cor-principal);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        #confirmarPedido:hover {
-            background-color: var(--cor-secundaria);
-        }
-    </style>
+    <link rel="stylesheet" href="css/slider.css">
 </head>
-
 <body>
     <div class="background"></div>
     <div class="card tamanho-tabela">
         <h1 class="titulo-tabela">Realizar Pedido</h1>
-        <div class="product-list">
+        
+        <!-- Spring Slider Container -->
+        <div class="spring-slider-container">
+            <div class="spring-slider">
+                <button class="slider-btn prev-btn">&lt;</button>
+                
+                <div class="slider-track" id="productSliderTrack">
+                    <!-- Produtos serão inseridos aqui via JavaScript -->
+                </div>
+                
+                <button class="slider-btn next-btn">&gt;</button>
             </div>
+            
+            <!-- Indicadores do slider -->
+            <div class="slider-dots" id="sliderDots"></div>
+        </div>
+        
         <div id="total-pedido">Total do Pedido: R$ 0.00</div>
         <div class="payment-options">
             <h3>Selecione a Forma de Pagamento:</h3>
@@ -139,66 +39,7 @@
         <button id="confirmarPedido">Confirmar Pedido</button>
         <a href="index.html" class="voltar-btn">Voltar</a>
     </div>
-    <script>
-        const productList = document.querySelector('.product-list');
-        const totalPedidoDiv = document.getElementById('total-pedido');
 
-        fetch('get_produtos.php')
-            .then(response => response.json())
-            .then(produtos => {
-                produtos.forEach(produto => {
-                    const productItem = document.createElement('div');
-                    productItem.classList.add('product-item');
-
-                    productItem.innerHTML = `
-                        <img src="${produto.imagem}" alt="${produto.nome}" class="imagem-produto">
-                        <label for="${produto.id_produto}">${produto.nome} - R$ ${produto.preco}</label>
-                        <div class="quantity-input-group">
-                            <button type="button" class="quantity-btn" data-id="${produto.id_produto}" data-action="minus">-</button>
-                            <input type="number" id="${produto.id_produto}" name="${produto.id_produto}" value="0" min="0" data-preco="${produto.preco}">
-                            <button type="button" class="quantity-btn" data-id="${produto.id_produto}" data-action="plus">+</button>
-                        </div>
-                    `;
-
-                    productList.appendChild(productItem);
-                });
-
-                const quantityButtons = document.querySelectorAll('.quantity-btn');
-
-                quantityButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const productId = this.getAttribute('data-id');
-                        const action = this.getAttribute('data-action');
-                        const inputField = this.parentNode.querySelector('input[type="number"]');
-                        let currentValue = parseInt(inputField.value, 10);
-
-                        if (action === 'plus') {
-                            currentValue++;
-                        } else if (action === 'minus' && currentValue > 0) {
-                            currentValue--;
-                        }
-
-                        inputField.value = currentValue;
-                        atualizarTotalPedido();
-                    });
-                });
-                atualizarTotalPedido();
-            })
-            .catch(error => console.error('Erro ao buscar produtos:', error));
-
-        function atualizarTotalPedido() {
-            let total = 0;
-            const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
-            quantityInputs.forEach(input => {
-                const preco = parseFloat(input.getAttribute('data-preco'));
-                const quantidade = parseInt(input.value, 10);
-                if (!isNaN(preco) && !isNaN(quantidade)) {
-                    total += preco * quantidade;
-                }
-            });
-            totalPedidoDiv.textContent = `Total do Pedido: R$ ${total.toFixed(2)}`;
-        }
-    </script>
+    <script src="js/slider.js"></script>
 </body>
-
 </html>
