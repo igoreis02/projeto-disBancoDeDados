@@ -24,7 +24,8 @@
                 <input type="hidden" name="telefone" value="<?php echo htmlspecialchars($telefone); ?>">
                 <button type="submit">Editar Endereço</button>
             </form>
-            <form action="pedido.html" method="GET">
+            <form action="pedido.html?" method="GET">
+                <input type="hidden" name="telefone" value="<?php echo htmlspecialchars($telefone); ?>">   
                 <button type="submit">Confirmar Endereço</button>
             </form>
         </div>

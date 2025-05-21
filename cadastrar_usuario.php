@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<p style='font-family: sans-serif; text-align: center;'><a href='cadastro.html?telefone=" . $telefone . "'>Voltar ao formulário de cadastro</a></p>";
         exit;
     }else {
-         header("Location: pedido.html");
+         header("Location: pedido.html?telefone=" . urlencode($telefone));
     }
   
 /*

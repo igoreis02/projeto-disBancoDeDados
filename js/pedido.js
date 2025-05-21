@@ -8,12 +8,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const trocoField = document.getElementById('troco-field');
     const valorPagoInput = document.getElementById('valor-pago');
     const valorTrocoP = document.getElementById('valor-troco');
+    const confirmarPedidoBtn = document.getElementById('confirmarPedido'); // New
+    const clienteTelefoneInput = document.getElementById('clienteTelefone'); // New
+    const erro = document.getElementById('mensagem');
 
     let currentIndex = 0;
     let itemWidth = 0;
     let itemsPerView = 1;
     let produtos = [];
-    let currentTotal = 0; // Variable to store the current total of the order
+    let currentTotal = 0;
+
+    // Get phone number from URL if available (from cadastro.html)
+    const urlParams = new URLSearchParams(window.location.search);
+    const telefoneFromURL = urlParams.get('telefone');
+    if (telefoneFromURL) {
+        clienteTelefoneInput.value = telefoneFromURL;
+    }
 
     // Buscar produtos do servidor
     fetch('get_produtos.php')
@@ -23,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
             produtos = data;
             renderProducts();
             setupSlider();
-            atualizarTotalPedido(); // Initial calculation after products are rendered
+            atualizarTotalPedido();
         })
         .catch(error => console.error('Erro ao buscar produtos:', error));
 
@@ -35,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const sliderItem = document.createElement('div');
             sliderItem.classList.add('slider-item');
 
-            const inputId = `quantity-input-${produto.id_produto}`;
+            const inputId = `quantity-input-${produto.id_produtos}`; // Corrected product ID attribute
 
             sliderItem.innerHTML = `
                 <div class="product-card">
@@ -45,9 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p>R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}</p>
                     </div>
                     <div class="quantity-input-group">
-                        <button type="button" class="quantity-btn minus-btn" data-product-id="${produto.id_produto}">-</button>
-                        <input type="number" id="${inputId}" name="${produto.id_produto}" value="0" min="0" step="1" data-preco="${produto.preco}">
-                        <button type="button" class="quantity-btn plus-btn" data-product-id="${produto.id_produto}">+</button>
+                        <button type="button" class="quantity-btn minus-btn" data-product-id="${produto.id_produtos}">-</button>
+                        <input type="number" id="${inputId}" name="${produto.id_produtos}" value="0" min="0" step="1" data-preco="${produto.preco}">
+                        <button type="button" class="quantity-btn plus-btn" data-product-id="${produto.id_produtos}">+</button>
                     </div>
                 </div>
             `;
@@ -55,8 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
             sliderTrack.appendChild(sliderItem);
 
             const inputField = sliderItem.querySelector(`#${inputId}`);
-            const minusBtn = sliderItem.querySelector(`.minus-btn[data-product-id="${produto.id_produto}"]`);
-            const plusBtn = sliderItem.querySelector(`.plus-btn[data-product-id="${produto.id_produto}"]`);
+            const minusBtn = sliderItem.querySelector(`.minus-btn[data-product-id="${produto.id_produtos}"]`);
+            const plusBtn = sliderItem.querySelector(`.plus-btn[data-product-id="${produto.id_produtos}"]`);
 
             minusBtn.addEventListener('click', () => {
                 let currentValue = parseInt(inputField.value, 10);
@@ -76,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Configurar o slider (no change)
+    // Configurar o slider
     function setupSlider() {
         const sliderItems = document.querySelectorAll('.slider-item');
         if (sliderItems.length === 0) return;
@@ -90,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('resize', handleResize);
     }
 
-    // Criar dots de navegação (no change)
+    // Criar dots de navegação
     function createDots() {
         dotsContainer.innerHTML = '';
         const sliderItems = document.querySelectorAll('.slider-item');
@@ -107,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Atualizar dots ativos (no change)
+    // Atualizar dots ativos
     function updateDots() {
         const dots = document.querySelectorAll('.dot');
         const activeDotIndex = Math.floor(currentIndex / itemsPerView);
@@ -117,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Mover para um slide específico (no change)
+    // Mover para um slide específico
     function goToSlide(index) {
         const sliderItems = document.querySelectorAll('.slider-item');
         if (sliderItems.length === 0) return;
@@ -131,17 +141,17 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDots();
     }
 
-    // Slide anterior (no change)
+    // Slide anterior
     function prevSlide() {
         goToSlide(currentIndex - 1);
     }
 
-    // Próximo slide (no change)
+    // Próximo slide
     function nextSlide() {
         goToSlide(currentIndex + 1);
     }
 
-    // Recalcular dimensões ao redimensionar a janela (no change)
+    // Recalcular dimensões ao redimensionar a janela
     function handleResize() {
         const sliderItems = document.querySelectorAll('.slider-item');
         if (sliderItems.length === 0) return;
@@ -166,10 +176,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        currentTotal = total; // Store the calculated total
-        totalPedidoDiv.textContent = `Total do Pedido: R$ ${total.toFixed(2).replace('.', ',')}`; // Format for Brazilian currency
+        currentTotal = total;
+        totalPedidoDiv.textContent = `Total do Pedido: R$ ${total.toFixed(2).replace('.', ',')}`;
 
-        // Recalculate change if cash is selected
         if (document.querySelector('input[name="payment"]:checked')?.value === 'dinheiro') {
             calcularTroco();
         }
@@ -177,32 +186,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to calculate and display change with validation
     function calcularTroco() {
-        const valorPagoStr = valorPagoInput.value.trim(); // Get string value and trim whitespace
+        const valorPagoStr = valorPagoInput.value.trim();
         let valorPago = parseFloat(valorPagoStr);
         let troco = 0;
 
-        // If the input is empty or 0, treat it as exact payment (no change needed)
         if (valorPagoStr === '' || valorPago === 0) {
             valorTrocoP.textContent = `Troco: R$ 0,00 (Valor exato)`;
-            valorTrocoP.style.color = 'inherit'; // Reset color
+            valorTrocoP.style.color = 'inherit';
             return;
         }
 
-        // Handle invalid or negative input (non-numeric, or explicitly negative)
         if (isNaN(valorPago) || valorPago < 0) {
-            valorTrocoP.textContent = `Troco: R$ 0,00`; // Or "Por favor, insira um valor válido"
+            valorTrocoP.textContent = `Troco: R$ 0,00`;
             valorTrocoP.style.color = 'inherit';
             return;
         }
 
         if (valorPago < currentTotal) {
-            // Display a message if amount paid is insufficient
             valorTrocoP.textContent = `Valor insuficiente! Faltam R$ ${(currentTotal - valorPago).toFixed(2).replace('.', ',')}`;
-            valorTrocoP.style.color = 'red'; // Make the text red for emphasis
+            valorTrocoP.style.color = 'red';
         } else {
             troco = valorPago - currentTotal;
             valorTrocoP.textContent = `Troco: R$ ${troco.toFixed(2).replace('.', ',')}`;
-            valorTrocoP.style.color = 'inherit'; // Reset color if sufficient
+            valorTrocoP.style.color = 'inherit';
         }
     }
 
@@ -211,14 +217,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target.name === 'payment') {
             if (event.target.value === 'dinheiro') {
                 trocoField.style.display = 'block';
-                valorPagoInput.value = ''; // Clear previous input
-                valorTrocoP.textContent = 'Troco: R$ 0,00'; // Reset troco display
-                valorTrocoP.style.color = 'inherit'; // Reset color
-                // Call calcularTroco to immediately show "Valor exato" if total is 0 or user just selected
+                valorPagoInput.value = '';
+                valorTrocoP.textContent = 'Troco: R$ 0,00';
+                valorTrocoP.style.color = 'inherit';
                 calcularTroco();
             } else {
                 trocoField.style.display = 'none';
-                valorPagoInput.value = ''; // Clear input when switching away from dinheiro
+                valorPagoInput.value = '';
             }
         }
     });
@@ -226,8 +231,80 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener for Valor Pago input
     valorPagoInput.addEventListener('input', calcularTroco);
 
-
     // Event listeners for slider navigation
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
+
+    // New: Event listener for Confirmar Pedido button
+  confirmarPedidoBtn.addEventListener('click', function() {
+        const selectedProducts = [];
+        const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
+        let hasSelectedProducts = false;
+
+        quantityInputs.forEach(input => {
+            const quantity = parseInt(input.value, 10);
+            if (quantity > 0) {
+                hasSelectedProducts = true;
+                const productId = input.name;
+                const product = produtos.find(p => p.id_produtos == productId);
+                if (product) {
+                    selectedProducts.push({
+                        id: product.id_produtos,
+                        nome: product.nome,
+                        preco: parseFloat(product.preco),
+                        quantidade: quantity
+                    });
+                }
+            }
+        });
+
+        if (!hasSelectedProducts) {
+            erro.textContent = 'Por favor, selecione pelo menos um produto para o pedido.';
+            erro.style.color = 'red';
+            return;
+        }
+
+        const paymentMethod = document.querySelector('input[name="payment"]:checked');
+        if (!paymentMethod) {
+            erro.textContent = 'Por favor, selecione uma forma de pagamento.';
+            erro.style.color = 'red';
+            return;
+        }
+
+        const formaPagamento = paymentMethod ? paymentMethod.value : ''; // Garante que a formaPagamento não é null
+
+        let valorPagoParaTroco = 0; // Initialize to 0
+
+        // If payment is cash, get the paid amount
+        if (formaPagamento === 'dinheiro') {
+            valorPagoParaTroco = parseFloat(valorPagoInput.value);
+            // Adicione console.log para depuração aqui
+            console.log('Forma de pagamento: Dinheiro');
+            console.log('Valor Pago no input:', valorPagoInput.value);
+            console.log('Valor Pago parseado:', valorPagoParaTroco);
+            console.log('Total atual:', currentTotal);
+
+
+            if (isNaN(valorPagoParaTroco) || valorPagoParaTroco < currentTotal) {
+                erro.textContent = 'Para pagamento em dinheiro, o valor pago deve ser igual ou maior que o total do pedido.';
+                erro.style.color = 'red';
+                return; // Impede o redirecionamento se a validação falhar
+            }
+        }
+
+
+        // Constructing the URL with parameters
+        const params = new URLSearchParams();
+        params.append('telefone', clienteTelefoneInput.value);
+        params.append('total', currentTotal.toFixed(2));
+        params.append('forma_pagamento', formaPagamento);
+        params.append('produtos', JSON.stringify(selectedProducts));
+
+        // Add valor_pago parameter ONLY if payment is 'dinheiro'
+        if (formaPagamento === 'dinheiro') {
+            params.append('valor_pago', valorPagoParaTroco.toFixed(2));
+        } 
+
+        window.location.href = `confirmar_pedido.php?${params.toString()}`;
+    });
 });
