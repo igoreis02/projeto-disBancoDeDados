@@ -3,7 +3,6 @@ const mensagemDiv = document.getElementById('mensagem');
 const telefoneInput = document.getElementById('telefone');
 const senhaInput = document.getElementById('hidden');
 const pesquisaTelefoneButton = document.getElementById('pesquisaTelefone');
-const botaoVoltar = document.getElementsByClassName('voltar-inicio')
 const privacidade = document.getElementById('privacidade');
 const privacidadeInput = document.querySelector('.checkbox');
 
@@ -40,9 +39,9 @@ telefoneInput.addEventListener('input', function () {
 verificarForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const telefone = telefoneInput.value;
-    const privacidade = document.getElementById('privacidade').checked;
+    const privacidadeAceita = privacidade.checked;
 
-    if (!privacidade) {
+    if (!privacidadeAceita) {
         mensagemDiv.textContent = 'Aceite os termos de privacidade.';
         mensagemDiv.style.color = 'red';
         return;
@@ -93,8 +92,6 @@ verificarForm.addEventListener('submit', function (event) {
             mensagemDiv.textContent = 'Erro ao verificar a senha.';
             mensagemDiv.style.color = 'red';
         });
-        //criar botao voltar
-        
     } else {
         fetch('verificar_telefone.php', {
             method: 'POST',
@@ -103,20 +100,33 @@ verificarForm.addEventListener('submit', function (event) {
             },
             body: `telefone=${telefone}`
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.existe) {
-                  // Redireciona para confirmar_endereco.php com os dados do usuário
-                    window.location.href = `confirmar_endereco.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}&endereco=${encodeURIComponent(data.endereco)}&quadra=${encodeURIComponent(data.quadra)}&lote=${encodeURIComponent(data.lote)}&setor=${encodeURIComponent(data.setor)}&complemento=${encodeURIComponent(data.complemento)}&cidade=${encodeURIComponent(data.cidade)}`;
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Adicione este log para depuração
+            if (data.existe) {
+                // Se o telefone existe, verificar se há pedidos pendentes, aceitos ou em entrega
+                if (data.pedido_pendente_ou_aceito) {
+                    console.log(data);
+                    // Redireciona para a página de pedido na loja
+                    window.location.href = `pedido_na_loja.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}&id_pedido=${encodeURIComponent(data.id_pedido)}&status_pedido=${encodeURIComponent(data.status_pedido)}&valor_total=${encodeURIComponent(data.valor_total)}&produtos_detalhes=${encodeURIComponent(data.produtos_detalhes)}&forma_pagamento=${encodeURIComponent(data.forma_pagamento)}&valor_pago=${encodeURIComponent(data.valor_pago)}&troco=${encodeURIComponent(data.troco)}&endereco=${encodeURIComponent(data.endereco)}&quadra=${encodeURIComponent(data.quadra)}&lote=${encodeURIComponent(data.lote)}&setor=${encodeURIComponent(data.setor)}&complemento=${encodeURIComponent(data.complemento)}&cidade=${encodeURIComponent(data.cidade)}`;
+                } else if (data.pedido_em_entrega) {
+                    // Redireciona para a página de pedido em entrega
+                    window.location.href = `pedido_em_entrega.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}`;
                 } else {
-                    window.location.href = `cadastro.html?telefone=${telefone}`;
+                    
+                    // Se não há pedidos pendentes/aceitos/em entrega, redireciona para confirmação de endereço
+                    window.location.href = `confirmar_endereco.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}&endereco=${encodeURIComponent(data.endereco)}&quadra=${encodeURIComponent(data.quadra)}&lote=${encodeURIComponent(data.lote)}&setor=${encodeURIComponent(data.setor)}&complemento=${encodeURIComponent(data.complemento)}&cidade=${encodeURIComponent(data.cidade)}`;
                 }
-            })
-            .catch(error => {
-                console.error('Erro na requisição:', error);
-                mensagemDiv.textContent = 'Erro ao verificar o telefone.';
-                mensagemDiv.style.color = 'red';
-            });
+            } else {
+                // Se o telefone não existe, redireciona para cadastro
+                window.location.href = `cadastro.html?telefone=${telefone}`;
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            mensagemDiv.textContent = 'Erro ao verificar o telefone.';
+            mensagemDiv.style.color = 'red';
+        });
     }
 });
 

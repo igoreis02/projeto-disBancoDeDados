@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const valorTrocoP = document.getElementById('valor-troco');
     const confirmarPedidoBtn = document.getElementById('confirmarPedido'); // New
     const clienteTelefoneInput = document.getElementById('clienteTelefone'); // New
-    const erro = document.getElementById('mensagem');
+    const erro = document.getElementById('mensagem'); // Element to display error messages
 
     let currentIndex = 0;
     let itemWidth = 0;
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clienteTelefoneInput.value = telefoneFromURL;
     }
 
-    // Buscar produtos do servidor
+    // Fetch products from the server
     fetch('get_produtos.php')
         .then(response => response.json())
         .then(data => {
@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
             produtos = data;
             renderProducts();
             setupSlider();
-            atualizarTotalPedido();
+            atualizarTotalPedido(); // Initial calculation after products are rendered
         })
         .catch(error => console.error('Erro ao buscar produtos:', error));
 
-    // Renderizar produtos no slider
+    // Render products in the slider
     function renderProducts() {
         sliderTrack.innerHTML = '';
 
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Configurar o slider
+    // Configure the slider
     function setupSlider() {
         const sliderItems = document.querySelectorAll('.slider-item');
         if (sliderItems.length === 0) return;
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('resize', handleResize);
     }
 
-    // Criar dots de navegação
+    // Create navigation dots
     function createDots() {
         dotsContainer.innerHTML = '';
         const sliderItems = document.querySelectorAll('.slider-item');
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Atualizar dots ativos
+    // Update active dots
     function updateDots() {
         const dots = document.querySelectorAll('.dot');
         const activeDotIndex = Math.floor(currentIndex / itemsPerView);
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Mover para um slide específico
+    // Move to a specific slide
     function goToSlide(index) {
         const sliderItems = document.querySelectorAll('.slider-item');
         if (sliderItems.length === 0) return;
@@ -141,17 +141,17 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDots();
     }
 
-    // Slide anterior
+    // Previous slide
     function prevSlide() {
         goToSlide(currentIndex - 1);
     }
 
-    // Próximo slide
+    // Next slide
     function nextSlide() {
         goToSlide(currentIndex + 1);
     }
 
-    // Recalcular dimensões ao redimensionar a janela
+    // Recalculate dimensions on window resize
     function handleResize() {
         const sliderItems = document.querySelectorAll('.slider-item');
         if (sliderItems.length === 0) return;
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         createDots();
     }
 
-    // Atualizar total do pedido
+    // Update order total
     function atualizarTotalPedido() {
         let total = 0;
         const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
@@ -190,15 +190,16 @@ document.addEventListener('DOMContentLoaded', function() {
         let valorPago = parseFloat(valorPagoStr);
         let troco = 0;
 
-        if (valorPagoStr === '' || valorPago === 0) {
+        // If input is empty, treat as exact value for now
+        if (valorPagoStr === '') {
             valorTrocoP.textContent = `Troco: R$ 0,00 (Valor exato)`;
             valorTrocoP.style.color = 'inherit';
             return;
         }
 
         if (isNaN(valorPago) || valorPago < 0) {
-            valorTrocoP.textContent = `Troco: R$ 0,00`;
-            valorTrocoP.style.color = 'inherit';
+            valorTrocoP.textContent = `Valor inválido!`;
+            valorTrocoP.style.color = 'red';
             return;
         }
 
@@ -217,13 +218,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target.name === 'payment') {
             if (event.target.value === 'dinheiro') {
                 trocoField.style.display = 'block';
-                valorPagoInput.value = '';
-                valorTrocoP.textContent = 'Troco: R$ 0,00';
-                valorTrocoP.style.color = 'inherit';
-                calcularTroco();
+                valorPagoInput.value = ''; // Clear previous input
+                valorTrocoP.textContent = 'Troco: R$ 0,00'; // Reset troco display
+                valorTrocoP.style.color = 'inherit'; // Reset color
+                calcularTroco(); // Call calcularTroco to immediately show "Valor exato" if total is 0 or user just selected
             } else {
                 trocoField.style.display = 'none';
-                valorPagoInput.value = '';
+                valorPagoInput.value = ''; // Clear input when switching away from dinheiro
+                erro.textContent = ''; // Clear any previous error message
             }
         }
     });
@@ -231,22 +233,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener for Valor Pago input
     valorPagoInput.addEventListener('input', calcularTroco);
 
+
     // Event listeners for slider navigation
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
 
     // New: Event listener for Confirmar Pedido button
-  confirmarPedidoBtn.addEventListener('click', function() {
+    confirmarPedidoBtn.addEventListener('click', function() {
         const selectedProducts = [];
         const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
         let hasSelectedProducts = false;
+
+        erro.textContent = ''; // Clear previous error messages
 
         quantityInputs.forEach(input => {
             const quantity = parseInt(input.value, 10);
             if (quantity > 0) {
                 hasSelectedProducts = true;
                 const productId = input.name;
-                const product = produtos.find(p => p.id_produtos == productId);
+                const product = produtos.find(p => p.id_produtos == productId); // Corrected product ID attribute
                 if (product) {
                     selectedProducts.push({
                         id: product.id_produtos,
@@ -271,27 +276,35 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const formaPagamento = paymentMethod ? paymentMethod.value : ''; // Garante que a formaPagamento não é null
-
+        const formaPagamento = paymentMethod.value;
         let valorPagoParaTroco = 0; // Initialize to 0
 
-        // If payment is cash, get the paid amount
+        // If payment is cash, get the paid amount and validate
         if (formaPagamento === 'dinheiro') {
-            valorPagoParaTroco = parseFloat(valorPagoInput.value);
-            // Adicione console.log para depuração aqui
-            console.log('Forma de pagamento: Dinheiro');
-            console.log('Valor Pago no input:', valorPagoInput.value);
-            console.log('Valor Pago parseado:', valorPagoParaTroco);
-            console.log('Total atual:', currentTotal);
+            const valorPagoInputTrimmed = valorPagoInput.value.trim();
 
+            // If the input is empty, treat it as if the exact total was paid.
+            if (valorPagoInputTrimmed === '') {
+                valorPagoParaTroco = currentTotal;
+            } else {
+                valorPagoParaTroco = parseFloat(valorPagoInputTrimmed);
 
-            if (isNaN(valorPagoParaTroco) || valorPagoParaTroco < currentTotal) {
+                // Check if not a valid number after trying to parse
+                if (isNaN(valorPagoParaTroco)) {
+                    erro.textContent = 'Por favor, insira um valor válido para pagamento em dinheiro.';
+                    erro.style.color = 'red';
+                    return;
+                }
+                 // Check if paid amount is less than total (after handling empty input)
+                 if (valorPagoParaTroco < currentTotal) {
                 erro.textContent = 'Para pagamento em dinheiro, o valor pago deve ser igual ou maior que o total do pedido.';
                 erro.style.color = 'red';
-                return; // Impede o redirecionamento se a validação falhar
+                return; // Prevent redirection if validation fails
+                 }
             }
-        }
 
+           
+        }
 
         // Constructing the URL with parameters
         const params = new URLSearchParams();

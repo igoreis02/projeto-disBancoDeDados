@@ -6,6 +6,21 @@
     <title>Realizar Pedido</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/slider.css">
+      <style>
+          
+        /* Regra para remover o pseudo-elemento ::before da classe .card nesta página */
+        .card::before {
+            content: none;
+        }
+         .card.tamanho-tabela { /* Use a classe combinada para especificidade */
+            margin-top: 20px; /* Define o top para 20px */
+            /* Mantenha o margin-left/right como auto ou o valor desejado para centralizar */
+            margin-left: auto;
+            margin-right: auto;
+            /* Se o padding-top de 140px estiver empurrando para baixo, ajuste-o aqui */
+            padding-top: 50px; /* Exemplo: Reduza o padding-top se 140px for muito */
+        }
+    </style>
 </head>
 <body>
     <div class="background"></div>
@@ -45,7 +60,7 @@
     </div>
 
     <input type="hidden" id="clienteTelefone" name="clienteTelefone">
-
+    <input type="hidden" id="idPedidoExistente" name="idPedidoExistente"> <input type="hidden" id="hasGasProduct" name="hasGasProduct" value="0"> 
     <script src="js/pedido.js"></script>
 </body>
 </html>

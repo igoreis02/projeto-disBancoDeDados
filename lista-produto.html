@@ -7,9 +7,19 @@
     <title>Lista de Produtos</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ... Seu CSS existente ... */
-
-        
+          
+        /* Regra para remover o pseudo-elemento ::before da classe .card nesta página */
+        .card::before {
+            content: none;
+        }
+         .card.tamanho-tabela { /* Use a classe combinada para especificidade */
+            margin-top: 20px; /* Define o top para 20px */
+            /* Mantenha o margin-left/right como auto ou o valor desejado para centralizar */
+            margin-left: auto;
+            margin-right: auto;
+            /* Se o padding-top de 140px estiver empurrando para baixo, ajuste-o aqui */
+            padding-top: 50px; /* Exemplo: Reduza o padding-top se 140px for muito */
+        }
     </style>
 </head>
 

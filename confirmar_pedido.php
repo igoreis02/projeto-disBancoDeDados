@@ -4,62 +4,70 @@ $username = "root";
 $password = "";
 $dbname = "cadastro";
 
-// Create connection
+// Conexão com o banco de dados
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Verifica a conexão
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get data from URL parameters
+// Obtém os dados dos parâmetros da URL
 $telefone = isset($_GET['telefone']) ? $_GET['telefone'] : '';
-$total_pedido = isset($_GET['total']) ? (float)$_GET['total'] : 0.00; // Convert to float for calculations
+$total_pedido = isset($_GET['total']) ? (float)$_GET['total'] : 0.00; // Converte para float para cálculos
 $forma_pagamento = isset($_GET['forma_pagamento']) ? $_GET['forma_pagamento'] : 'Não informado';
 $produtos_json = isset($_GET['produtos']) ? $_GET['produtos'] : '[]';
 $produtos_selecionados = json_decode($produtos_json, true);
+$id_pedido_existente = isset($_GET['id_pedido_existente']) ? (int)$_GET['id_pedido_existente'] : 0; // ID do pedido existente
+$has_gas_product = isset($_GET['has_gas_product']) ? (int)$_GET['has_gas_product'] : 0; // Tem produto de gás
 
-$valor_pago = null; // Inicializa como null
+// Obtém valor_pago apenas se estiver definido e a forma de pagamento for 'dinheiro'
+$valor_pago = null;
 if ($forma_pagamento === 'dinheiro' && isset($_GET['valor_pago'])) {
     $valor_pago = (float)$_GET['valor_pago'];
-    // Adicione um console.log aqui para depuração no servidor
-    error_log("confirmar_pedido.php: Valor Pago recebido: " . $valor_pago);
 }
 
-// Calculate troco
+// Calcula o troco
 $troco = 0;
 if ($forma_pagamento === 'dinheiro' && $valor_pago !== null) {
     $troco = $valor_pago - $total_pedido;
-    // Adicione um console.log aqui para depuração no servidor
-    error_log("confirmar_pedido.php: Troco calculado: " . $troco);
 }
 
+// Variáveis para os dados do cliente e endereço
+$cliente_nome = '';
+$endereco_cliente = '';
+$quadra_cliente = '';
+$lote_cliente = '';
+$setor_cliente = '';
+$complemento_cliente = '';
+$cidade_cliente = '';
+$endereco_completo_formatado = '';
 
-// Fetch client details
-$cliente_nome = "Não encontrado";
-$cliente_endereco = "Não encontrado";
-
+// Se o telefone estiver presente, busca os dados do cliente e endereço no banco de dados
 if (!empty($telefone)) {
-    // CORREÇÃO AQUI: Se a chave primária da tabela 'clientes' é 'id', use 'id'
-    $stmt = $conn->prepare("SELECT nome, endereco, quadra, lote, setor, complemento, cidade FROM clientes WHERE telefone = ?");
-    if ($stmt) { // Verifica se a preparação foi bem-sucedida
-        $stmt->bind_param("s", $telefone);
-        $stmt->execute();
-        $stmt->bind_result($nome, $endereco, $quadra, $lote, $setor, $complemento, $cidade);
-        $stmt->fetch();
-        $stmt->close();
+    $sql_cliente = "SELECT nome, endereco, quadra, lote, setor, complemento, cidade FROM clientes WHERE telefone = ?";
+    $stmt_cliente = $conn->prepare($sql_cliente);
+    
+    if ($stmt_cliente) {
+        $stmt_cliente->bind_param("s", $telefone);
+        $stmt_cliente->execute();
+        $stmt_cliente->bind_result($cliente_nome, $endereco_cliente, $quadra_cliente, $lote_cliente, $setor_cliente, $complemento_cliente, $cidade_cliente);
+        $stmt_cliente->fetch();
+        $stmt_cliente->close();
 
-        if ($nome) {
-            $cliente_nome = ucwords($nome); // Capitalize first letter of each word
-            $cliente_endereco = ucwords("$endereco, Qd $quadra, Lt $lote, Setor $setor");
-            if (!empty($complemento)) {
-                $cliente_endereco .= ", Complemento: " . ucwords($complemento);
-            }
-            $cliente_endereco .= ", " . ucwords($cidade);
+        // Formata o endereço completo
+        $endereco_completo_formatado = ucwords(htmlspecialchars($endereco_cliente)) . ', Qd ' . htmlspecialchars($quadra_cliente) . ', Lt ' . htmlspecialchars($lote_cliente);
+
+        if (!empty($setor_cliente)) {
+            $endereco_completo_formatado .= '<br>Setor: ' . ucwords(htmlspecialchars($setor_cliente));
         }
+        if (!empty($complemento_cliente)) {
+            $endereco_completo_formatado .= '<br>Complemento: ' . ucwords(htmlspecialchars($complemento_cliente));
+        }
+        $endereco_completo_formatado .= '<br>' . ucwords(htmlspecialchars($cidade_cliente));
+
     } else {
-        // Log ou exiba um erro se a preparação da query falhar
-        error_log("Erro ao preparar a query para buscar cliente: " . $conn->error);
+        error_log("Erro ao preparar a busca de cliente em confirmar_pedido.php: " . $conn->error);
     }
 }
 
@@ -73,69 +81,111 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmar Pedido</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .card {
+            text-align: center;
+            padding: 30px;
+        }
+        .card h1 {
+            color: var(--cor-titulo);
+            margin-bottom: 20px;
+        }
+        .card p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .pedido-summary {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 400px;
+            text-align: left;
+        }
+        .pedido-summary strong {
+            color: var(--cor-principal);
+        }
+        .form-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .form-buttons button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-buttons .confirm-button {
+            background-color: var(--cor-principal);
+        }
+        .form-buttons .confirm-button:hover {
+            background-color: var(--cor-secundaria);
+        }
+        .form-buttons .cancel-button {
+            background-color: #dc3545;
+        }
+        .form-buttons .cancel-button:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
     <div class="background"></div>
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
-        <h2>Confirme seu Pedido</h2>
-
-        <div class="confirmation-details">
-            <p><strong>Nome:</strong> <?php echo htmlspecialchars($cliente_nome); ?></p>
-            <p><strong>Endereço de Entrega:</strong> <?php echo htmlspecialchars($cliente_endereco); ?></p>
-
-            <h3>Produtos Selecionados:</h3>
+        <h1>Confirmar Pedido</h1>
+        <p>Olá, <strong><?php echo htmlspecialchars(ucwords(explode(' ', $cliente_nome)[0])); ?></strong>! Por favor, confirme os detalhes do seu pedido:</p>
+        
+        <div class="pedido-summary">
+            <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p>
+            <p><strong>Produtos:</strong></p>
             <ul>
-                <?php if (!empty($produtos_selecionados)): ?>
-                    <?php foreach ($produtos_selecionados as $produto): ?>
-                        <li>
-                            <?php echo htmlspecialchars($produto['quantidade']); ?> - <?php echo htmlspecialchars(ucwords($produto['nome'])); ?> -
-                            Valor Unitário: R$ <?php echo number_format($produto['preco'], 2, ',', '.'); ?> -
-                            valor do pedido: R$ <?php echo number_format($produto['preco'] * $produto['quantidade'], 2, ',', '.'); ?>
-                        </li>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <li>Nenhum produto selecionado.</li>
-                <?php endif; ?>
+                <?php foreach ($produtos_selecionados as $produto): ?>
+                    <li><?php echo htmlspecialchars($produto['quantidade']); ?>x <?php echo htmlspecialchars(ucwords($produto['nome'])); ?> (R$ <?php echo number_format($produto['preco'], 2, ',', '.'); ?>)</li>
+                <?php endforeach; ?>
             </ul>
-
-            <p><strong>Valor Total do Pedido:</strong> R$ <?php echo number_format($total_pedido, 2, ',', '.'); ?></p>
+            <p><strong>Total:</strong> R$ <?php echo number_format($total_pedido, 2, ',', '.'); ?></p>
             <p><strong>Forma de Pagamento:</strong> <?php echo htmlspecialchars(ucwords($forma_pagamento)); ?></p>
+            <?php if ($forma_pagamento === 'dinheiro' && $valor_pago !== null): ?>
+                <p><strong>Valor Pago:</strong> R$ <?php echo number_format($valor_pago, 2, ',', '.'); ?></p>
+                <p><strong>Troco:</strong> R$ <?php echo number_format($troco, 2, ',', '.'); ?></p>
+            <?php endif; ?>
+        </div>
 
-            <?php if ($forma_pagamento === 'dinheiro' && $valor_pago !== null && $valor_pago >= $total_pedido): ?>
-        <p><strong>Valor Pago:</strong> R$ <?php echo number_format($valor_pago, 2, ',', '.'); ?></p>
-        <p><strong>Troco:</strong> R$ <?php echo number_format($troco, 2, ',', '.'); ?></p>
-    <?php
-    // Opcional: Adicionar uma mensagem se o valor pago for insuficiente na tela de confirmação
-    elseif ($forma_pagamento === 'dinheiro' && $valor_pago !== null && $valor_pago < $total_pedido):
-    ?>
-        <p style="color: red;"><strong>Valor Pago Insuficiente:</strong> R$ <?php echo number_format($valor_pago, 2, ',', '.'); ?></p>
-        <p style="color: red;"><strong>Faltam:</strong> R$ <?php echo number_format($total_pedido - $valor_pago, 2, ',', '.'); ?></p>
-    <?php endif; ?>
-
-    <button id="finalizarPedidoBtn">Finalizar Pedido</button>
-    <a href="pedido.html?telefone=<?php echo htmlspecialchars($telefone); ?>" class="voltar-btn">Voltar e Editar Pedido</a>
-
-    <div class="footer">
-      <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+        <div class="form-buttons">
+            <button class="confirm-button" id="finalizarPedidoBtn">Finalizar Pedido</button>
+            <button class="cancel-button" onclick="window.history.back()">Voltar e Editar</button>
+        </div>
     </div>
 
     <script>
-        // Este é o JavaScript que lida com o clique no botão Finalizar Pedido
         document.getElementById('finalizarPedidoBtn').addEventListener('click', function() {
-            // As variáveis PHP são injetadas diretamente no JavaScript aqui
             const telefoneCliente = "<?php echo htmlspecialchars($telefone); ?>";
             const totalPedido = "<?php echo htmlspecialchars($total_pedido); ?>";
             const formaPagamento = "<?php echo htmlspecialchars($forma_pagamento); ?>";
             const produtosSelecionados = <?php echo json_encode($produtos_selecionados); ?>;
             const valorPago = <?php echo ($valor_pago !== null) ? htmlspecialchars($valor_pago) : 'null'; ?>;
+            const idPedidoExistente = "<?php echo htmlspecialchars($id_pedido_existente); ?>"; // NOVO: ID do pedido existente
+            const hasGasProduct = "<?php echo htmlspecialchars($has_gas_product); ?>"; // NOVO: Tem produto de gás
 
             const dadosDoPedido = {
                 telefone: telefoneCliente,
                 total: totalPedido,
                 forma_pagamento: formaPagamento,
                 produtos: produtosSelecionados,
-                valor_pago: valorPago
+                valor_pago: valorPago,
+                id_pedido_existente: idPedidoExistente, // Inclui o ID do pedido existente
+                has_gas_product: hasGasProduct // Inclui a informação de gás
             };
 
             fetch('salvar_pedido.php', {
@@ -148,9 +198,8 @@ $conn->close();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message); // Exibe a mensagem de sucesso
-                    // AQUI É A MUDANÇA CRÍTICA: Redireciona usando a URL recebida do servidor
-                    window.location.href = data.redirect_url;
+                    alert(data.message);
+                    window.location.href = data.redirect_url; // Usa a URL de redirecionamento do PHP
                 } else {
                     alert('Erro ao finalizar o pedido: ' + data.message);
                 }

@@ -15,6 +15,8 @@
             /* Alinha os botões verticalmente */
             width: 100%;
             /* Garante que ocupa a largura total do card */
+            flex-wrap: wrap; /* Permite que os botões quebrem para a próxima linha em telas menores */
+            gap: 10px; /* Espaçamento entre os botões */
         }
 
         .menu-button {
@@ -28,11 +30,25 @@
             /* Um fundo cinza claro */
             color: #333;
             /* Texto um pouco mais escuro */
+            flex: 1 1 auto; /* Permite que os botões cresçam e encolham */
+            min-width: 120px; /* Largura mínima para os botões */
         }
 
         .menu-button:hover {
             background-color: #e0e0e0;
             /* Escurece um pouco no hover */
+        }
+        /* Estilo para o botão de voltar, se houver */
+        .voltar-btn {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .voltar-btn:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -45,11 +61,11 @@
         <div class="menu-buttons">
             <button class="menu-button" id="clientes">Clientes</button>
             <button class="menu-button" id="produtos">Produtos</button>
-        </div>
+            <button class="menu-button" id="pedidos">Pedidos</button> </div>
         <a href="index.html" class="voltar-btn">Sair</a>
     </div>
     <div class="footer">
-        <p>&copy; 2024 Souza Gás. Todos os direitos reservados.</p>
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
     </div>
     <script>
         document.getElementById('clientes').addEventListener('click', function() {
@@ -60,6 +76,11 @@
         document.getElementById('produtos').addEventListener('click', function() {
             //  Redirecionar para a página de produtos
             window.location.href = 'lista-produto.html'; //  Mude para o caminho correto
+        });
+
+        // Novo evento para o botão "Pedidos"
+        document.getElementById('pedidos').addEventListener('click', function() {
+            window.location.href = 'lista_pedidos.php'; // Redireciona para a nova página de pedidos
         });
     </script>
 </body>
