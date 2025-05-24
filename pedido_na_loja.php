@@ -20,6 +20,55 @@ $valor_total_formatado = number_format($valor_total, 2, ',', '.');
 // Formata o valor pago e troco se existirem
 $valor_pago_formatado = ($valor_pago !== null) ? number_format($valor_pago, 2, ',', '.') : '';
 $troco_formatado = number_format($troco, 2, ',', '.');
+
+// Conexão com o banco de dados para buscar o endereço completo
+$servername = "localhost:3307";
+$username = "root";
+$password = "";
+$dbname = "cadastro";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+$endereco_completo_formatado = 'Endereço não disponível';
+if ($conn->connect_error) {
+    error_log("Erro na conexão com o banco de dados em pedido_na_loja.php: " . $conn->connect_error);
+} else {
+    // Busca o id_cliente baseado no telefone
+    $id_cliente = null;
+    $stmt_cliente_id = $conn->prepare("SELECT id FROM clientes WHERE telefone = ?");
+    if ($stmt_cliente_id) {
+        $stmt_cliente_id->bind_param("s", $telefone);
+        $stmt_cliente_id->execute();
+        $result_cliente_id = $stmt_cliente_id->get_result();
+        if ($result_cliente_id->num_rows > 0) {
+            $row_cliente_id = $result_cliente_id->fetch_assoc();
+            $id_cliente = $row_cliente_id['id'];
+        }
+        $stmt_cliente_id->close();
+    }
+
+    if ($id_cliente !== null) {
+        $sql_endereco = "SELECT endereco, quadra, lote, setor, complemento, cidade FROM clientes WHERE id = ?";
+        $stmt_endereco = $conn->prepare($sql_endereco);
+        if ($stmt_endereco) {
+            $stmt_endereco->bind_param("i", $id_cliente);
+            $stmt_endereco->execute();
+            $stmt_endereco->bind_result($endereco, $quadra, $lote, $setor, $complemento, $cidade);
+            $stmt_endereco->fetch();
+            $stmt_endereco->close();
+
+            $endereco_completo_formatado = ucwords(htmlspecialchars($endereco)) . ', Qd ' . htmlspecialchars($quadra) . ', Lt ' . htmlspecialchars($lote);
+            if (!empty($setor)) {
+                $endereco_completo_formatado .= '<br>Setor: ' . ucwords(htmlspecialchars($setor));
+            }
+            if (!empty($complemento)) {
+                $endereco_completo_formatado .= '<br>Complemento: ' . ucwords(htmlspecialchars($complemento));
+            }
+            $endereco_completo_formatado .= '<br>' . ucwords(htmlspecialchars($cidade));
+        }
+    }
+    $conn->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -30,24 +79,20 @@ $troco_formatado = number_format($troco, 2, ',', '.');
     <title>Pedido na Loja</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Regra para remover o pseudo-elemento ::before da classe .card nesta página */
-        .card::before {
-            content: none;
-        }
-
-        .card {
+                .card {
             text-align: center;
             padding: 30px;
         }
         .card h1 {
             color: var(--cor-titulo);
-            margin-bottom: 20px;
+            margin-bottom: 0;
+            padding-top: 90px; /* Adicionado para espaçamento superior */
         }
         /* Estilo para a frase específica */
         .card .message-paragraph {
             margin-bottom: 10px;
             font-size: 1.1em;
-            margin-top: 50px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+            margin-top: 25px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
         }
         .pedido-details {
             background-color: #f9f9f9;
@@ -87,10 +132,10 @@ $troco_formatado = number_format($troco, 2, ',', '.');
             background-color: var(--cor-secundaria);
         }
         .form-buttons .exit-button {
-            background-color: #dc3545; /* Vermelho para sair */
+            background-color:   #eb9f25; /* Vermelho para sair */
         }
         .form-buttons .exit-button:hover {
-            background-color: #c82333;
+            background-color: rgb(197, 133, 31);
         }
     </style>
 </head>
@@ -102,7 +147,7 @@ $troco_formatado = number_format($troco, 2, ',', '.');
         <p class="message-paragraph">Você tem um pedido que está na Loja esperando para sair:</p>
         
         <div class="pedido-details">
-            <p><strong>Produtos:</strong> <?php echo $produtos_detalhes; ?></p>
+            <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p> <p><strong>Produtos:</strong> <?php echo $produtos_detalhes; ?></p>
             <p><strong>Valor Total:</strong> R$ <?php echo $valor_total_formatado; ?></p>
             <p><strong>Forma de Pagamento:</strong> <?php echo !empty($forma_pagamento) ? ucwords($forma_pagamento) : 'Não informado'; ?>
             <?php if ($forma_pagamento === 'dinheiro' && $valor_pago !== null): ?>
@@ -115,7 +160,7 @@ $troco_formatado = number_format($troco, 2, ',', '.');
         </div>
 
         <div class="form-buttons">
-            <a href="pedido.html?telefone=<?php echo $telefone; ?>&id_pedido=<?php echo $id_pedido; ?>" class="edit-button">Editar Pedido</a>
+            <a href="pedido.html?telefone=<?php echo $telefone; ?>&id_pedido=<?php echo $id_pedido; ?>&nome=<?php echo $primeiroNome; ?>" class="edit-button">Editar Pedido</a>
             <a href="index.html" class="exit-button">Sair</a>
         </div>
     </div>

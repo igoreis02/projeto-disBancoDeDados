@@ -1,66 +1,185 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realizar Pedido</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/slider.css">
-      <style>
-          
+    <style>
         /* Regra para remover o pseudo-elemento ::before da classe .card nesta página */
         .card::before {
             content: none;
         }
-         .card.tamanho-tabela { /* Use a classe combinada para especificidade */
-            margin-top: 20px; /* Define o top para 20px */
-            /* Mantenha o margin-left/right como auto ou o valor desejado para centralizar */
-            margin-left: auto;
-            margin-right: auto;
-            /* Se o padding-top de 140px estiver empurrando para baixo, ajuste-o aqui */
-            padding-top: 50px; /* Exemplo: Reduza o padding-top se 140px for muito */
+
+        .pedido-details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .pedido-details strong {
+            color: var(--cor-principal);
+        }
+
+        .spring-slider-container {
+            padding: 0;
+        }
+
+        .nome-produto {
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .tamanho-tabela {
+            width: 30%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .form-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .form-buttons button,
+        .form-buttons a {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            display: block;
+            /* Garante que ocupem a largura total */
+            width: 100%;
+            /* Garante que ocupem a largura total */
+            box-sizing: border-box;
+            /* Inclui padding e borda na largura total */
+        }
+
+        .form-buttons .edit-button {
+            background-color: var(--cor-principal);
+        }
+
+        .form-buttons .edit-button:hover {
+            background-color: var(--cor-secundaria);
+        }
+
+        .form-buttons .exit-button {
+            background-color: #eb9f25;
+            /* Vermelho para sair */
+        }
+
+        .form-buttons .exit-button:hover {
+            background-color: rgb(197, 133, 31);
         }
     </style>
 </head>
+
 <body>
     <div class="background"></div>
     <div class="card tamanho-tabela">
-        <h1 class="titulo-tabela">Realizar Pedido</h1>
+        <h1 class="titulo-tabela" id="tituloPedido">Realizar Pedido</h1>
+        <div class="pedido-details">
+            <h2 class="nome-produto">Produtos</h2>
+            <div class="spring-slider-container">
+                <div class="spring-slider">
+                    <button class="slider-btn prev-btn">&lt;</button>
 
-        <div class="spring-slider-container">
-            <div class="spring-slider">
-                <button class="slider-btn prev-btn">&lt;</button>
-
-                <div class="slider-track" id="productSliderTrack">
+                    <div class="slider-track" id="productSliderTrack">
                     </div>
 
-                <button class="slider-btn next-btn">&gt;</button>
+                    <button class="slider-btn next-btn">&gt;</button>
+                </div>
+
+                <div class="slider-dots" id="sliderDots"></div>
             </div>
-
-            <div class="slider-dots" id="sliderDots"></div>
         </div>
-
         <div id="total-pedido">Total do Pedido: R$ 0.00</div>
-        <div class="payment-options">
-            <h3>Selecione a Forma de Pagamento:</h3>
-            <label><input type="radio" name="payment" value="dinheiro" required>Dinheiro</label>
-            <label><input type="radio" name="payment" value="debito" required>Cartão de Débito</label>
-            <label><input type="radio" name="payment" value="credito" required>Cartão de Crédito</label>
-            <label><input type="radio" name="payment" value="pix" required>Pix</label>
 
-            <div id="troco-field" style="display: none; margin-top: 15px;">
-                <label for="valor-pago">Valor Pago (para troco):</label>
-                <input type="number" id="valor-pago" step="0.01" min="0" placeholder="R$ 0.00">
-                <p id="valor-troco">Troco: R$ 0.00</p>
+        <div class="pedido-details">
+            <div class="payment-options">
+                <h3>Selecione a Forma de Pagamento:</h3>
+                <label><input type="radio" name="payment" value="dinheiro" required>Dinheiro</label>
+                <label><input type="radio" name="payment" value="debito" required>Cartão de Débito</label>
+                <label><input type="radio" name="payment" value="credito" required>Cartão de Crédito</label>
+                <label><input type="radio" name="payment" value="pix" required>Pix</label>
+
+                <div id="troco-field" style="display: none; margin-top: 15px;">
+                    <label for="valor-pago">Valor Pago (para troco):</label>
+                    <input type="number" id="valor-pago" step="0.01" min="0" placeholder="R$ 0.00">
+                    <p id="valor-troco">Troco: R$ 0.00</p>
+                </div>
             </div>
         </div>
-        <button id="confirmarPedido">Confirmar Pedido</button>
-        <div id="mensagem"></div>
-        <a href="index.html" class="voltar-btn">Voltar</a>
+        <div class="form-buttons">
+            <div id="mensagem"></div>
+            <button id="confirmarPedido" class="edit-button">Confirmar Pedido</button>
+            <a href="index.html" class="exit-button">Sair</a>
+        </div>
+
+
+
     </div>
 
     <input type="hidden" id="clienteTelefone" name="clienteTelefone">
-    <input type="hidden" id="idPedidoExistente" name="idPedidoExistente"> <input type="hidden" id="hasGasProduct" name="hasGasProduct" value="0"> 
+    <input type="hidden" id="idPedidoExistente" name="idPedidoExistente">
+    <input type="hidden" id="hasGasProduct" name="hasGasProduct" value="0">
+    <script>
+        // Aguarda o carregamento completo do DOM
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cria um objeto URLSearchParams para analisar os parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            // Obtém o valor do parâmetro 'nome' da URL e pega apenas o primeiro nome
+            const nomeCompleto = urlParams.get('nome');
+            const nomeCliente = nomeCompleto ? nomeCompleto.split(' ')[0] : null;
+
+            // Obtém a referência ao elemento h1 pelo seu ID
+            const tituloPedido = document.getElementById('tituloPedido');
+
+            // Verifica se o elemento h1 existe
+            if (tituloPedido) {
+                // Limpa qualquer conteúdo existente no h1
+                tituloPedido.innerHTML = '';
+
+                if (nomeCliente) {
+                    // Cria um span para o nome do cliente e define a cor cor-titulo
+                    const spanNome = document.createElement('span');
+                    spanNome.textContent = nomeCliente;
+                    spanNome.style.color = 'var(--cor-titulo)'; // Cor cor-titulo para o nome
+
+                    // Adiciona o span do nome ao h1
+                    tituloPedido.appendChild(spanNome);
+
+                    // Adiciona uma quebra de linha
+                    tituloPedido.appendChild(document.createElement('br'));
+                }
+
+                // Cria um span para a frase "faça seu pedido." e define a cor principal
+                const spanFrase = document.createElement('span');
+                // Usa CSS custom property para a cor principal, garantindo que o CSS seja carregado
+                spanFrase.style.color = 'var(--cor-principal)';
+                spanFrase.textContent = 'faça seu pedido.';
+
+                // Adiciona o span da frase ao h1
+                tituloPedido.appendChild(spanFrase);
+            }
+        });
+    </SCript>
     <script src="js/pedido.js"></script>
 </body>
+
 </html>

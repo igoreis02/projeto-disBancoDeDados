@@ -333,13 +333,17 @@ $conn->close();
         #currentOrderItems div:last-child {
             border-bottom: none;
         }
+        .tamanho-tabela{
+            width: 80%;
+            border-collapse: collapse;
+        }
     </style>
 </head>
 <body>
     <div class="background"></div>
     <div class="card tamanho-tabela">
         <h1 class="titulo-tabela">Lista de Pedidos</h1>
-
+        <a href="menu.html" class="voltar-btn">Voltar ao Menu</a>
         <div class="table-container">
             <table id="pedidosTable">
                 <thead>
@@ -398,7 +402,7 @@ $conn->close();
                 </tbody>
             </table>
         </div>
-        <a href="menu.html" class="voltar-btn">Voltar ao Menu</a>
+        
     </div>
     <div class="footer">
         <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>

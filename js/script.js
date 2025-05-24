@@ -113,9 +113,8 @@ verificarForm.addEventListener('submit', function (event) {
                     // Redireciona para a página de pedido em entrega
                     window.location.href = `pedido_em_entrega.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}`;
                 } else {
-                    
                     // Se não há pedidos pendentes/aceitos/em entrega, redireciona para confirmação de endereço
-                    window.location.href = `confirmar_endereco.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}&endereco=${encodeURIComponent(data.endereco)}&quadra=${encodeURIComponent(data.quadra)}&lote=${encodeURIComponent(data.lote)}&setor=${encodeURIComponent(data.setor)}&complemento=${encodeURIComponent(data.complemento)}&cidade=${encodeURIComponent(data.cidade)}`;
+                    window.location.href = `confirmar_endereco.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}`;
                 }
             } else {
                 // Se o telefone não existe, redireciona para cadastro

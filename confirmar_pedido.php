@@ -94,6 +94,14 @@ $conn->close();
             margin-bottom: 10px;
             font-size: 1.1em;
         }
+         .card .message-paragraph {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            margin-top: 60px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+        }
+        .nome-cliente{
+            color:var(--cor-titulo)
+        }
         .pedido-summary {
             background-color: #f9f9f9;
             border: 1px solid #ddd;
@@ -132,10 +140,10 @@ $conn->close();
             background-color: var(--cor-secundaria);
         }
         .form-buttons .cancel-button {
-            background-color: #dc3545;
+            background-color:   #eb9f25;
         }
         .form-buttons .cancel-button:hover {
-            background-color: #c82333;
+            background-color: rgb(197, 133, 31);
         }
     </style>
 </head>
@@ -144,7 +152,7 @@ $conn->close();
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1>Confirmar Pedido</h1>
-        <p>Olá, <strong><?php echo htmlspecialchars(ucwords(explode(' ', $cliente_nome)[0])); ?></strong>! Por favor, confirme os detalhes do seu pedido:</p>
+        <p class="message-paragraph">Olá, <strong class="nome-cliente"><?php echo htmlspecialchars(ucwords(explode(' ', $cliente_nome)[0])); ?></strong>! Por favor, confirme os detalhes do seu pedido:</p>
         
         <div class="pedido-summary">
             <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p>
