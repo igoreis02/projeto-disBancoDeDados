@@ -4,8 +4,9 @@
     max-width: 800px;
     margin: 20px auto;
     position: relative;
-    padding: 0 50px;
+    padding: 0 50px; /* Isso adiciona um padding lateral, que é importante considerar */
 }
+
 
 .spring-slider {
     position: relative;
@@ -16,15 +17,15 @@
     display: flex;
     transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
     will-change: transform;
-    gap: 20px;
+    gap: 15px; /* Manter o gap */
 }
 
 .slider-item {
-    min-width: calc(100% - 40px);
-    padding: 0 10px;
+    min-width: calc(100% - 40px); /* Garante que o item ocupe a largura completa do contêiner menos padding */
+    padding: 0 10px; /* Padding interno */
     flex-shrink: 0;
+    box-sizing: border-box; /* IMPORTANTE: Inclui padding na largura total do item */
 }
-
 .product-card {
     background: white;
     border-radius: 10px;
@@ -164,15 +165,70 @@
 
 .payment-options {
     margin-top: 20px;
-    text-align: center;
+    text-align: center; /* Centraliza o cabeçalho h3 */
+
+    /* Adicione estas propriedades para flexbox */
+    display: flex;
+    flex-wrap: wrap; /* Faz os itens quebrarem para a próxima linha se não houver espaço */
+    justify-content: center; /* Centraliza os itens horizontalmente */
+    gap: 10px; /* Adiciona um pequeno espaço entre as labels */
+}
+.payment-options h3 {
+    margin-top: 0; /* Remove a margem superior para melhor alinhamento */
+    margin-bottom: 10px;
+    width: 100%; /* Garante que o título ocupe a largura total */
 }
 
-.payment-options h3 {
-    margin-bottom: 10px;
-}
 
 .payment-options label {
-    margin: 0 10px;
+    /* Mantenha suas propriedades existentes aqui */
+    margin: 0; /* Remove margens extras que podem atrapalhar o flexbox */
+    padding: 8px 15px; /* Adicione padding para as labels */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s, border-color 0.2s;
+    display: inline-flex; /* Usa inline-flex para alinhar o input e o texto */
+    align-items: center; /* Alinha o conteúdo verticalmente */
+    white-space: nowrap; /* Impede que o texto dentro da label quebre */
+}
+
+.payment-options label input[type="radio"] {
+    margin-right: 8px; /* Espaço entre o radio button e o texto */
+}
+
+.payment-options label:hover {
+    background-color: #e0e0e0;
+    border-color: var(--cor-principal);
+}
+
+.payment-options label input[type="radio"]:checked + span { /* Se você envolver o texto em um span */
+    color: var(--cor-principal);
+    font-weight: bold;
+}
+
+.payment-options label input[type="radio"]:checked {
+    accent-color: var(--cor-principal); /* Destaca o radio button selecionado */
+}
+
+/* Estilos para o campo de troco */
+#troco-field {
+    width: 100%; /* Ocupa a largura total para ficar abaixo das opções */
+    margin-top: 15px;
+    text-align: center; /* Centraliza o conteúdo do campo de troco */
+}
+
+#troco-field label, #troco-field input, #troco-field p {
+    display: block; /* Garante que cada elemento do troco fique em sua própria linha */
+    margin: 5px auto; /* Centraliza e adiciona margem vertical */
+    max-width: 250px; /* Limita a largura dos inputs para melhor visualização */
+}
+
+#troco-field input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 #confirmarPedido {
@@ -203,8 +259,4 @@
         min-width: calc(33.33% - 27px);
     }
 }
-
-.spring-slider-container {
-        padding: 0 60px;
-    }
 

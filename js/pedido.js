@@ -8,44 +8,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const trocoField = document.getElementById('troco-field');
     const valorPagoInput = document.getElementById('valor-pago');
     const valorTrocoP = document.getElementById('valor-troco');
-    const confirmarPedidoBtn = document.getElementById('confirmarPedido'); // New
-    const clienteTelefoneInput = document.getElementById('clienteTelefone'); // New
-    const erro = document.getElementById('mensagem'); // Element to display error messages
+    const confirmarPedidoBtn = document.getElementById('confirmarPedido');
+    const clienteTelefoneInput = document.getElementById('clienteTelefone');
+    const erro = document.getElementById('mensagem');
 
     let currentIndex = 0;
-    let itemWidth = 0;
-    let itemsPerView = 1;
+    let itemWidth = 0; // Largura de um item, incluindo o gap "virtual" que ele ocupa
+    let totalItems = 0; // Número total de produtos
     let produtos = [];
     let currentTotal = 0;
 
-    // Get phone number from URL if available (from cadastro.html)
     const urlParams = new URLSearchParams(window.location.search);
     const telefoneFromURL = urlParams.get('telefone');
     if (telefoneFromURL) {
         clienteTelefoneInput.value = telefoneFromURL;
     }
 
-    // Fetch products from the server
     fetch('get_produtos.php')
         .then(response => response.json())
         .then(data => {
             console.log("Produtos fetched:", data);
             produtos = data;
             renderProducts();
-            setupSlider();
-            atualizarTotalPedido(); // Initial calculation after products are rendered
+            setupSlider(); // Chamar setupSlider após renderizar os produtos
+            atualizarTotalPedido();
         })
         .catch(error => console.error('Erro ao buscar produtos:', error));
 
-    // Render products in the slider
     function renderProducts() {
         sliderTrack.innerHTML = '';
-
         produtos.forEach(produto => {
             const sliderItem = document.createElement('div');
             sliderItem.classList.add('slider-item');
 
-            const inputId = `quantity-input-${produto.id_produtos}`; // Corrected product ID attribute
+            const inputId = `quantity-input-${produto.id_produtos}`;
 
             sliderItem.innerHTML = `
                 <div class="product-card">
@@ -61,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `;
-
             sliderTrack.appendChild(sliderItem);
 
             const inputField = sliderItem.querySelector(`#${inputId}`);
@@ -84,85 +79,152 @@ document.addEventListener('DOMContentLoaded', function() {
 
             inputField.addEventListener('input', atualizarTotalPedido);
         });
+        totalItems = produtos.length; // Atualiza o total de itens após a renderização
     }
 
-    // Configure the slider
     function setupSlider() {
         const sliderItems = document.querySelectorAll('.slider-item');
-        if (sliderItems.length === 0) return;
+        if (sliderItems.length === 0) {
+            itemWidth = 0; // Reset itemWidth if no items
+            dotsContainer.innerHTML = ''; // Clear dots if no items
+            return;
+        }
 
-        itemWidth = sliderItems[0].offsetWidth;
-        itemsPerView = Math.round(sliderTrack.offsetWidth / itemWidth);
+        // Obtém a largura computada de um item e o gap
+        const firstItem = sliderItems[0];
+        const computedStyle = window.getComputedStyle(sliderTrack);
+        const gap = parseFloat(computedStyle.getPropertyValue('gap')) || 0;
+
+        // Largura real do item (offsetWidth inclui padding e borda) + o gap que ele 'ocupa'
+        itemWidth = firstItem.offsetWidth + gap;
+
+        // Se houver apenas um item, ajuste o itemWidth para evitar problemas de cálculo de translação
+        if (totalItems === 1) {
+            itemWidth = firstItem.offsetWidth;
+        }
 
         createDots();
-        goToSlide(0);
-
+        goToSlide(currentIndex); // Vai para o slide atual para aplicar a posição inicial
         window.addEventListener('resize', handleResize);
     }
 
-    // Create navigation dots
+
     function createDots() {
         dotsContainer.innerHTML = '';
-        const sliderItems = document.querySelectorAll('.slider-item');
-        if (sliderItems.length === 0) return;
+        if (totalItems === 0) return;
 
-        const dotCount = Math.ceil(sliderItems.length / itemsPerView);
-
-        for (let i = 0; i < dotCount; i++) {
+        // O número de pontos é igual ao número total de itens, pois avançamos um por um
+        for (let i = 0; i < totalItems; i++) {
             const dot = document.createElement('div');
             dot.className = 'dot';
-            if (i === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => goToSlide(i * itemsPerView));
+            if (i === currentIndex) dot.classList.add('active'); // Ativa o dot inicial
+            dot.addEventListener('click', () => goToSlide(i));
             dotsContainer.appendChild(dot);
         }
     }
 
-    // Update active dots
     function updateDots() {
         const dots = document.querySelectorAll('.dot');
-        const activeDotIndex = Math.floor(currentIndex / itemsPerView);
-
         dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === activeDotIndex);
+            dot.classList.toggle('active', index === currentIndex);
         });
     }
 
-    // Move to a specific slide
     function goToSlide(index) {
-        const sliderItems = document.querySelectorAll('.slider-item');
-        if (sliderItems.length === 0) return;
+        if (totalItems === 0 || itemWidth === 0) return;
 
-        const maxIndex = sliderItems.length - itemsPerView;
+        // Calcula o índice máximo para garantir que o último item esteja visível
+        // A largura visível do track
+        const trackVisibleWidth = sliderTrack.offsetWidth;
+        const lastItem = document.querySelector('.slider-item:last-child');
+        let maxIndex = 0;
+
+        if (lastItem) {
+            // Calcula a posição da borda direita do último item se ele estivesse na posição 0
+            const lastItemOriginalPosition = lastItem.offsetLeft; // Posição do último item sem translate
+
+            // O slider pode ir até um ponto onde a borda direita do ÚLTIMO item
+            // esteja alinhada com a borda direita da área visível do slider.
+            // Para isso, a translação é: (largura total do track - largura visível do track)
+            // Dividido pela largura de um item para obter o índice.
+            // Arredondar para cima para garantir que o último item seja acessível.
+            const totalContentWidth = itemWidth * totalItems; // Largura total de todos os itens + gaps
+            if (totalContentWidth > trackVisibleWidth) {
+                // maxScrollLeft é o quanto o sliderTrack precisa se deslocar para a esquerda
+                // para que o último item visível seja o último item do array.
+                const lastItemWidth = lastItem.offsetWidth;
+                const gap = parseFloat(window.getComputedStyle(sliderTrack).getPropertyValue('gap')) || 0;
+
+                // O offsetRight do último item quando totalmente visível.
+                // Isso é complexo porque o `min-width` pode significar que nem sempre N itens cabem perfeitamente.
+                // A melhor abordagem é calcular a quantidade de "scroll" necessária.
+                // Se o último item estiver no final da tela, a translação é:
+                // (total de itens * itemWidth) - (largura do track visível)
+                let calculatedMaxScroll = (totalItems * itemWidth) - (trackVisibleWidth + gap);
+                // Divida pelo itemWidth para obter o índice aproximado
+                maxIndex = Math.ceil(calculatedMaxScroll / itemWidth);
+
+                // Garante que o maxIndex não seja negativo e não ultrapasse o número de itens - 1
+                maxIndex = Math.max(0, Math.min(maxIndex, totalItems - 1));
+            } else {
+                maxIndex = 0; // Se todos os itens couberem, não há rolagem
+            }
+        }
+
+
+        // Garante que o índice não seja negativo e não ultrapasse o máximo possível
         currentIndex = Math.max(0, Math.min(index, maxIndex));
 
-        const targetPosition = -currentIndex * itemWidth;
-        sliderTrack.style.transform = `translateX(${targetPosition}px)`;
+        // Posição de translação: -currentIndex * itemWidth
+        // Adicionamos um ajuste aqui para garantir que o último item se encaixe
+        // Se estiver no último slide, e o ultimo item estiver parcialmente visível, ajuste a translação
+        let targetPosition = -currentIndex * itemWidth;
 
+        // Ajuste para o último slide:
+        // Se estamos no "último" slide (ou seja, currentIndex está próximo do maxIndex),
+        // precisamos garantir que o último item esteja totalmente visível.
+        // Isso pode exigir que a translação seja um pouco menor do que o calculado
+        // para "empurrar" o último item para a vista.
+        if (currentIndex === maxIndex && totalItems > 0) {
+            const currentContentWidth = (totalItems * itemWidth); // Largura total dos itens
+            const visibleWidth = sliderTrack.offsetWidth;
+            const remainingSpace = currentContentWidth - visibleWidth;
+            if (remainingSpace > 0) {
+                // A posição final deve ser tal que o último item esteja visível.
+                // Se o itemWidth * maxIndex não for o suficiente, empurre mais.
+                // Ex: se 3 itens visíveis, e o último de 10 itens está no slide 8,
+                // ele pode estar cortado. A translação deveria ser mais para a esquerda.
+                targetPosition = -(currentContentWidth - visibleWidth + parseFloat(window.getComputedStyle(sliderTrack).gap || 0));
+                // Certifique-se de que não estamos empurrando muito para a esquerda,
+                // ou seja, a posição não deve ser menor do que o necessário para exibir o primeiro item
+                targetPosition = Math.max(targetPosition, -(maxIndex * itemWidth));
+            } else {
+                targetPosition = 0; // Se tudo cabe, não precisa rolar
+            }
+        }
+         // Adicionalmente, garantimos que o targetPosition não seja negativo se houver poucos itens
+        if (targetPosition > 0) {
+            targetPosition = 0;
+        }
+
+        sliderTrack.style.transform = `translateX(${targetPosition}px)`;
         updateDots();
     }
 
-    // Previous slide
     function prevSlide() {
-        goToSlide(currentIndex - 1);
+        goToSlide(currentIndex - 1); // Avança um item por vez
     }
 
-    // Next slide
     function nextSlide() {
-        goToSlide(currentIndex + 1);
+        goToSlide(currentIndex + 1); // Avança um item por vez
     }
 
-    // Recalculate dimensions on window resize
     function handleResize() {
-        const sliderItems = document.querySelectorAll('.slider-item');
-        if (sliderItems.length === 0) return;
-
-        itemWidth = sliderItems[0].offsetWidth;
-        itemsPerView = Math.round(sliderTrack.offsetWidth / itemWidth);
-        goToSlide(currentIndex);
-        createDots();
+        setupSlider(); // Recalcula tudo no redimensionamento
+        goToSlide(currentIndex); // Garante que a posição seja ajustada após o redimensionamento
     }
 
-    // Update order total
+    // --- Funções de Pedido (mantidas as originais) ---
     function atualizarTotalPedido() {
         let total = 0;
         const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
@@ -184,13 +246,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to calculate and display change with validation
     function calcularTroco() {
         const valorPagoStr = valorPagoInput.value.trim();
         let valorPago = parseFloat(valorPagoStr);
         let troco = 0;
 
-        // If input is empty, treat as exact value for now
         if (valorPagoStr === '') {
             valorTrocoP.textContent = `Troco: R$ 0,00 (Valor exato)`;
             valorTrocoP.style.color = 'inherit';
@@ -213,45 +273,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Event listener for payment method selection
     paymentOptions.addEventListener('change', function(event) {
         if (event.target.name === 'payment') {
             if (event.target.value === 'dinheiro') {
                 trocoField.style.display = 'block';
-                valorPagoInput.value = ''; // Clear previous input
-                valorTrocoP.textContent = 'Troco: R$ 0,00'; // Reset troco display
-                valorTrocoP.style.color = 'inherit'; // Reset color
-                calcularTroco(); // Call calcularTroco to immediately show "Valor exato" if total is 0 or user just selected
+                valorPagoInput.value = '';
+                valorTrocoP.textContent = 'Troco: R$ 0,00';
+                valorTrocoP.style.color = 'inherit';
+                calcularTroco();
             } else {
                 trocoField.style.display = 'none';
-                valorPagoInput.value = ''; // Clear input when switching away from dinheiro
-                erro.textContent = ''; // Clear any previous error message
+                valorPagoInput.value = '';
+                erro.textContent = '';
             }
         }
     });
 
-    // Event listener for Valor Pago input
     valorPagoInput.addEventListener('input', calcularTroco);
 
-
-    // Event listeners for slider navigation
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
 
-    // New: Event listener for Confirmar Pedido button
     confirmarPedidoBtn.addEventListener('click', function() {
         const selectedProducts = [];
         const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
         let hasSelectedProducts = false;
 
-        erro.textContent = ''; // Clear previous error messages
+        erro.textContent = '';
 
         quantityInputs.forEach(input => {
             const quantity = parseInt(input.value, 10);
             if (quantity > 0) {
                 hasSelectedProducts = true;
                 const productId = input.name;
-                const product = produtos.find(p => p.id_produtos == productId); // Corrected product ID attribute
+                const product = produtos.find(p => p.id_produtos == productId);
                 if (product) {
                     selectedProducts.push({
                         id: product.id_produtos,
@@ -277,46 +332,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const formaPagamento = paymentMethod.value;
-        let valorPagoParaTroco = 0; // Initialize to 0
+        let valorPagoParaTroco = 0;
 
-        // If payment is cash, get the paid amount and validate
         if (formaPagamento === 'dinheiro') {
             const valorPagoInputTrimmed = valorPagoInput.value.trim();
 
-            // If the input is empty, treat it as if the exact total was paid.
             if (valorPagoInputTrimmed === '') {
                 valorPagoParaTroco = currentTotal;
             } else {
                 valorPagoParaTroco = parseFloat(valorPagoInputTrimmed);
 
-                // Check if not a valid number after trying to parse
                 if (isNaN(valorPagoParaTroco)) {
                     erro.textContent = 'Por favor, insira um valor válido para pagamento em dinheiro.';
                     erro.style.color = 'red';
                     return;
                 }
-                 // Check if paid amount is less than total (after handling empty input)
-                 if (valorPagoParaTroco < currentTotal) {
-                erro.textContent = 'Para pagamento em dinheiro, o valor pago deve ser igual ou maior que o total do pedido.';
-                erro.style.color = 'red';
-                return; // Prevent redirection if validation fails
-                 }
+                if (valorPagoParaTroco < currentTotal) {
+                    erro.textContent = 'Para pagamento em dinheiro, o valor pago deve ser igual ou maior que o total do pedido.';
+                    erro.style.color = 'red';
+                    return;
+                }
             }
-
-           
         }
 
-        // Constructing the URL with parameters
         const params = new URLSearchParams();
         params.append('telefone', clienteTelefoneInput.value);
         params.append('total', currentTotal.toFixed(2));
         params.append('forma_pagamento', formaPagamento);
         params.append('produtos', JSON.stringify(selectedProducts));
 
-        // Add valor_pago parameter ONLY if payment is 'dinheiro'
         if (formaPagamento === 'dinheiro') {
             params.append('valor_pago', valorPagoParaTroco.toFixed(2));
-        } 
+        }
 
         window.location.href = `confirmar_pedido.php?${params.toString()}`;
     });

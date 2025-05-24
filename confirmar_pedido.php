@@ -19,7 +19,8 @@ $forma_pagamento = isset($_GET['forma_pagamento']) ? $_GET['forma_pagamento'] : 
 $produtos_json = isset($_GET['produtos']) ? $_GET['produtos'] : '[]';
 $produtos_selecionados = json_decode($produtos_json, true);
 $id_pedido_existente = isset($_GET['id_pedido_existente']) ? (int)$_GET['id_pedido_existente'] : 0; // ID do pedido existente
-$has_gas_product = isset($_GET['has_gas_product']) ? (int)$_GET['has_gas_product'] : 0; // Tem produto de gás
+$has_gas_product = isset($_GET['has_gas_product']) ? (int)$_GET['has_gas_product'] : 0; // Tem produto de gás (0 ou 1)
+
 
 // Obtém valor_pago apenas se estiver definido e a forma de pagamento for 'dinheiro'
 $valor_pago = null;
@@ -86,10 +87,7 @@ $conn->close();
             text-align: center;
             padding: 30px;
         }
-        .card h1 {
-            color: var(--cor-titulo);
-            margin-bottom: 20px;
-        }
+
         .card p {
             margin-bottom: 10px;
             font-size: 1.1em;
@@ -97,7 +95,7 @@ $conn->close();
          .card .message-paragraph {
             margin-bottom: 10px;
             font-size: 1.1em;
-            margin-top: 60px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+            margin-top: 100px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
         }
         .nome-cliente{
             color:var(--cor-titulo)
@@ -151,7 +149,6 @@ $conn->close();
     <div class="background"></div>
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
-        <h1>Confirmar Pedido</h1>
         <p class="message-paragraph">Olá, <strong class="nome-cliente"><?php echo htmlspecialchars(ucwords(explode(' ', $cliente_nome)[0])); ?></strong>! Por favor, confirme os detalhes do seu pedido:</p>
         
         <div class="pedido-summary">
@@ -178,13 +175,15 @@ $conn->close();
 
     <script>
         document.getElementById('finalizarPedidoBtn').addEventListener('click', function() {
+            const urlParams = new URLSearchParams(window.location.search);
             const telefoneCliente = "<?php echo htmlspecialchars($telefone); ?>";
             const totalPedido = "<?php echo htmlspecialchars($total_pedido); ?>";
             const formaPagamento = "<?php echo htmlspecialchars($forma_pagamento); ?>";
-            const produtosSelecionados = <?php echo json_encode($produtos_selecionados); ?>;
-            const valorPago = <?php echo ($valor_pago !== null) ? htmlspecialchars($valor_pago) : 'null'; ?>;
-            const idPedidoExistente = "<?php echo htmlspecialchars($id_pedido_existente); ?>"; // NOVO: ID do pedido existente
-            const hasGasProduct = "<?php echo htmlspecialchars($has_gas_product); ?>"; // NOVO: Tem produto de gás
+            const produtosJson = urlParams.get('produtos');
+            const produtosSelecionados = JSON.parse(produtosJson);
+            const valorPago = parseFloat(urlParams.get('valor_pago'));
+            const idPedidoExistente = parseInt("<?php echo htmlspecialchars($id_pedido_existente); ?>"); // Converte para int
+            const hasGasProduct = Boolean(parseInt("<?php echo htmlspecialchars($has_gas_product); ?>")); // Converte para boolean
 
             const dadosDoPedido = {
                 telefone: telefoneCliente,
@@ -197,26 +196,36 @@ $conn->close();
             };
 
             fetch('salvar_pedido.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dadosDoPedido)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    window.location.href = data.redirect_url; // Usa a URL de redirecionamento do PHP
-                } else {
-                    alert('Erro ao finalizar o pedido: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro na requisição:', error);
-                alert('Ocorreu um erro ao tentar finalizar o pedido. Por favor, tente novamente.');
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(dadosDoPedido)
+                    })
+                    .then(response => {
+                        // Log the raw response status and text for debugging
+                        console.log('Raw response status:', response.status);
+                        if (!response.ok) {
+                            // If response is not OK (e.g., 500 Internal Server Error)
+                            return response.text().then(text => {
+                                throw new Error('HTTP error! Status: ' + response.status + ' - ' + text);
+                            });
+                        }
+                        return response.json(); // Attempt to parse as JSON
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.href = data.redirect_url; // Usa a URL de redirecionamento do PHP
+                        } else {
+                            alert('Erro ao finalizar o pedido: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro na requisição:', error);
+                        alert('Ocorreu um erro ao tentar finalizar o pedido. Por favor, tente novamente. Detalhes no console.');
+                    });
             });
-        });
     </script>
 </body>
 </html>

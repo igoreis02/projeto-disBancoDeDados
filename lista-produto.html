@@ -12,17 +12,40 @@
         .card::before {
             content: none;
         }
-         .card.tamanho-tabela { /* Use a classe combinada para especificidade */
-            margin-top: 20px; /* Define o top para 20px */
-            /* Mantenha o margin-left/right como auto ou o valor desejado para centralizar */
-            margin-left: auto;
-            margin-right: auto;
-            /* Se o padding-top de 140px estiver empurrando para baixo, ajuste-o aqui */
-            padding-top: 50px; /* Exemplo: Reduza o padding-top se 140px for muito */
-        }
+        
         .tamanho-tabela{
             width: 80%;
             border-collapse: collapse;
+        }
+        .voltar-menu-btn-right {
+            background-color: var(--cor-titulo); /* Use the color from your CSS variables */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none; /* Remove underline from link */
+            display: inline-block; /* Allows padding and margin */
+            margin-left: auto; /* Pushes the button to the right */
+            margin-right: 10px; /* Small margin from the right edge */
+            align-self: flex-end; /* Aligns itself to the end of the flex container */
+            margin-bottom: 20px; /* Space below the button */
+        }
+        .voltar-menu-btn-right:hover {
+            opacity: 0.9;
+        }
+         .card.tamanho-tabela .header-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: space-between; /* Distribute items with space between them */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .botoes-lista-produto{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -31,8 +54,11 @@
     <div class="background"></div>
     <div class="card tamanho-tabela">
         <h1 class="titulo-tabela">Lista de Produtos</h1>
-        <button id="addProdutoBtn">Adicionar Produto</button>
-        <button id="entradaEstoqueBtn">Entrada de Estoque</button> 
+        <div class="botoes-lista-produto">
+            <button id="addProdutoBtn">Adicionar Produto</button>
+            <button id="entradaEstoqueBtn">Entrada de Estoque</button>
+            <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
+        </div>
         <div class="table-container">
             <table id="productTable">
                 <thead>
@@ -48,7 +74,7 @@
                 </tbody>
             </table>
         </div>
-        <a href="menu.html" class="voltar-btn">Voltar</a>
+        
     </div>
     <div class="footer">
         <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>

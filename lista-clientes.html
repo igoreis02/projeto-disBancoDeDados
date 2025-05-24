@@ -15,6 +15,30 @@
             width: 80%;
             border-collapse: collapse;
         }
+        .voltar-menu-btn-right {
+            background-color: var(--cor-titulo); 
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none; 
+            display: inline-block; 
+            margin-left: auto; 
+            margin-right: 10px; 
+            align-self: flex-end;/* Aligns itself to the end of the flex container */
+            margin-bottom: 20px; /* Space below the button */
+        }
+        .voltar-menu-btn-right:hover {
+            opacity: 0.9;
+        }
+         .card.tamanho-tabela .header-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: space-between; /* Distribute items with space between them */
+            align-items: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -22,6 +46,7 @@
     <div class="background"></div>
     <div class="card  tamanho-tabela">
         <h1 class="titulo-tabela">Lista de Clientes</h1>
+        <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
         <div class="table-container">
             <table id="clientTable">
                 <thead>
@@ -45,7 +70,7 @@
                 </tbody>
             </table>
         </div>
-        <a href="menu.html" class="voltar-btn">Voltar</a>
+        
     </div>
     <div class="footer">
         <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
