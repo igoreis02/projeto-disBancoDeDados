@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="css/slider.css">
     <style>
         /* Regra para remover o pseudo-elemento ::before da classe .card nesta página */
-        .card::before {
-            content: none;
+        .card{
+            padding-right: 20px;
+            padding-left: 20px;
         }
 
         .pedido-details {
@@ -21,6 +22,7 @@
             margin: 20px auto;
             max-width: 800px;
             text-align: left;
+            width: 100%;
         }
 
         .pedido-details strong {
@@ -37,13 +39,6 @@
             text-align: center;
         }
 
-        .tamanho-tabela {
-            width: 30%;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
 
         .form-buttons {
             display: flex;
@@ -91,7 +86,8 @@
 
 <body>
     <div class="background"></div>
-    <div class="card tamanho-tabela">
+    <div class="card">
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1 class="titulo-tabela" id="tituloPedido">Realizar Pedido</h1>
         <div class="pedido-details">
             <h2 class="nome-produto">Produtos</h2>
@@ -130,14 +126,14 @@
             <button id="confirmarPedido" class="edit-button">Confirmar Pedido</button>
             <a href="index.html" class="exit-button">Sair</a>
         </div>
-
-
+        <input type="hidden" id="clienteTelefone" name="clienteTelefone">
+        <input type="hidden" id="idPedidoExistente" name="idPedidoExistente">
+        <input type="hidden" id="hasGasProduct" name="hasGasProduct" value="0">
+        <input type="hidden" id="${inputId}" name="${produto.id_produtos}" value="0" min="0" step="1" data-preco="${produto.preco}" data-nome="${produto.nome}">
 
     </div>
 
-    <input type="hidden" id="clienteTelefone" name="clienteTelefone">
-    <input type="hidden" id="idPedidoExistente" name="idPedidoExistente">
-    <input type="hidden" id="hasGasProduct" name="hasGasProduct" value="0">
+   
     <script>
         // Aguarda o carregamento completo do DOM
         document.addEventListener('DOMContentLoaded', function () {

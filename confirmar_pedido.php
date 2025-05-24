@@ -194,7 +194,7 @@ $conn->close();
                 id_pedido_existente: idPedidoExistente, // Inclui o ID do pedido existente
                 has_gas_product: hasGasProduct // Inclui a informação de gás
             };
-
+            console.log('Dados do pedido:', dadosDoPedido); // Log para verificar os dados
             fetch('salvar_pedido.php', {
                         method: 'POST',
                         headers: {
@@ -215,15 +215,15 @@ $conn->close();
                     })
                     .then(data => {
                         if (data.success) {
-                            alert(data.message);
+                            console.log(data.message);
                             window.location.href = data.redirect_url; // Usa a URL de redirecionamento do PHP
                         } else {
-                            alert('Erro ao finalizar o pedido: ' + data.message);
+                            console.log('Erro ao finalizar o pedido: ' + data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Erro na requisição:', error);
-                        alert('Ocorreu um erro ao tentar finalizar o pedido. Por favor, tente novamente. Detalhes no console.');
+                        console.log('Ocorreu um erro ao tentar finalizar o pedido. Por favor, tente novamente. Detalhes no console.');
                     });
             });
     </script>

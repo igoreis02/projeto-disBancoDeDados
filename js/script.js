@@ -105,8 +105,8 @@ verificarForm.addEventListener('submit', function (event) {
             console.log(data); // Adicione este log para depuração
             if (data.existe) {
                 // Se o telefone existe, verificar se há pedidos pendentes, aceitos ou em entrega
-                if (data.pedido_pendente_ou_aceito) {
-                    console.log(data);
+                if (data.pedido_pendente_ou_aceito ) {
+                    
                     // Redireciona para a página de pedido na loja
                     window.location.href = `pedido_na_loja.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}&id_pedido=${encodeURIComponent(data.id_pedido)}&status_pedido=${encodeURIComponent(data.status_pedido)}&valor_total=${encodeURIComponent(data.valor_total)}&produtos_detalhes=${encodeURIComponent(data.produtos_detalhes)}&forma_pagamento=${encodeURIComponent(data.forma_pagamento)}&valor_pago=${encodeURIComponent(data.valor_pago)}&troco=${encodeURIComponent(data.troco)}&endereco=${encodeURIComponent(data.endereco)}&quadra=${encodeURIComponent(data.quadra)}&lote=${encodeURIComponent(data.lote)}&setor=${encodeURIComponent(data.setor)}&complemento=${encodeURIComponent(data.complemento)}&cidade=${encodeURIComponent(data.cidade)}`;
                 } else if (data.pedido_em_entrega) {

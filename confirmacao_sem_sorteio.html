@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Pedido Concluído!</title>
+    <style>
+        .confirmacao-info {
+            margin-top: 20px;
+        }
+
+        .confirmacao-info h1 {
+            color: var(--cor-principal);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .confirmacao-info p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .botao_Voltar {
+            background-color: var(--cor-titulo);
+            color: white;
+            padding: 12px 60px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            align-items: center;
+        }
+
+        .botao_Voltar:hover {
+            background-color: var(--cor-titulo-hover);
+            /* Um tom ligeiramente mais escuro */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="card">
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
+        <img class="imagem" src="imagens/boneco.png" alt="">
+
+        <div class="sorteio form">
+            <h1>Olá, <span id="nomeCadastrado"></span>!</h1>
+            <p class="paragrafo">Seu pedido foi concluído com sucesso, logo estará chegando na sua residência.</p>
+            <p class="paragrafo">Obrigado pela preferência!</p>
+
+        </div>
+        <div>
+            <button class="botao_Voltar">Sair</button>
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const nomeCompletoParam = urlParams.get('nome');
+
+            const nomeCadastradoSpan = document.getElementById('nomeCadastrado');
+
+            if (nomeCompletoParam) {
+                // O nome já deve vir como o primeiro nome capitalizado do PHP
+                nomeCadastradoSpan.textContent = decodeURIComponent(nomeCompletoParam);
+            } else {
+                nomeCadastradoSpan.textContent = 'Cliente';
+            }
+
+            document.querySelector('.botao_Voltar').addEventListener('click', function () {
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+
+</html>

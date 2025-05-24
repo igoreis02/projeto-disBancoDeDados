@@ -56,15 +56,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         $id_pedido = $id_pedido_existente; // Assume que é uma atualização se id_pedido_existente for > 0
-
+        $status_inicial = "Pendente";
         if ($id_pedido_existente > 0) {
             // É uma atualização de pedido existente
             // Atualiza o pedido principal
-            $stmt_pedido = $conn->prepare("UPDATE pedidos SET valor_total = ?, forma_pagamento = ?, valor_pago = ? WHERE id_pedido = ? AND id_cliente = ?");
+            $stmt_pedido = $conn->prepare("UPDATE pedidos SET valor_total = ?, forma_pagamento = ?, valor_pago = ? , status_pedido = ? WHERE id_pedido = ? AND id_cliente = ?");
             if (!$stmt_pedido) {
                 throw new Exception("Erro ao preparar a atualização do pedido: " . $conn->error);
             }
-            $stmt_pedido->bind_param("dsdii", $valor_total, $forma_pagamento, $valor_pago, $id_pedido, $id_cliente);
+           $stmt_pedido->bind_param("dsdsii", $valor_total, $forma_pagamento, $valor_pago, $status_pedido, $id_pedido, $id_cliente); // 's' para status_pedido
             if (!$stmt_pedido->execute()) {
                 throw new Exception("Erro ao executar a atualização do pedido: " . $stmt_pedido->error);
             }
@@ -84,12 +84,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             // É um novo pedido
             // 2. Inserir o pedido na tabela 'pedidos'
-            $status_inicial = "Pendente";
-            $stmt_pedido = $conn->prepare("INSERT INTO pedidos (id_cliente, valor_total, forma_pagamento, data_pedido, status_pedido, valor_pago) VALUES (?, ?, ?, NOW(), ?, ?)");
+            
+            $stmt_pedido = $conn->prepare("INSERT INTO pedidos (id_cliente, valor_total, forma_pagamento, status_pedido, valor_pago) VALUES (?, ?, ?, ?, ?)");
             if (!$stmt_pedido) {
                 throw new Exception("Erro ao preparar a inserção do pedido: " . $conn->error);
             }
-            $stmt_pedido->bind_param("idsds", $id_cliente, $valor_total, $forma_pagamento, $status_inicial, $valor_pago);
+            $stmt_pedido->bind_param("iddsd", $id_cliente, $valor_total, $forma_pagamento, $status_inicial, $valor_pago); // 's' para status_pedido
             if (!$stmt_pedido->execute()) {
                 throw new Exception("Erro ao executar a inserção do pedido: " . $stmt_pedido->error);
             }
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_item->close();
 
         // 4. Lógica de sorteio de número (apenas para novos pedidos e se não houver gás)
-        if ($id_pedido_existente == 0 && $has_gas_product == 0) { // Se for um novo pedido E não tiver gás
+        if ($id_pedido_existente == 0 && $has_gas_product == true) { // Se for um novo pedido E não tiver gás
             $min = 100;
             $max = 10000;
             $numero_sorteado = null;
@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_check_sorteio->close();
 
             // Se o cliente não tem número sorteado, sorteia um
-            if ($numero_sorteado === null) {
+            if ($numero_sorteado != null) {
                 // Lógica de sorteio de número único (função auxiliar)
                 function sortearNumeroUnico($conn, $min, $max) {
                     while (true) {
@@ -174,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             // Se for atualização de pedido OU se tiver gás, não sorteia e redireciona para o início
             $message = 'Pedido finalizado e salvo com sucesso!';
-            $redirect_url = 'index.html';
+            $redirect_url = 'confirmacao_sem_sorteio.html?nome=' . urlencode(explode(' ', $nome_cliente)[0]);
         }
 
         // Se tudo ocorreu bem, commita a transação

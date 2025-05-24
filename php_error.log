@@ -1,0 +1,41 @@
+[24-May-2025 23:23:27 Europe/Berlin] --- INÍCIO DA REQUISIÇÃO ---
+[24-May-2025 23:23:27 Europe/Berlin] Dados JSON recebidos em salvar_pedido.php: Array
+(
+    [telefone] => 62993094343
+    [total] => 100
+    [forma_pagamento] => debito
+    [produtos] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 1
+                    [nome] => Gás P13
+                    [preco] => 100
+                    [quantidade] => 1
+                )
+
+        )
+
+    [valor_pago] => 
+    [id_pedido_existente] => 0
+    [has_gas_product] => 
+)
+
+[24-May-2025 23:23:27 Europe/Berlin] Variáveis extraídas: 
+[24-May-2025 23:23:27 Europe/Berlin]   telefone_cliente: 62993094343
+[24-May-2025 23:23:27 Europe/Berlin]   valor_total: 100
+[24-May-2025 23:23:27 Europe/Berlin]   forma_pagamento: debito
+[24-May-2025 23:23:27 Europe/Berlin]   valor_pago: null
+[24-May-2025 23:23:27 Europe/Berlin]   id_pedido_existente: 0 (esperado 0 para novo pedido)
+[24-May-2025 23:23:27 Europe/Berlin]   has_gas_product: false (esperado true se tiver gás)
+[24-May-2025 23:23:27 Europe/Berlin] Cliente encontrado: ID=5, Nome=Albert Igor Souza Pereira
+[24-May-2025 23:23:27 Europe/Berlin] Transação iniciada.
+[24-May-2025 23:23:27 Europe/Berlin] Modo de operação: CRIAÇÃO de novo pedido.
+[24-May-2025 23:23:27 Europe/Berlin] Status inicial para novo pedido definido como: 'Pendente'
+[24-May-2025 23:23:27 Europe/Berlin] Novo pedido inserido com ID: 70
+[24-May-2025 23:23:27 Europe/Berlin] Item adicionado ao pedido 70: Produto ID 1, Quantidade 1
+[24-May-2025 23:23:27 Europe/Berlin] Verificando condição de sorteio: (id_pedido_existente == 0) é true E (has_gas_product) é false
+[24-May-2025 23:23:27 Europe/Berlin] Condição de sorteio NÃO atendida. Redirecionando para confirmacao_sem_sorteio.html.
+[24-May-2025 23:23:27 Europe/Berlin] Redirecionando para confirmacao_sem_sorteio.html: confirmacao_sem_sorteio.html?nome=Albert
+[24-May-2025 23:23:27 Europe/Berlin] Transação concluída com sucesso.
+[24-May-2025 23:23:27 Europe/Berlin] --- FIM DA REQUISIÇÃO ---

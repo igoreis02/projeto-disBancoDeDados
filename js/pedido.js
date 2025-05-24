@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmarPedidoBtn = document.getElementById('confirmarPedido');
     const clienteTelefoneInput = document.getElementById('clienteTelefone');
     const erro = document.getElementById('mensagem');
+    const hasGasProductInput = document.getElementById('hasGasProduct'); // Get the hidden input for hasGasProduct
 
     let currentIndex = 0;
     let itemWidth = 0; // Largura de um item, incluindo o gap "virtual" que ele ocupa
@@ -23,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (telefoneFromURL) {
         clienteTelefoneInput.value = telefoneFromURL;
     }
+    const idPedidoExistenteFromURL = urlParams.get('id_pedido');
+    if (idPedidoExistenteFromURL) {
+        document.getElementById('idPedidoExistente').value = idPedidoExistenteFromURL;
+    }
+
 
     fetch('get_produtos.php')
         .then(response => response.json())
@@ -52,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="quantity-input-group">
                         <button type="button" class="quantity-btn minus-btn" data-product-id="${produto.id_produtos}">-</button>
-                        <input type="number" id="${inputId}" name="${produto.id_produtos}" value="0" min="0" step="1" data-preco="${produto.preco}">
+                        <input type="number" id="${inputId}" name="${produto.id_produtos}" value="0" min="0" step="1" data-preco="${produto.preco}" data-nome="${produto.nome}">
                         <button type="button" class="quantity-btn plus-btn" data-product-id="${produto.id_produtos}">+</button>
                     </div>
                 </div>
@@ -227,19 +233,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Funções de Pedido (mantidas as originais) ---
     function atualizarTotalPedido() {
         let total = 0;
+        let gasProductSelected = false; // Flag to check if gas product is selected
         const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
 
         quantityInputs.forEach(inputField => {
             const preco = parseFloat(inputField.getAttribute('data-preco'));
             const quantidade = parseInt(inputField.value, 10);
+            const productName = inputField.getAttribute('data-nome'); // Get the product name
 
             if (!isNaN(preco) && !isNaN(quantidade)) {
                 total += preco * quantidade;
+            }
+
+            // Check if the selected product is a "gas" product (case-insensitive)
+            if (productName && productName.toLowerCase().includes('gás') && quantidade > 0) {
+                gasProductSelected = true; // Set flag to true if a gas product is found
             }
         });
 
         currentTotal = total;
         totalPedidoDiv.textContent = `Total do Pedido: R$ ${total.toFixed(2).replace('.', ',')}`;
+
+        // Set the hidden input value based on whether a gas product is selected
+        hasGasProductInput.value = gasProductSelected ? '1' : '0';
 
         if (document.querySelector('input[name="payment"]:checked')?.value === 'dinheiro') {
             calcularTroco();
@@ -278,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (event.target.value === 'dinheiro') {
                 trocoField.style.display = 'block';
                 valorPagoInput.value = '';
-                valorTrocoP.textContent = 'Troco: R$ 0,00';
+                valorTrocoP.textContent = 'Troco: R$ 0.00';
                 valorTrocoP.style.color = 'inherit';
                 calcularTroco();
             } else {
@@ -364,6 +380,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (formaPagamento === 'dinheiro') {
             params.append('valor_pago', valorPagoParaTroco.toFixed(2));
         }
+
+        // Add this line to include id_pedido_existente
+        const idPedidoExistente = document.getElementById('idPedidoExistente').value;
+        if (idPedidoExistente) {
+            params.append('id_pedido_existente', idPedidoExistente);
+        }
+        
+        // Use the updated value from the hidden input
+        const hasGasProduct = hasGasProductInput.value;
+        params.append('has_gas_product', hasGasProduct);
 
         window.location.href = `confirmar_pedido.php?${params.toString()}`;
     });
