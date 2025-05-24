@@ -343,16 +343,16 @@ $conn->close();
             background-color: var(--cor-secundaria);
         }
         .voltar-menu-btn-right {
-            background-color: var(--cor-titulo); 
+            background-color: var(--cor-titulo);
             color: white;
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-decoration: none; 
-            display: inline-block; 
-            margin-left: auto; 
-            margin-right: 10px; 
+            text-decoration: none;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: 10px;
             align-self: flex-end;/* Aligns itself to the end of the flex container */
             margin-bottom: 20px; /* Space below the button */
         }
@@ -554,6 +554,10 @@ $conn->close();
         </div>
     </div>
 
+    <audio id="pendingOrderSound" loop>
+        <source src="sons/tudum.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -599,10 +603,35 @@ $conn->close();
             const confirmCancelButton = document.getElementById('confirmCancelButton');
             const backCancelButton = document.getElementById('backCancelButton');
 
+            // Audio element for pending orders
+            const pendingOrderSound = document.getElementById('pendingOrderSound');
+            let soundInterval;
 
             let allProducts = [];
             let currentChangingPedidoId = null;
             let previousPedidoStatus = null; // Para armazenar o status antes de selecionar "Concluído" ou "Cancelado"
+
+            // Função para verificar pedidos pendentes e tocar o som
+            function checkPendingOrdersAndPlaySound() {
+                const pendingOrders = document.querySelectorAll('.status-select[value="Pendente"]');
+                if (pendingOrders.length > 0) {
+                    if (pendingOrderSound.paused) {
+                        pendingOrderSound.play().catch(error => {
+                            console.log('Erro ao tentar tocar o áudio (provavelmente autoplay bloqueado):', error);
+                            // Pode exibir uma mensagem ao usuário para interagir com a página
+                            // ou adicionar um botão de "Ativar Sons"
+                        });
+                    }
+                } else {
+                    if (!pendingOrderSound.paused) {
+                        pendingOrderSound.pause();
+                        pendingOrderSound.currentTime = 0; // Reinicia o áudio
+                    }
+                }
+            }
+
+            // Inicia a verificação a cada 5 segundos (você pode ajustar o intervalo)
+            soundInterval = setInterval(checkPendingOrdersAndPlaySound, 5000); // Check every 5 seconds
 
             // Função para abrir o modal de confirmação de conclusão
             function openConfirmCompleteModal() {
@@ -1056,7 +1085,9 @@ $conn->close();
                             console.log('Status atualizado com sucesso!');
                         }
                         // Recarrega a página para refletir todas as mudanças (ex: estoque)
-                        fetchAndRenderPedidos(); 
+                        fetchAndRenderPedidos();
+                        // Re-check pending orders after status update
+                        checkPendingOrdersAndPlaySound();
                     } else {
                         console.error('Erro ao atualizar status: ' + data.message);
                         // Se a atualização falhar, reverte o select para o seu status inicial
@@ -1077,6 +1108,9 @@ $conn->close();
             document.querySelectorAll('.status-select').forEach(selectElement => {
                 applyStatusColor(selectElement);
             });
+
+            // Initial check for pending orders when the page loads
+            checkPendingOrdersAndPlaySound();
 
         }); // Fim do DOMContentLoaded
     </script>
