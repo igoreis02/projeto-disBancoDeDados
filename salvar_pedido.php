@@ -123,9 +123,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = 'Pedido finalizado e salvo com sucesso!';
         $redirect_url = 'confirmacao_sem_sorteio.html?nome=' . urlencode(explode(' ', $nome_cliente)[0]);
 
-        if ($has_gas_product) { // Se o pedido contém um produto de gás
-            $min = 100;
-            $max = 10000;
+       if ($has_gas_product && $id_pedido_existente == 0) {
+        $min = 100;
+        $max = 10000;
             
             // Função auxiliar para sortear um número único
             function sortearNumeroUnico($conn, $min, $max) {
