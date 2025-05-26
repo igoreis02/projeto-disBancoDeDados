@@ -42,6 +42,18 @@
             background-color: var(--cor-titulo-hover);
             /* Um tom ligeiramente mais escuro */
         }
+        .pedido-details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 400px;
+            text-align: left;
+        }
+        .pedido-details strong {
+            color: var(--cor-principal);
+        }
     </style>
 </head>
 
@@ -51,7 +63,7 @@
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <img class="imagem" src="imagens/boneco.png" alt="">
 
-        <div class="sorteio form">
+        <div class="pedido-details">
             <h1>Olá, <span id="nomeCadastrado"></span>!</h1>
             <p class="paragrafo">Seu pedido foi concluído com sucesso, logo estará chegando na sua residência.</p>
             <p class="paragrafo">Obrigado pela preferência!</p>
