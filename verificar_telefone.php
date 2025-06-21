@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json'); // Garante que a resposta é JSON
 
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

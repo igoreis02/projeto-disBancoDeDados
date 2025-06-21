@@ -1,34 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
-    <title>Souza Gás e Água</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Souza Gás e Água</title>
+  <style>
+    .form-buttons button,
+    .form-buttons a {
+      padding: 12px 25px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      transition: background-color 0.3s ease;
+      display: block;
+      /* Garante que ocupem a largura total */
+      width: 100%;
+      /* Garante que ocupem a largura total */
+      box-sizing: border-box;
+      /* Inclui padding e borda na largura total */
+    }
+
+    .form-buttons .edit-button {
+      background-color: var(--cor-principal);
+    }
+
+    .form-buttons .edit-button:hover {
+      background-color: var(--cor-secundaria);
+    }
+  </style>
 </head>
+
 <body>
-    <div class="background"></div>
-    <div class="card">
+  <div class="background"></div>
+  <div class="card">
     <img class="logo" src="imagens/logo.png" alt="Logo" />
-    <h2 >Faça seu pedido</h2>
+    <h2>Faça seu pedido</h2>
     <img class="imagem" src="imagens/boneco.png" alt="">
-   
+
     <form class="form" id="formulario">
-    <label class="titulo-label" for="telefone">Digite seu telefone:</label>
-    <input type="tel" name="telefone" id="telefone" placeholder="Telefone"/>
-    <input id="hidden" type="password" name="senha" placeholder="Senha"/>
-    <div class="checkbox">
-    <input type="checkbox" id="privacidade" class="check">
-    <label for="privacidade" id="termoPrivacidade">Li e aceito a &nbsp;<a href="TermoPrivacidade.html" class="link"
-      target="_blank">política de privacidade</a></label>
-    </div>
-    <button class="botao" type="submit" id="pesquisaTelefone">Próximo</button>
+      <label class="titulo-label" for="telefone">Digite seu telefone:</label>
+      <input type="tel" name="telefone" id="telefone" placeholder="Telefone" />
+      <input id="hidden" type="password" name="senha" placeholder="Senha" />
+      <div class="checkbox">
+        <input type="checkbox" id="privacidade" class="check">
+        <label for="privacidade" id="termoPrivacidade">Li e aceito a &nbsp;<a href="TermoPrivacidade.html" class="link"
+            target="_blank">política de privacidade</a></label>
+      </div>
+      <div class="form-buttons">
+        <button class="edit-button" type="submit" id="pesquisaTelefone">Próximo</button>
+      </div>
     </form>
     <div id="mensagem"></div>
-    </div>
-    <div class="footer">
-      <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
-      </div>
-    <script src="js/script.js"></script>
+  </div>
+  <div class="footer">
+    <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+  </div>
+  <script src="js/script.js"></script>
 </body>
+
 </html>

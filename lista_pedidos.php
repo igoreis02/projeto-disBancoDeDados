@@ -1,95 +1,27 @@
 <?php
-$servername = "localhost:3307";
+// Define o fuso horário para garantir a data correta
+date_default_timezone_set('America/Sao_Paulo');
+
+// Estes são os valores iniciais para os filtros no carregamento da página.
+// A busca real dos dados será feita via AJAX no JavaScript.
+$filter_date = isset($_GET['filter_date']) ? $_GET['filter_date'] : date('Y-m-d');
+$filter_status = isset($_GET['filter_status']) ? $_GET['filter_status'] : 'PendenteAceito';
+
+// Conexão com o banco de dados (pode ser útil para outras funções PHP ou se você quiser
+// carregar entregadores, etc., de forma inicial no PHP se preferir)
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";
 
-// Conexão com o banco de dados.
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verifica a conexão.
 if ($conn->connect_error) {
     die("Erro na conexão com o banco de dados: " . $conn->connect_error);
 }
 
-// Obtém a data a ser filtrada (padrão para o dia atual se não for fornecida)
-$filter_date = isset($_GET['filter_date']) ? $_GET['filter_date'] : date('Y-m-d');
-
-// Query para buscar todos os pedidos com detalhes do cliente e dos produtos.
-$sql = "
-    SELECT
-        p.id_pedido,
-        p.status_pedido,
-        c.nome AS cliente_nome,
-        c.telefone AS cliente_telefone,
-        c.endereco,
-        c.quadra,
-        c.lote,
-        c.setor,
-        c.complemento,
-        c.cidade,
-        p.valor_total,
-        p.forma_pagamento,
-        p.data_pedido,
-        p.valor_pago,
-        GROUP_CONCAT(CONCAT(ip.quantidade, 'x ', prod.nome, ' (R$ ', FORMAT(ip.preco_unitario, 2, 'pt_BR'), ')') SEPARATOR '<br>') AS produtos_detalhes,
-        p.id_cliente
-    FROM
-        pedidos p
-    JOIN
-        clientes c ON p.id_cliente = c.id
-    LEFT JOIN
-        itens_pedido ip ON p.id_pedido = ip.id_pedido
-    LEFT JOIN
-        produtos prod ON ip.id_produto = prod.id_produtos
-    WHERE
-        DATE(p.data_pedido) = ?
-    GROUP BY
-        p.id_pedido, p.status_pedido, c.nome, c.telefone, c.endereco, c.quadra, c.lote, c.setor, c.complemento, c.cidade, p.valor_total, p.forma_pagamento, p.data_pedido, p.valor_pago, p.id_cliente
-    ORDER BY
-        p.data_pedido DESC;
-";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $filter_date);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$pedidos = [];
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $endereco_completo = ucwords(htmlspecialchars($row['endereco']) . ', Qd ' . htmlspecialchars($row['quadra']) . ', Lt ' . htmlspecialchars($row['lote']));
-
-        if (!empty($row['setor'])) {
-            $endereco_completo .= '<br>Setor: ' . ucwords(htmlspecialchars($row['setor']));
-        }
-        if (!empty($row['complemento'])) {
-            $endereco_completo .= '<br>Complemento: ' . ucwords(htmlspecialchars($row['complemento']));
-        }
-        $endereco_completo .= '<br>' . ucwords(htmlspecialchars($row['cidade']));
-
-        $row['endereco_completo'] = $endereco_completo;
-
-        $forma_pagamento_display = ucwords($row['forma_pagamento']);
-        if ($row['forma_pagamento'] === 'dinheiro' && $row['valor_pago'] !== null) {
-            $valor_pago_formatado = number_format($row['valor_pago'], 2, ',', '.');
-            $troco = $row['valor_pago'] - $row['valor_total'];
-            $troco_formatado = number_format($troco, 2, ',', '.');
-
-            $forma_pagamento_display .= " (R$ {$valor_pago_formatado})";
-            $forma_pagamento_display .= "<br>Troco: R$ {$troco_formatado}";
-        }
-        $row['forma_pagamento_display'] = $forma_pagamento_display;
-
-        // Formata a data_pedido para exibição de data/hora
-        $row['data_pedido_display'] = htmlspecialchars(date('d/m/Y H:i', strtotime($row['data_pedido'])));
-
-        $pedidos[] = $row;
-    }
-}
-
-$stmt->close();
 $conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -118,13 +50,6 @@ $conn->close();
             padding-right: 25px;
         }
 
-        /* REMOVIDAS as regras CSS com [value="..."] para evitar conflitos */
-        /* .status-select[value="Pendente"] { background-color: #FFC107; color: white; } */
-        /* .status-select[value="Entrega"] { background-color: #87CEEB; color: white; } */
-        /* .status-select[value="Concluido"] { background-color: #28a745; color: white; } */
-        /* .status-select[value="Cancelado"] { background-color: #dc3545; color: white; } */
-        /* .status-select[value="Aceito"] { background-color: #6c757d; color: white; } */
-
         /* Novas regras CSS para as classes adicionadas pelo JavaScript (mantidas) */
         .status-select.status-Pendente { background-color: #FFC107; }
         .status-select.status-Aceito { background-color: #6c757d; }
@@ -151,8 +76,6 @@ $conn->close();
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.3s ease;
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             z-index: 10;
             white-space: nowrap;
             min-width: 80px;
@@ -160,37 +83,57 @@ $conn->close();
         }
 
         .print-button {
-            background-color: rgba(40, 167, 69, 0.7);
+            background-color: rgba(40, 167, 69, 0.7); /* Verde */
             right: 5px;
+            top: 50%; /* Posiciona no meio da célula */
+            transform: translateY(-50%); /* Ajusta para centralizar verticalmente */
+            margin-bottom: 0; /* Garante que não haja margem extra */
         }
 
         .edit-address-button {
-            background-color: rgba(76, 132, 121, 0.7);
+            background-color: rgba(76, 132, 121, 0.7); /* Azul Esverdeado */
             right: 5px;
+            top: 50%; /* Posição do topo para o primeiro botão */
+            transform: translateY(-50%); /* Ajusta para centralizar verticalmente */
         }
 
         .edit-product-button {
-            background-color: rgba(235, 159, 37, 0.7);
+            background-color: rgba(235, 159, 37, 0.7); /* Laranja */
             right: 5px;
-            margin-top: 5px;
+            top: 50%; /* Remove a propriedade top */
+            transform: translateY(-50%); /* Ajusta para centralizar verticalmente */
         }
 
-        #pedidosTable tbody tr:hover .action-button {
-            opacity: 1;
+        /* Style for Edit Payment button */
+        .edit-payment-button {
+            background-color: rgba(0, 123, 255, 0.7); /* Blue */
+            right: 5px;
+            top: 50%; /* Position in the middle of the cell */
+            transform: translateY(-50%); /* Adjust to vertically center */
+            margin-bottom: 0; /* Ensure no extra margin */
         }
+        /* NEW: Style for Edit Delivery button */
+        .edit-delivery-button {
+            background-color: rgba(108, 117, 125, 0.7); /* Cinza */
+            right: 5px;
+            top: 50%; /* Position in the middle of the cell */
+            transform: translateY(-50%); /* Adjust to vertically center */
+            margin-bottom: 0; /* Ensure no extra margin */
+        }
+
 
         #pedidosTable tbody td.cliente-info-cell,
         #pedidosTable tbody td.endereco-cell,
-        #pedidosTable tbody td.produtos-cell {
+        #pedidosTable tbody td.produtos-cell,
+        #pedidosTable tbody td.pagamento-cell,
+        #pedidosTable tbody td.entregador-cell { /* NEW: Add entregador-cell */
             position: relative;
-            padding-right: 90px;
+            padding-right: 120px; /* Mantido para dar espaço aos botões */
         }
 
-        .cliente-text-content,
-        .endereco-text-content,
-        .produtos-text-content {
-            position: relative;
-            z-index: 5;
+        /* Regra para mostrar os botões ao passar o mouse */
+        #pedidosTable tbody tr:hover .action-button {
+            opacity: 1;
         }
 
         #pedidosTable td {
@@ -303,12 +246,13 @@ $conn->close();
         #currentOrderItems div:last-child {
             border-bottom: none;
         }
-        .tamanho-tabela{
-            width: 80%;
+        .tamanho-tabela {
+            width: 90%; /* Ajustado para 100% para ser responsivo */
             border-collapse: collapse;
+            margin-top: 20px;
         }
-        /* Novas regras de estilo para o filtro de data */
-        .date-filter-container {
+        /* Regras de estilo para o filtro de data */
+        .filter-container { /* Renomeado de date-filter-container para ser mais genérico */
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -317,19 +261,21 @@ $conn->close();
             padding-right: 10px; /* Espaço do lado direito */
         }
 
-        .date-filter-container label {
+        .filter-container label {
             font-weight: bold;
             color: var(--cor-principal);
         }
 
-        .date-filter-container input[type="date"] {
+        .filter-container input[type="date"],
+        .filter-container select { /* Adicionado select aqui */
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
+            cursor: pointer;
         }
 
-        .date-filter-container button {
+        .filter-container button {
             background-color: var(--cor-principal);
             color: white;
             padding: 8px 15px;
@@ -339,7 +285,7 @@ $conn->close();
             font-size: 1rem;
         }
 
-        .date-filter-container button:hover {
+        .filter-container button:hover {
             background-color: var(--cor-secundaria);
         }
         .voltar-menu-btn-right {
@@ -362,7 +308,7 @@ $conn->close();
          .card.tamanho-tabela .header-buttons {
             width: 100%;
             display: flex;
-            justify-content: space-between; /* Distribute items with space between them */
+            justify-content: flex-end; /* Alterado para alinhar apenas o botão "Voltar ao Menu" à direita */
             align-items: center;
             margin-bottom: 20px;
         }
@@ -375,292 +321,469 @@ $conn->close();
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin: 0 5px; /* Ajuste a margem para espaçamento */
+            margin-right: 10px;
+        }
+
+        .modal-form-button.cancel {
+            background-color: #6c757d; /* Cinza para cancelar */
         }
 
         .modal-form-button:hover {
-            background-color: var(--cor-secundaria);
+            opacity: 0.9;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .modal-form-button.cancel-modal-btn {
-            background-color: #dc3545; /* Vermelho para cancelar */
+        .header h1 {
+            color: var(--cor-titulo); /* Supondo que você tenha uma variável CSS --cor-titulo */
+            margin: 0;
         }
 
-        .modal-form-button.cancel-modal-btn:hover {
-            background-color: #c82333;
-        }
     </style>
 </head>
 <body>
-    <div class="background"></div>
-    <div class="card tamanho-tabela">
-        <h1 class="titulo-tabela">Lista de Pedidos</h1>
-         <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
+    <audio id="pendingOrderSound" src="audio/novo_pedido.mp3" preload="auto" loop></audio>
 
-        <div class="date-filter-container">
+    <div class="card tamanho-tabela">
+        <div class="header">
+            <h1>Lista de Pedidos</h1>
+            <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
+        </div>
+
+
+        <div class="filter-container">
             <label for="filterDate">Filtrar por Data:</label>
             <input type="date" id="filterDate" value="<?php echo htmlspecialchars($filter_date); ?>">
-            <button onclick="applyDateFilter()">Aplicar Filtro</button>
+
+            <label for="filterStatus">Filtrar por Status:</label>
+            <select id="filterStatus">
+                <option value="PendenteAceito" <?php echo ($filter_status == 'PendenteAceito') ? 'selected' : ''; ?>>Pendentes/Aceitos</option>
+                <option value="Todos" <?php echo ($filter_status == 'Todos') ? 'selected' : ''; ?>>Todos</option>
+                <option value="Pendente" <?php echo ($filter_status == 'Pendente') ? 'selected' : ''; ?>>Pendente</option>
+                <option value="Aceito" <?php echo ($filter_status == 'Aceito') ? 'selected' : ''; ?>>Aceito</option>
+                <option value="Entrega" <?php echo ($filter_status == 'Entrega') ? 'selected' : ''; ?>>Em Entrega</option>
+                <option value="Concluido" <?php echo ($filter_status == 'Concluido') ? 'selected' : ''; ?>>Concluído</option>
+                <option value="Cancelado" <?php echo ($filter_status == 'Cancelado') ? 'selected' : ''; ?>>Cancelado</option>
+            </select>
+            <button id="applyFilterButton">Aplicar Filtro</button>
         </div>
 
         <div class="table-container">
-            <table id="pedidosTable">
+            <table id="pedidosTable" class="tamanho-tabela">
                 <thead>
                     <tr>
-                        <th>Data Pedido/Hora</th>
+                        <th>ID Pedido</th>
                         <th>Status</th>
-                        <th>Cliente e Telefone</th>
+                        <th>Data/Hora</th>
+                        <th>Cliente</th>
                         <th>Endereço</th>
                         <th>Produtos</th>
                         <th>Valor Total</th>
-                        <th>Forma Pagamento</th>
+                        <th>Pagamento</th>
+                        <th>Entregador</th>
                         </tr>
                 </thead>
                 <tbody id="pedidosTableBody">
-                    <?php if (!empty($pedidos)): ?>
-                        <?php foreach ($pedidos as $pedido): ?>
-                            <tr>
-                                <td><?php echo $pedido['data_pedido_display']; ?></td>
-                                <td>
-                                    <select class="status-select" data-id-pedido="<?php echo htmlspecialchars($pedido['id_pedido']); ?>" value="<?php echo htmlspecialchars($pedido['status_pedido']); ?>" data-initial-status="<?php echo htmlspecialchars($pedido['status_pedido']); ?>" <?php echo ($pedido['status_pedido'] == 'Concluido' || $pedido['status_pedido'] == 'Cancelado') ? 'disabled' : ''; ?>>
-                                        <option value="Pendente" <?php echo ($pedido['status_pedido'] == 'Pendente') ? 'selected' : ''; ?>>Pendente</option>
-                                        <option value="Aceito" <?php echo ($pedido['status_pedido'] == 'Aceito') ? 'selected' : ''; ?>>Aceito</option>
-                                        <option value="Entrega" <?php echo ($pedido['status_pedido'] == 'Entrega') ? 'selected' : ''; ?>>Entrega</option>
-                                        <option value="Concluido" <?php echo ($pedido['status_pedido'] == 'Concluido') ? 'selected' : ''; ?>>Concluído</option>
-                                        <option value="Cancelado" <?php echo ($pedido['status_pedido'] == 'Cancelado') ? 'selected' : ''; ?>>Cancelado</option>
-                                    </select>
-                                </td>
-                                <td class="cliente-info-cell">
-                                    <div class="cliente-text-content">
-                                        <?php echo htmlspecialchars(ucwords($pedido['cliente_nome'])); ?><br>
-                                        <?php echo htmlspecialchars($pedido['cliente_telefone']); ?>
-                                    </div>
-                                    <button class="print-button action-button" data-id-pedido="<?php echo htmlspecialchars($pedido['id_pedido']); ?>">Imprimir</button>
-                                </td>
-                                <td class="endereco-cell">
-                                    <div class="endereco-text-content">
-                                        <?php echo $pedido['endereco_completo']; ?>
-                                    </div>
-                                    <button class="edit-address-button action-button" data-telefone="<?php echo htmlspecialchars($pedido['cliente_telefone']); ?>">Editar Endereço</button>
-                                </td>
-                                <td class="produtos-cell"> <div class="produtos-text-content">
-                                        <?php echo $pedido['produtos_detalhes']; ?>
-                                    </div>
-                                    <button class="edit-product-button action-button" data-id-pedido="<?php echo htmlspecialchars($pedido['id_pedido']); ?>" data-id-cliente="<?php echo htmlspecialchars($pedido['id_cliente']); ?>">Editar Produto</button>
-                                </td>
-                                <td>R$ <?php echo htmlspecialchars(number_format($pedido['valor_total'], 2, ',', '.')); ?></td>
-                                <td><?php echo $pedido['forma_pagamento_display']; ?></td>
-                                </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="7" style="text-align: center;">Nenhum pedido encontrado para a data selecionada.</td>
-                        </tr>
-                    <?php endif; ?>
+                    <tr><td colspan="9">Carregando pedidos...</td></tr>
                 </tbody>
             </table>
         </div>
-
-    </div>
-    <div class="footer">
-        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
     </div>
 
     <div id="editAddressModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal" id="closeModalSpan">&times;</span>
             <h2>Editar Endereço do Cliente</h2>
             <form id="modalEditAddressForm" class="modal-form">
-                <input type="hidden" id="modalTelefone" name="telefone">
-                <label for="modalNome">Nome:</label>
-                <input type="text" id="modalNome" name="nome" readonly>
+                <input type="hidden" id="modalTelefoneInput" name="telefone">
+                <label for="modalNomeInput">Nome do Cliente:</label>
+                <input type="text" id="modalNomeInput" name="nome_cliente" readonly>
 
-                <label for="modalEndereco">Endereço:</label>
-                <input type="text" id="modalEndereco" name="endereco" required>
+                <label for="modalEnderecoInput">Endereço:</label>
+                <input type="text" id="modalEnderecoInput" name="endereco" placeholder="Rua, Avenida, etc.">
 
-                <label for="modalQuadra">Quadra:</label>
-                <input type="text" id="modalQuadra" name="quadra" required>
+                <label for="modalQuadraInput">Quadra:</label>
+                <input type="text" id="modalQuadraInput" name="quadra" placeholder="Qd. 10">
 
-                <label for="modalLote">Lote:</label>
-                <input type="text" id="modalLote" name="lote" required>
+                <label for="modalLoteInput">Lote:</label>
+                <input type="text" id="modalLoteInput" name="lote" placeholder="Lt. 20">
 
-                <label for="modalSetor">Setor:</label>
-                <input type="text" id="modalSetor" name="setor" required>
+                <label for="modalSetorInput">Setor/Bairro:</label>
+                <input type="text" id="modalSetorInput" name="setor" placeholder="Setor Central">
 
-                <label for="modalComplemento">Complemento:</label>
-                <input type="text" id="modalComplemento" name="complemento">
+                <label for="modalComplementoInput">Complemento:</label>
+                <input type="text" id="modalComplementoInput" name="complemento" placeholder="Apto 101, Casa 2, Prox. ao mercado">
 
-                <label for="modalCidade">Cidade:</label>
-                <input type="text" id="modalCidade" name="cidade" required>
+                <label for="modalCidadeInput">Cidade:</label>
+                <input type="text" id="modalCidadeInput" name="cidade" placeholder="Cidade">
 
+                <div id="modalMessage" style="margin-bottom: 10px;"></div>
                 <button type="submit">Salvar Alterações</button>
-                <button type="button" class="cancel-modal-btn">Cancelar</button>
+                <button type="button" id="cancelModalBtn" class="modal-form-button cancel">Cancelar</button>
             </form>
-            <div id="modal-message" style="color: red; margin-top: 10px;"></div>
         </div>
     </div>
 
     <div id="editProductModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal close-product-modal">&times;</span>
-            <h2>Editar Produtos do Pedido <span id="modalProductOrderId"></span></h2>
+            <span class="close-modal" id="closeProductModalSpan">&times;</span>
+            <h2>Editar Produtos do Pedido #<span id="modalProductOrderIdSpan"></span></h2>
             <form id="modalEditProductForm" class="modal-form">
-                <input type="hidden" id="modalProductIdPedido" name="id_pedido">
-                <input type="hidden" id="modalProductClienteId" name="id_cliente">
+                <input type="hidden" id="modalProductIdPedidoInput" name="id_pedido">
+                <input type="hidden" id="modalProductClienteIdInput" name="id_cliente">
 
-                <h3>Produtos Atuais do Pedido:</h3>
+                <h3>Produtos Atuais:</h3>
                 <div id="currentOrderItems">
-                    Nenhum produto no pedido.
-                </div>
+                    </div>
 
                 <h3>Adicionar/Atualizar Produto:</h3>
-                <label for="selectProduct">Produto:</label>
-                <select id="selectProduct" name="id_produto" required>
+                <label for="selectProductDropdown">Produto:</label>
+                <select id="selectProductDropdown" name="id_produto">
                     <option value="">Selecione um produto</option>
-                    </select>
+                </select>
 
-                <label for="productQuantity">Quantidade:</label>
-                <input type="number" id="productQuantity" name="quantidade" min="1" value="1" required>
+                <label for="productQuantityInput">Quantidade:</label>
+                <input type="number" id="productQuantityInput" name="quantidade" min="1" value="1">
 
-                <button type="button" id="addProductToOrder">Adicionar/Atualizar Produto no Pedido</button>
-                <button type="submit">Finalizar Edição de Produtos</button>
-                <button type="button" class="cancel-modal-btn close-product-modal">Cancelar</button>
+                <div id="modalProductMessage" style="margin-bottom: 10px;"></div>
+                <button type="button" id="addProductToOrderButton">Adicionar/Atualizar Produto</button>
+                <button type="submit">Concluir Edição</button>
+                <button type="button" id="cancelProductModalBtn" class="modal-form-button cancel">Cancelar</button>
             </form>
-            <div id="modal-product-message" style="color: red; margin-top: 10px;"></div>
         </div>
     </div>
 
+    <div id="editPaymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closePaymentModalSpan">&times;</span>
+            <h2>Editar Pagamento do Pedido #<span id="modalPaymentOrderIdSpan"></span></h2>
+            <form id="modalEditPaymentForm" class="modal-form">
+                <input type="hidden" id="modalPaymentPedidoIdInput" name="id_pedido">
+                <input type="hidden" id="modalPaymentValorTotalInput" name="valor_total">
+
+                <label for="selectPaymentMethod">Forma de Pagamento:</label>
+                <select id="selectPaymentMethod" name="forma_pagamento">
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Credito">Crédito</option>
+                    <option value="Debito">Débito</option>
+                    <option value="Pix">Pix</option>
+                </select>
+
+                <div id="trocoContainer" style="display: none;">
+                    <label for="valorPagoInput">Valor Pago (Dinheiro):</label>
+                    <input type="number" id="valorPagoInput" name="valor_pago" min="0" step="0.01" placeholder="Ex: 50.00">
+                    <p>Valor Total do Pedido: R$ <span id="displayValorTotal">0.00</span></p>
+                    <p>Troco: R$ <span id="displayTroco">0.00</span></p>
+                </div>
+
+                <div id="modalPaymentMessage" style="margin-bottom: 10px;"></div>
+                <button type="submit">Salvar Alterações</button>
+                <button type="button" id="cancelPaymentModalBtn" class="modal-form-button cancel">Cancelar</button>
+            </form>
+        </div>
+    </div>
     <div id="confirmCompleteModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal close-complete-modal">&times;</span>
-            <h2>Concluir Pedido</h2>
-            <p>Tem certeza que deseja concluir este pedido? Uma vez concluído, o status não poderá ser alterado.</p>
-            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
-                <button id="confirmCompleteButton" class="modal-form-button">Concluir</button>
-                <button id="cancelCompleteButton" class="modal-form-button cancel-modal-btn">Cancelar</button>
-            </div>
+            <span class="close-modal" id="closeCompleteModalSpan">&times;</span>
+            <h2>Confirmar Conclusão do Pedido</h2>
+            <p>Tem certeza que deseja marcar este pedido como "Concluído"?</p>
+            <button id="confirmCompleteButton" class="modal-form-button">Sim, Concluir</button>
+            <button id="cancelCompleteButton" class="modal-form-button cancel">Não, Voltar</button>
         </div>
     </div>
 
     <div id="confirmCancelModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal close-cancel-modal">&times;</span>
-            <h2>Cancelar Pedido</h2>
-            <p>Deseja cancelar este pedido? Uma vez cancelado, o status não poderá ser alterado.</p>
-            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
-                <button id="confirmCancelButton" class="modal-form-button cancel-modal-btn">Cancelar</button>
-                <button id="backCancelButton" class="modal-form-button">Voltar</button>
-            </div>
+            <span class="close-modal" id="closeCancelModalSpan">&times;</span>
+            <h2>Confirmar Cancelamento do Pedido</h2>
+            <p>Tem certeza que deseja marcar este pedido como "Cancelado"?</p>
+            <button id="confirmCancelButton" class="modal-form-button">Sim, Cancelar</button>
+            <button id="backCancelButton" class="modal-form-button cancel">Não, Voltar</button>
         </div>
     </div>
 
-    <audio id="pendingOrderSound" loop>
-        <source src="sons/tudum.mp3" type="audio/mpeg">
-        Seu navegador não suporta o elemento de áudio.
-    </audio>
+    <div id="assignDeliveryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeAssignModalSpan">&times;</span>
+            <h2>Atribuir Entregador</h2>
+            <p>Atribuir entregador para o Pedido #<span id="modalDeliveryOrderIdSpan"></span> (Status Atual: <span id="currentStatusDisplay"></span>)</p>
+            <form id="modalAssignDeliveryForm" class="modal-form">
+                <input type="hidden" id="modalDeliveryPedidoIdInput" name="id_pedido">
+                <input type="hidden" id="modalDeliveryNewStatusInput" name="status">
+
+                <label for="selectEntregadorDropdown">Selecionar Entregador:</label>
+                <select id="selectEntregadorDropdown" name="id_entregador">
+                    <option value="">Carregando entregadores...</option>
+                </select>
+
+                <div id="modalAssignMessage" style="margin-bottom: 10px;"></div>
+                <button type="submit" id="confirmAssignDeliveryButton" class="modal-form-button">Atribuir para Entrega</button>
+                <button type="button" id="cancelAssignDeliveryButton" class="modal-form-button cancel">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editDeliveryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeEditDeliveryModalSpan">&times;</span>
+            <h2>Editar Entregador do Pedido #<span id="modalEditDeliveryOrderIdSpan"></span></h2>
+            <form id="modalEditDeliveryForm" class="modal-form">
+                <input type="hidden" id="modalEditDeliveryPedidoIdInput" name="id_pedido">
+
+                <label for="selectEditEntregadorDropdown">Selecionar Entregador:</label>
+                <select id="selectEditEntregadorDropdown" name="id_entregador">
+                    <option value="">Carregando entregadores...</option>
+                </select>
+
+                <div id="modalEditDeliveryMessage" style="margin-bottom: 10px;"></div>
+                <button type="submit" class="modal-form-button">Salvar Alterações</button>
+                <button type="button" id="cancelEditDeliveryButton" class="modal-form-button cancel">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Elementos do Modal de Edição de Endereço
+            // Referências aos elementos do DOM
+            const pedidosTableBody = document.getElementById('pedidosTableBody'); // Novo: Referência ao tbody
+            const filterDateInput = document.getElementById('filterDate');
+            const filterStatusSelect = document.getElementById('filterStatus');
+            const applyFilterButton = document.getElementById('applyFilterButton');
+
+            // Garante que filterDateInput tem um valor ao carregar, se o PHP não o definiu.
+            if (!filterDateInput.value) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                filterDateInput.value = `${year}-${month}-${day}`;
+            }
+
             const editAddressModal = document.getElementById('editAddressModal');
-            const closeModalSpan = document.querySelector('.close-modal');
-            const cancelModalBtn = document.querySelector('.cancel-modal-btn');
+            const closeModalSpan = document.getElementById('closeModalSpan');
             const modalEditAddressForm = document.getElementById('modalEditAddressForm');
-            const modalMessageDiv = document.getElementById('modal-message');
+            const modalTelefoneInput = document.getElementById('modalTelefoneInput');
+            const modalNomeInput = document.getElementById('modalNomeInput');
+            const modalEnderecoInput = document.getElementById('modalEnderecoInput');
+            const modalQuadraInput = document.getElementById('modalQuadraInput');
+            const modalLoteInput = document.getElementById('modalLoteInput');
+            const modalSetorInput = document.getElementById('modalSetorInput');
+            const modalComplementoInput = document.getElementById('modalComplementoInput');
+            const modalCidadeInput = document.getElementById('modalCidadeInput');
+            const modalMessageDiv = document.getElementById('modalMessage');
+            const cancelModalBtn = document.getElementById('cancelModalBtn');
 
-            const modalTelefoneInput = document.getElementById('modalTelefone');
-            const modalNomeInput = document.getElementById('modalNome');
-            const modalEnderecoInput = document.getElementById('modalEndereco');
-            const modalQuadraInput = document.getElementById('modalQuadra');
-            const modalLoteInput = document.getElementById('modalLote');
-            const modalSetorInput = document.getElementById('modalSetor');
-            const modalComplementoInput = document.getElementById('modalComplemento');
-            const modalCidadeInput = document.getElementById('modalCidade');
-
-            // Elementos do Modal de Edição de Produto
             const editProductModal = document.getElementById('editProductModal');
-            const closeProductModalSpan = document.querySelector('.close-product-modal');
-            const cancelProductModalBtn = document.querySelector('#editProductModal .cancel-modal-btn');
+            const closeProductModalSpan = document.getElementById('closeProductModalSpan');
             const modalEditProductForm = document.getElementById('modalEditProductForm');
-            const modalProductMessageDiv = document.getElementById('modal-product-message');
-            const modalProductIdPedidoInput = document.getElementById('modalProductIdPedido');
-            const modalProductClienteIdInput = document.getElementById('modalProductClienteId');
-            const modalProductOrderIdSpan = document.getElementById('modalProductOrderId');
-            const selectProductDropdown = document.getElementById('selectProduct');
-            const productQuantityInput = document.getElementById('productQuantity');
-            const addProductToOrderButton = document.getElementById('addProductToOrder');
+            const modalProductIdPedidoInput = document.getElementById('modalProductIdPedidoInput');
+            const modalProductClienteIdInput = document.getElementById('modalProductClienteIdInput');
+            const modalProductOrderIdSpan = document.getElementById('modalProductOrderIdSpan');
+            const selectProductDropdown = document.getElementById('selectProductDropdown');
+            const productQuantityInput = document.getElementById('productQuantityInput');
+            const addProductToOrderButton = document.getElementById('addProductToOrderButton');
             const currentOrderItemsDiv = document.getElementById('currentOrderItems');
+            const modalProductMessageDiv = document.getElementById('modalProductMessage');
+            const cancelProductModalBtn = document.getElementById('cancelProductModalBtn');
 
-            // Elementos para o Modal de Confirmação de Conclusão
             const confirmCompleteModal = document.getElementById('confirmCompleteModal');
-            const closeCompleteModalSpan = document.querySelector('.close-complete-modal');
+            const closeCompleteModalSpan = document.getElementById('closeCompleteModalSpan');
             const confirmCompleteButton = document.getElementById('confirmCompleteButton');
-            const cancelCompleteButton = document.getElementById('cancelCompleteButton');
+            const cancelCompleteButton = document = document.getElementById('cancelCompleteButton');
 
-            // NOVO: Elementos para o Modal de Confirmação de Cancelamento
             const confirmCancelModal = document.getElementById('confirmCancelModal');
-            const closeCancelModalSpan = document.querySelector('.close-cancel-modal');
+            const closeCancelModalSpan = document.getElementById('closeCancelModalSpan');
             const confirmCancelButton = document.getElementById('confirmCancelButton');
             const backCancelButton = document.getElementById('backCancelButton');
 
-            // Audio element for pending orders
+            const assignDeliveryModal = document.getElementById('assignDeliveryModal');
+            const closeAssignModalSpan = document.getElementById('closeAssignModalSpan');
+            const modalDeliveryOrderIdSpan = document.getElementById('modalDeliveryOrderIdSpan');
+            const modalDeliveryPedidoIdInput = document.getElementById('modalDeliveryPedidoIdInput');
+            const modalDeliveryNewStatusInput = document.getElementById('modalDeliveryNewStatusInput');
+            const selectEntregadorDropdown = document.getElementById('selectEntregadorDropdown');
+            const modalAssignMessageDiv = document.getElementById('modalAssignMessage');
+            const confirmAssignDeliveryButton = document.getElementById('confirmAssignDeliveryButton');
+            const cancelAssignDeliveryButton = document.getElementById('cancelAssignDeliveryButton');
+            const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+
+            // Payment Modal Elements
+            const editPaymentModal = document.getElementById('editPaymentModal');
+            const closePaymentModalSpan = document.getElementById('closePaymentModalSpan');
+            const modalEditPaymentForm = document.getElementById('modalEditPaymentForm');
+            const modalPaymentOrderIdSpan = document.getElementById('modalPaymentOrderIdSpan');
+            const modalPaymentPedidoIdInput = document.getElementById('modalPaymentPedidoIdInput');
+            const modalPaymentValorTotalInput = document.getElementById('modalPaymentValorTotalInput');
+            const selectPaymentMethod = document.getElementById('selectPaymentMethod');
+            const trocoContainer = document.getElementById('trocoContainer');
+            const valorPagoInput = document.getElementById('valorPagoInput');
+            const displayValorTotal = document.getElementById('displayValorTotal');
+            const displayTroco = document.getElementById('displayTroco');
+            const modalPaymentMessage = document.getElementById('modalPaymentMessage');
+            const cancelPaymentModalBtn = document.getElementById('cancelPaymentModalBtn');
+
+            // NEW: Edit Delivery Modal Elements
+            const editDeliveryModal = document.getElementById('editDeliveryModal');
+            const closeEditDeliveryModalSpan = document.getElementById('closeEditDeliveryModalSpan');
+            const modalEditDeliveryForm = document.getElementById('modalEditDeliveryForm');
+            const modalEditDeliveryOrderIdSpan = document.getElementById('modalEditDeliveryOrderIdSpan');
+            const modalEditDeliveryPedidoIdInput = document.getElementById('modalEditDeliveryPedidoIdInput');
+            const selectEditEntregadorDropdown = document.getElementById('selectEditEntregadorDropdown');
+            const modalEditDeliveryMessage = document.getElementById('modalEditDeliveryMessage');
+            const cancelEditDeliveryButton = document.getElementById('cancelEditDeliveryButton');
+
+
             const pendingOrderSound = document.getElementById('pendingOrderSound');
             let soundInterval;
 
             let allProducts = [];
             let currentChangingPedidoId = null;
-            let previousPedidoStatus = null; // Para armazenar o status antes de selecionar "Concluído" ou "Cancelado"
+            let previousPedidoStatus = null; // Para armazenar o status antes de selecionar "Concluído", "Cancelado" ou "Entrega"
+
+            // Função auxiliar para capitalizar a primeira letra de cada palavra.
+            function ucwords(str) {
+                if (!str) return '';
+                return str.toLowerCase().replace(/(^|\s)\S/g, function(firstChar) {
+                    return firstChar.toUpperCase();
+                });
+            }
+
+            // Função para escapar HTML (para evitar XSS ao injetar dados no DOM)
+            function htmlspecialchars(str) {
+                if (typeof str != 'string') return str; // Retorna números e outros tipos diretamente
+                var map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return str.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+
+            // FUNÇÃO PRINCIPAL: Busca e renderiza os pedidos
+            async function fetchAndRenderPedidos() {
+                const selectedDate = filterDateInput.value;
+                const selectedStatus = filterStatusSelect.value;
+                pedidosTableBody.innerHTML = '<tr><td colspan="9">Carregando pedidos...</td></tr>'; // Limpa e mostra carregando
+
+                try {
+                    const response = await fetch(`fetch_pedidos.php?filter_date=${encodeURIComponent(selectedDate)}&filter_status=${encodeURIComponent(selectedStatus)}`);
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+
+                    if (data.success) {
+                        pedidosTableBody.innerHTML = ''; // Limpa antes de adicionar as novas linhas
+                        if (data.pedidos.length > 0) {
+                            data.pedidos.forEach(pedido => {
+                                const row = document.createElement('tr');
+
+                                // Determine if edit buttons should be visible
+                                const showEditButtons = (pedido.status_pedido === 'Pendente' || pedido.status_pedido === 'Aceito');
+                                // NEW: Determine if edit delivery button should be visible
+                                const showEditDeliveryButton = (pedido.status_pedido === 'Entrega');
+
+
+                                row.innerHTML = `
+                                    <td>${htmlspecialchars(pedido.id_pedido)}</td>
+                                    <td>
+                                        <select class="status-select" data-id-pedido="${htmlspecialchars(pedido.id_pedido)}" data-initial-status="${htmlspecialchars(pedido.status_pedido)}">
+                                            </select>
+                                    </td>
+                                    <td>${htmlspecialchars(pedido.data_pedido_display)}</td>
+                                    <td class="cliente-info-cell">
+                                        <div class="cliente-text-content">
+                                            ${htmlspecialchars(pedido.cliente_nome)}<br>
+                                            ${htmlspecialchars(pedido.cliente_telefone)}
+                                        </div>
+                                        <button class="action-button print-button" data-id-pedido="${htmlspecialchars(pedido.id_pedido)}">Imprimir</button>
+                                    </td>
+                                    <td class="endereco-cell">
+                                        <div class="endereco-text-content">
+                                            ${pedido.endereco_completo}
+                                        </div>
+                                        ${showEditButtons ? `<button class="action-button edit-address-button" data-telefone="${htmlspecialchars(pedido.cliente_telefone)}">Editar Endereço</button>` : ''}
+                                    </td>
+                                    <td class="produtos-cell">
+                                        <div class="produtos-text-content">
+                                            ${pedido.produtos_detalhes}
+                                        </div>
+                                        ${showEditButtons ? `<button class="action-button edit-product-button" data-id-pedido="${htmlspecialchars(pedido.id_pedido)}" data-id-cliente="${htmlspecialchars(pedido.id_cliente)}">Editar Produtos</button>` : ''}
+                                    </td>
+                                    <td>${htmlspecialchars(pedido.valor_total_display)}</td>
+                                    <td class="pagamento-cell">
+                                        <div class="pagamento-text-content">
+                                            ${htmlspecialchars(pedido.forma_pagamento_display)}
+                                        </div>
+                                        ${showEditButtons ? `<button class="action-button edit-payment-button" data-id-pedido="${htmlspecialchars(pedido.id_pedido)}">Editar Pagamento</button>` : ''}
+                                    </td>
+                                    <td class="entregador-cell">
+                                        <div class="entregador-text-content">
+                                            ${htmlspecialchars(pedido.entregador_nome ?? 'Não atribuído')}
+                                        </div>
+                                        ${showEditDeliveryButton && pedido.entregador_nome ? `<button class="action-button edit-delivery-button" data-id-pedido="${htmlspecialchars(pedido.id_pedido)}" data-current-entregador-id="${htmlspecialchars(pedido.id_entregador ?? '')}">Editar Entregador</button>` : ''}
+                                    </td>
+                                `;
+                                pedidosTableBody.appendChild(row);
+                            });
+                        } else {
+                            pedidosTableBody.innerHTML = '<tr><td colspan="9">Nenhum pedido encontrado para a data e status selecionados.</td></tr>';
+                        }
+                        // Re-anexa listeners aos novos elementos e aplica cores
+                        attachEventListeners();
+                        document.querySelectorAll('.status-select').forEach(selectElement => {
+                            setStatusOptions(selectElement, selectElement.dataset.initialStatus);
+                        });
+                        checkPendingOrdersAndPlaySound(); // Verifica o som após a atualização da tabela
+                    } else {
+                        pedidosTableBody.innerHTML = `<tr><td colspan="9">Erro ao carregar pedidos: ${data.message}</td></tr>`;
+                        console.error('Erro ao carregar pedidos:', data.message);
+                    }
+                } catch (error) {
+                    pedidosTableBody.innerHTML = `<tr><td colspan="9">Ocorreu um erro ao carregar os pedidos.</td></tr>`;
+                    console.error('Erro na requisição fetchAndRenderPedidos:', error);
+                }
+            }
+
 
             // Função para verificar pedidos pendentes e tocar o som
             function checkPendingOrdersAndPlaySound() {
-                const pendingOrders = document.querySelectorAll('.status-select[value="Pendente"]');
-                if (pendingOrders.length > 0) {
+                const currentFilterStatus = filterStatusSelect.value;
+                const statusSelects = document.querySelectorAll('.status-select');
+                let hasPendingOrder = false;
+
+                statusSelects.forEach(select => {
+                    if (select.value === 'Pendente') {
+                        hasPendingOrder = true;
+                    }
+                });
+
+                if ((currentFilterStatus === 'PendenteAceito' || currentFilterStatus === 'Todos') && hasPendingOrder) {
                     if (pendingOrderSound.paused) {
                         pendingOrderSound.play().catch(error => {
-                            console.log('Erro ao tentar tocar o áudio (provavelmente autoplay bloqueado):', error);
-                            // Pode exibir uma mensagem ao usuário para interagir com a página
-                            // ou adicionar um botão de "Ativar Sons"
+                            console.log('Erro ao tentar tocar o áudio (provavelmente autoplay bloqueado ou arquivo não encontrado):', error);
                         });
                     }
                 } else {
                     if (!pendingOrderSound.paused) {
                         pendingOrderSound.pause();
-                        pendingOrderSound.currentTime = 0; // Reinicia o áudio
+                        pendingOrderSound.currentTime = 0;
                     }
                 }
             }
 
-            // Inicia a verificação a cada 5 segundos (você pode ajustar o intervalo)
-            soundInterval = setInterval(checkPendingOrdersAndPlaySound, 5000); // Check every 5 seconds
-
-            // Função para abrir o modal de confirmação de conclusão
-            function openConfirmCompleteModal() {
-                confirmCompleteModal.style.display = 'flex';
-            }
-
-            // Função para fechar o modal de confirmação de conclusão
-            function closeConfirmCompleteModal() {
-                confirmCompleteModal.style.display = 'none';
-            }
-
-            // NOVO: Função para abrir o modal de confirmação de cancelamento
-            function openConfirmCancelModal() {
-                confirmCancelModal.style.display = 'flex';
-            }
-
-            // NOVO: Função para fechar o modal de confirmação de cancelamento
-            function closeConfirmCancelModal() {
-                confirmCancelModal.style.display = 'none';
-            }
-
-
             // Função para aplicar a cor do status
             function applyStatusColor(element) {
                 const status = element.value;
-                // Remove quaisquer classes de cor anteriores para evitar conflitos
                 element.classList.remove('status-Pendente', 'status-Aceito', 'status-Entrega', 'status-Concluido', 'status-Cancelado');
 
-                // Adiciona a classe correspondente ao status atual
                 if (status === 'Pendente') {
                     element.classList.add('status-Pendente');
                 } else if (status === 'Aceito') {
@@ -672,59 +795,245 @@ $conn->close();
                 } else if (status === 'Cancelado') {
                     element.classList.add('status-Cancelado');
                 }
-                // Garante que a cor do texto seja branca para todos os status coloridos
                 element.style.color = 'white';
             }
 
-            // Função para recarregar os pedidos (recarrega a página para simplicidade)
-            function fetchAndRenderPedidos() {
-                window.location.reload();
+            // Função para preencher e configurar as opções do select de status
+            function setStatusOptions(selectElement, currentStatus) {
+                selectElement.innerHTML = '';
+                const statusOrder = ['Pendente', 'Aceito', 'Entrega', 'Concluido', 'Cancelado'];
+                const allowedTransitions = {
+                    'Pendente': ['Pendente', 'Aceito', 'Entrega', 'Concluido', 'Cancelado'],
+                    'Aceito': ['Aceito', 'Entrega', 'Concluido', 'Cancelado'],
+                    'Entrega': ['Entrega', 'Concluido', 'Cancelado'],
+                    'Concluido': ['Concluido'],
+                    'Cancelado': ['Cancelado']
+                };
+
+                const validOptions = allowedTransitions[currentStatus] || [];
+
+                statusOrder.forEach(statusValue => {
+                    if (validOptions.includes(statusValue)) {
+                        const option = document.createElement('option');
+                        option.value = statusValue;
+                        option.textContent = statusValue;
+                        if (statusValue === currentStatus) {
+                            option.selected = true;
+                        }
+                        selectElement.appendChild(option);
+                    }
+                });
+
+                if (currentStatus === 'Concluido' || currentStatus === 'Cancelado') {
+                    selectElement.disabled = true;
+                } else {
+                    selectElement.disabled = false;
+                }
+                applyStatusColor(selectElement);
             }
 
-            // Função para anexar event listeners aos botões
+            // Função para anexar event listeners aos botões e selects (chamada após cada renderização)
             function attachEventListeners() {
+                // Remove listeners antigos para evitar duplicação
                 document.querySelectorAll('.print-button').forEach(button => {
                     button.removeEventListener('click', handlePrintClick);
+                });
+                document.querySelectorAll('.edit-address-button').forEach(button => {
+                    button.removeEventListener('click', handleEditAddressClick);
+                });
+                document.querySelectorAll('.edit-product-button').forEach(button => {
+                    button.removeEventListener('click', handleEditProductClick);
+                });
+                document.querySelectorAll('.edit-payment-button').forEach(button => {
+                    button.removeEventListener('click', handleEditPaymentClick);
+                });
+                 document.querySelectorAll('.edit-delivery-button').forEach(button => { // NEW: Remove old delivery listeners
+                    button.removeEventListener('click', handleEditDeliveryClick);
+                });
+                document.querySelectorAll('.status-select').forEach(selectElement => {
+                    selectElement.removeEventListener('change', handleStatusChange);
+                });
+
+                // Adiciona novos listeners
+                document.querySelectorAll('.print-button').forEach(button => {
                     button.addEventListener('click', handlePrintClick);
                 });
 
+                // Only attach listeners if the buttons actually exist in the DOM
                 document.querySelectorAll('.edit-address-button').forEach(button => {
-                    button.removeEventListener('click', handleEditAddressClick);
                     button.addEventListener('click', handleEditAddressClick);
                 });
 
                 document.querySelectorAll('.edit-product-button').forEach(button => {
-                    button.removeEventListener('click', handleEditProductClick);
                     button.addEventListener('click', handleEditProductClick);
+                });
+
+                document.querySelectorAll('.edit-payment-button').forEach(button => {
+                    button.addEventListener('click', handleEditPaymentClick);
+                });
+                document.querySelectorAll('.edit-delivery-button').forEach(button => { // NEW: Add new delivery listeners
+                    button.addEventListener('click', handleEditDeliveryClick);
+                });
+
+                document.querySelectorAll('.status-select').forEach(selectElement => {
+                    selectElement.addEventListener('change', handleStatusChange);
                 });
             }
 
-            // Handler para o botão de imprimir
+            // --- Handlers de Eventos ---
+
             function handlePrintClick(event) {
                 event.stopPropagation();
                 const idPedido = this.dataset.idPedido;
                 window.open(`imprimir_pedido.php?id_pedido=${idPedido}`, '_blank');
             }
 
-            // Handlers para edição de endereço
             function handleEditAddressClick(event) {
                 event.stopPropagation();
                 const telefoneCliente = this.dataset.telefone;
                 openEditAddressModal(telefoneCliente);
             }
 
-            function openEditAddressModal(telefone) {
-                modalMessageDiv.textContent = '';
-                fetch(`get_cliente_endereco.php?telefone=${encodeURIComponent(telefone)}`)
+            function handleEditProductClick(event) {
+                event.stopPropagation();
+                const idPedido = this.dataset.idPedido;
+                const idCliente = this.dataset.idCliente;
+                openEditProductModal(idPedido, idCliente);
+            }
+
+            // handleEditPaymentClick function
+            function handleEditPaymentClick(event) {
+                event.stopPropagation();
+                const idPedido = this.dataset.idPedido;
+                openEditPaymentModal(idPedido);
+            }
+
+            // NEW: handleEditDeliveryClick function
+            function handleEditDeliveryClick(event) {
+                event.stopPropagation();
+                const idPedido = this.dataset.idPedido;
+                const currentEntregadorId = this.dataset.currentEntregadorId;
+                openEditDeliveryModal(idPedido, currentEntregadorId);
+            }
+
+            function handleStatusChange() {
+                const idPedido = this.dataset.idPedido;
+                const novoStatus = this.value;
+                const initialStatus = this.dataset.initialStatus;
+
+                currentChangingPedidoId = idPedido;
+                previousPedidoStatus = initialStatus;
+
+                if (novoStatus === 'Concluido') {
+                    openConfirmCompleteModal();
+                    confirmCompleteButton.onclick = () => {
+                        updatePedidoStatus(idPedido, novoStatus, this);
+                        closeConfirmCompleteModal();
+                    };
+                    cancelCompleteButton.onclick = () => {
+                        this.value = previousPedidoStatus;
+                        setStatusOptions(this, previousPedidoStatus);
+                        closeConfirmCompleteModal();
+                        currentChangingPedidoId = null;
+                        previousPedidoStatus = null;
+                    };
+                } else if (novoStatus === 'Cancelado') {
+                    openConfirmCancelModal();
+                    confirmCancelButton.onclick = () => {
+                        updatePedidoStatus(idPedido, novoStatus, this);
+                        closeConfirmCancelModal();
+                    };
+                    backCancelButton.onclick = () => {
+                        this.value = previousPedidoStatus;
+                        setStatusOptions(this, previousPedidoStatus);
+                        closeConfirmCancelModal();
+                        currentChangingPedidoId = null;
+                        previousPedidoStatus = null;
+                    };
+                } else if (novoStatus === 'Entrega') {
+                    openAssignDeliveryModal(idPedido, novoStatus, initialStatus);
+                } else {
+                    updatePedidoStatus(idPedido, novoStatus, this);
+                }
+            }
+
+
+            // --- Funções de Modal ---
+
+            function openConfirmCompleteModal() {
+                confirmCompleteModal.style.display = 'flex';
+            }
+
+            function closeConfirmCompleteModal() {
+                confirmCompleteModal.style.display = 'none';
+            }
+
+            function openConfirmCancelModal() {
+                confirmCancelModal.style.display = 'flex';
+            }
+
+            function closeConfirmCancelModal() {
+                confirmCancelModal.style.display = 'none';
+            }
+
+            function openAssignDeliveryModal(idPedido, novoStatus, currentStatus) {
+                modalAssignMessageDiv.textContent = '';
+                modalDeliveryOrderIdSpan.textContent = idPedido;
+                modalDeliveryPedidoIdInput.value = idPedido;
+                modalDeliveryNewStatusInput.value = novoStatus;
+                currentStatusDisplay.textContent = currentStatus;
+
+                selectEntregadorDropdown.innerHTML = '<option value="">Carregando entregadores...</option>';
+                confirmAssignDeliveryButton.textContent = 'Atribuir para Entrega';
+
+                fetch('get_entregadores.php')
                     .then(response => {
-                        console.log('Resposta bruta de get_cliente_endereco.php:', response);
                         if (!response.ok) {
                             throw new Error(`Erro HTTP! status: ${response.status}`);
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Dados processados de get_cliente_endereco.php:', data);
+                        if (data.success) {
+                            selectEntregadorDropdown.innerHTML = '<option value="">Selecione um entregador</option>';
+                            data.entregadores.forEach(entregador => {
+                                const option = document.createElement('option');
+                                option.value = entregador.id_entregador;
+                                option.textContent = entregador.nome;
+                                selectEntregadorDropdown.appendChild(option);
+                            });
+                        } else {
+                            modalAssignMessageDiv.textContent = 'Erro ao carregar entregadores: ' + data.message;
+                            modalAssignMessageDiv.style.color = 'red';
+                            selectEntregadorDropdown.innerHTML = '<option value="">Erro ao carregar</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar entregadores:', error);
+                        modalAssignMessageDiv.textContent = 'Ocorreu um erro ao carregar os entregadores.';
+                        modalAssignMessageDiv.style.color = 'red';
+                        selectEntregadorDropdown.innerHTML = '<option value="">Erro ao carregar</option>';
+                    });
+
+                assignDeliveryModal.style.display = 'flex';
+            }
+
+            function closeAssignDeliveryModal() {
+                assignDeliveryModal.style.display = 'none';
+                document.getElementById('modalAssignDeliveryForm').reset();
+            }
+
+
+            function openEditAddressModal(telefone) {
+                modalMessageDiv.textContent = '';
+                fetch(`get_cliente_endereco.php?telefone=${encodeURIComponent(telefone)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Erro HTTP! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
                         if (data.success) {
                             const cliente = data.data;
                             modalTelefoneInput.value = telefone;
@@ -750,14 +1059,6 @@ $conn->close();
             function closeEditAddressModal() {
                 editAddressModal.style.display = 'none';
                 modalEditAddressForm.reset();
-            }
-
-            // Handlers para edição de produto
-            function handleEditProductClick(event) {
-                event.stopPropagation();
-                const idPedido = this.dataset.idPedido;
-                const idCliente = this.dataset.idCliente;
-                openEditProductModal(idPedido, idCliente);
             }
 
             function openEditProductModal(idPedido, idCliente) {
@@ -802,7 +1103,8 @@ $conn->close();
                         if (items.length > 0) {
                             items.forEach(item => {
                                 const itemDiv = document.createElement('div');
-                                itemDiv.innerHTML = `${item.quantidade}x ${ucwords(item.nome_produto)} (R$ ${parseFloat(item.preco_unitario).toFixed(2).replace('.', ',')})`;
+                                itemDiv.innerHTML = `${item.quantidade}x ${ucwords(item.nome_produto)} (R$ ${parseFloat(item.preco_unitario).toFixed(2).replace('.', ',')})
+                                    <button onclick="removeProductFromOrder(${idPedido}, ${item.id_produto})" style="margin-left: 10px; background-color: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 5px;">Remover</button>`;
                                 currentOrderItemsDiv.appendChild(itemDiv);
                             });
                         } else {
@@ -814,7 +1116,6 @@ $conn->close();
                         currentOrderItemsDiv.textContent = 'Erro ao carregar produtos do pedido.';
                     });
 
-
                 editProductModal.style.display = 'flex';
             }
 
@@ -824,24 +1125,111 @@ $conn->close();
                 currentOrderItemsDiv.innerHTML = '';
             }
 
-            // Função auxiliar para capitalizar a primeira letra de cada palavra.
-            function ucwords(str) {
-                if (!str) return '';
-                return str.toLowerCase().replace(/(^|\s)\S/g, function(firstChar) {
-                    return firstChar.toUpperCase();
-                });
+            // openEditPaymentModal function
+            function openEditPaymentModal(idPedido) {
+                modalPaymentMessage.textContent = '';
+                modalPaymentOrderIdSpan.textContent = idPedido;
+                modalPaymentPedidoIdInput.value = idPedido;
+                displayTroco.textContent = '0.00';
+                valorPagoInput.value = '';
+                trocoContainer.style.display = 'none';
+
+                fetch(`fetch_payment_details.php?id_pedido=${encodeURIComponent(idPedido)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Erro HTTP! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            selectPaymentMethod.value = data.forma_pagamento;
+                            modalPaymentValorTotalInput.value = parseFloat(data.valor_total).toFixed(2);
+                            displayValorTotal.textContent = parseFloat(data.valor_total).toFixed(2).replace('.', ',');
+
+                            if (data.forma_pagamento === 'Dinheiro') {
+                                trocoContainer.style.display = 'block';
+                                if (data.valor_pago) {
+                                    valorPagoInput.value = parseFloat(data.valor_pago).toFixed(2);
+                                    const troco = parseFloat(data.valor_pago) - parseFloat(data.valor_total);
+                                    displayTroco.textContent = troco.toFixed(2).replace('.', ',');
+                                }
+                            }
+                            editPaymentModal.style.display = 'flex';
+                        } else {
+                            console.error('Erro ao carregar detalhes do pagamento: ' + data.message);
+                            modalPaymentMessage.textContent = 'Erro ao carregar detalhes do pagamento.';
+                            modalPaymentMessage.style.color = 'red';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar detalhes do pagamento:', error);
+                        modalPaymentMessage.textContent = 'Ocorreu um erro ao carregar os detalhes do pagamento.';
+                        modalPaymentMessage.style.color = 'red';
+                    });
             }
 
-            // Função para aplicar o filtro de data
-            window.applyDateFilter = function() {
-                const selectedDate = document.getElementById('filterDate').value;
-                window.location.href = `lista_pedidos.php?filter_date=${selectedDate}`;
-            };
+            // closeEditPaymentModal function
+            function closeEditPaymentModal() {
+                editPaymentModal.style.display = 'none';
+                modalEditPaymentForm.reset();
+                trocoContainer.style.display = 'none';
+                modalPaymentMessage.textContent = '';
+                displayTroco.textContent = '0.00';
+            }
+
+            // NEW: openEditDeliveryModal function
+            function openEditDeliveryModal(idPedido, currentEntregadorId) {
+                modalEditDeliveryMessage.textContent = '';
+                modalEditDeliveryOrderIdSpan.textContent = idPedido;
+                modalEditDeliveryPedidoIdInput.value = idPedido;
+                selectEditEntregadorDropdown.innerHTML = '<option value="">Carregando entregadores...</option>';
+
+                fetch('get_entregadores.php')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Erro HTTP! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            selectEditEntregadorDropdown.innerHTML = '<option value="">Selecione um entregador</option>';
+                            data.entregadores.forEach(entregador => {
+                                const option = document.createElement('option');
+                                option.value = entregador.id_entregador;
+                                option.textContent = entregador.nome;
+                                if (entregador.id_entregador == currentEntregadorId) {
+                                    option.selected = true;
+                                }
+                                selectEditEntregadorDropdown.appendChild(option);
+                            });
+                        } else {
+                            modalEditDeliveryMessage.textContent = 'Erro ao carregar entregadores: ' + data.message;
+                            modalEditDeliveryMessage.style.color = 'red';
+                            selectEditEntregadorDropdown.innerHTML = '<option value="">Erro ao carregar</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar entregadores para edição:', error);
+                        modalEditDeliveryMessage.textContent = 'Ocorreu um erro ao carregar os entregadores.';
+                        modalEditDeliveryMessage.style.color = 'red';
+                        selectEditEntregadorDropdown.innerHTML = '<option value="">Erro ao carregar</option>';
+                    });
+
+                editDeliveryModal.style.display = 'flex';
+            }
+
+            // NEW: closeEditDeliveryModal function
+            function closeEditDeliveryModal() {
+                editDeliveryModal.style.display = 'none';
+                modalEditDeliveryForm.reset();
+                modalEditDeliveryMessage.textContent = '';
+            }
 
 
-            // --- Event Listeners Principais ---
+            // --- Event Listeners para Modais (fechar) ---
 
-            // Event listeners para fechar modais
             closeModalSpan.addEventListener('click', closeEditAddressModal);
             cancelModalBtn.addEventListener('click', closeEditAddressModal);
             window.addEventListener('click', function(event) {
@@ -858,7 +1246,6 @@ $conn->close();
                 }
             });
 
-            // Event listeners para fechar o modal de confirmação de conclusão
             closeCompleteModalSpan.addEventListener('click', closeConfirmCompleteModal);
             window.addEventListener('click', function(event) {
                 if (event.target == confirmCompleteModal) {
@@ -866,7 +1253,6 @@ $conn->close();
                 }
             });
 
-            // NOVO: Event listeners para fechar o modal de confirmação de cancelamento
             closeCancelModalSpan.addEventListener('click', closeConfirmCancelModal);
             window.addEventListener('click', function(event) {
                 if (event.target == confirmCancelModal) {
@@ -874,243 +1260,377 @@ $conn->close();
                 }
             });
 
+            closeAssignModalSpan.addEventListener('click', function() {
+                closeAssignDeliveryModal();
+                if (currentChangingPedidoId) {
+                    const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
+                    if (selectElement && previousPedidoStatus) {
+                        selectElement.value = previousPedidoStatus;
+                        setStatusOptions(selectElement, previousPedidoStatus);
+                    }
+                }
+                currentChangingPedidoId = null;
+                previousPedidoStatus = null;
+            });
+            cancelAssignDeliveryButton.addEventListener('click', function() {
+                closeAssignDeliveryModal();
+                if (currentChangingPedidoId) {
+                    const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
+                    if (selectElement && previousPedidoStatus) {
+                        selectElement.value = previousPedidoStatus;
+                        setStatusOptions(selectElement, previousPedidoStatus);
+                    }
+                }
+                currentChangingPedidoId = null;
+                previousPedidoStatus = null;
+            });
+            window.addEventListener('click', function(event) {
+                if (event.target == assignDeliveryModal) {
+                    closeAssignDeliveryModal();
+                    if (currentChangingPedidoId) {
+                        const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
+                        if (selectElement && previousPedidoStatus) {
+                            selectElement.value = previousPedidoStatus;
+                            setStatusOptions(selectElement, previousPedidoStatus);
+                        }
+                    }
+                    currentChangingPedidoId = null;
+                    previousPedidoStatus = null;
+                }
+            });
 
-            // Lógica para submissão do formulário de edição de endereço
-            modalEditAddressForm.addEventListener('submit', function(event) {
+            // Payment Modal close listeners
+            closePaymentModalSpan.addEventListener('click', closeEditPaymentModal);
+            cancelPaymentModalBtn.addEventListener('click', closeEditPaymentModal);
+            window.addEventListener('click', function(event) {
+                if (event.target == editPaymentModal) {
+                    closeEditPaymentModal();
+                }
+            });
+
+            // NEW: Edit Delivery Modal close listeners
+            closeEditDeliveryModalSpan.addEventListener('click', closeEditDeliveryModal);
+            cancelEditDeliveryButton.addEventListener('click', closeEditDeliveryModal);
+            window.addEventListener('click', function(event) {
+                if (event.target == editDeliveryModal) {
+                    closeEditDeliveryModal();
+                }
+            });
+
+
+            // --- Lógica de Submissão de Formulários e AJAX ---
+
+            // Listener para o botão de aplicar filtro (agora chama fetchAndRenderPedidos)
+            applyFilterButton.addEventListener('click', fetchAndRenderPedidos);
+
+            // Listener para mudar o filtro de data (agora chama fetchAndRenderPedidos)
+            filterDateInput.addEventListener('change', fetchAndRenderPedidos);
+
+            // Listener para mudar o filtro de status (agora chama fetchAndRenderPedidos)
+            filterStatusSelect.addEventListener('change', fetchAndRenderPedidos);
+
+
+             modalEditAddressForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
+                modalMessageDiv.textContent = '';
 
-                const formData = new FormData(modalEditAddressForm);
+                const formData = new FormData(modalEditAddressForm); // Obtém os dados do formulário como FormData
 
-                fetch('update_endereco_cliente.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        modalMessageDiv.textContent = data.message;
+                try {
+                    const response = await fetch('update_endereco_cliente.php', {
+                        method: 'POST',
+                        body: formData // Envia o objeto FormData diretamente
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        modalMessageDiv.textContent = 'Endereço atualizado com sucesso!';
                         modalMessageDiv.style.color = 'green';
-                        setTimeout(() => {
-                            closeEditAddressModal();
-                            fetchAndRenderPedidos();
-                        }, 1500);
+                        closeEditAddressModal(); // Fecha o modal
+                        fetchAndRenderPedidos(); // Recarrega a tabela para ver a mudança
                     } else {
-                        modalMessageDiv.textContent = 'Erro: ' + data.message;
+                        modalMessageDiv.textContent = 'Erro ao atualizar endereço: ' + result.message;
                         modalMessageDiv.style.color = 'red';
                     }
-                })
-                .catch(error => {
-                    console.error('Erro na requisição de atualização de endereço:', error);
-                    modalMessageDiv.textContent = 'Ocorreu um erro na comunicação com o servidor. Tente novamente.';
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    modalMessageDiv.textContent = 'Ocorreu um erro ao tentar atualizar o endereço.';
                     modalMessageDiv.style.color = 'red';
-                });
+                }
             });
 
-            // Lógica para adicionar/atualizar produto no pedido (dentro do modal de edição de produto)
-            addProductToOrderButton.addEventListener('click', function() {
-                const selectedProductId = selectProductDropdown.value;
-                const quantity = parseInt(productQuantityInput.value);
+
+            addProductToOrderButton.addEventListener('click', async function() {
                 const idPedido = modalProductIdPedidoInput.value;
                 const idCliente = modalProductClienteIdInput.value;
+                const idProduto = selectProductDropdown.value;
+                const quantidade = productQuantityInput.value;
 
-                if (!selectedProductId || isNaN(quantity) || quantity <= 0) {
-                    modalProductMessageDiv.textContent = 'Por favor, selecione um produto e uma quantidade válida.';
+                if (!idProduto || !quantidade || quantidade < 1) {
+                    modalProductMessageDiv.textContent = 'Por favor, selecione um produto e insira uma quantidade válida.';
                     modalProductMessageDiv.style.color = 'red';
                     return;
                 }
 
-                const selectedProduct = allProducts.find(p => p.id_produtos == selectedProductId);
+                const selectedProduct = allProducts.find(p => p.id_produtos == idProduto);
                 if (!selectedProduct) {
-                    modalProductMessageDiv.textContent = 'Produto selecionado inválido.';
+                    modalProductMessageDiv.textContent = 'Produto não encontrado.';
                     modalProductMessageDiv.style.color = 'red';
                     return;
                 }
+                const precoUnitario = selectedProduct.preco;
 
-                fetch('update_order_items.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id_pedido: idPedido,
-                        id_cliente: idCliente,
-                        product_id: selectedProductId,
-                        quantity: quantity,
-                        price_unit: selectedProduct.preco
-                    })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Erro HTTP! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        modalProductMessageDiv.textContent = 'Produto adicionado/atualizado com sucesso no pedido!';
+                try {
+                    const response = await fetch('add_update_order_item.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_pedido: idPedido,
+                            id_produto: idProduto,
+                            quantidade: quantidade,
+                            preco_unitario: precoUnitario
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        modalProductMessageDiv.textContent = 'Produto adicionado/atualizado com sucesso!';
                         modalProductMessageDiv.style.color = 'green';
-                        openEditProductModal(idPedido, idCliente); // Recarrega os itens do modal
-                        fetchAndRenderPedidos(); // Recarrega a lista principal para atualizar o total e produtos
+                        openEditProductModal(idPedido, idCliente); // Reabre o modal para atualizar a lista
+                        fetchAndRenderPedidos(); // Recarrega a tabela principal
                     } else {
-                        modalProductMessageDiv.textContent = 'Erro ao adicionar/atualizar produto: ' + data.message;
+                        modalProductMessageDiv.textContent = 'Erro ao adicionar/atualizar produto: ' + result.message;
                         modalProductMessageDiv.style.color = 'red';
                     }
-                })
-                .catch(error => {
-                    console.error('Erro na requisição de atualização de produto:', error);
-                    modalProductMessageDiv.textContent = 'Ocorreu um erro ao salvar o produto. Verifique o console.';
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    modalProductMessageDiv.textContent = 'Ocorreu um erro ao tentar adicionar/atualizar o produto.';
                     modalProductMessageDiv.style.color = 'red';
-                });
+                }
             });
 
-            // Lógica para finalizar edição de produtos (o submit do formulário do modal)
+            window.removeProductFromOrder = async function(idPedido, idProduto) {
+                if (!confirm('Tem certeza que deseja remover este produto do pedido?')) {
+                    return;
+                }
+                try {
+                    const response = await fetch('remove_order_item.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_pedido: idPedido,
+                            id_produto: idProduto
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        modalProductMessageDiv.textContent = 'Produto removido com sucesso!';
+                        modalProductMessageDiv.style.color = 'green';
+                        openEditProductModal(idPedido, modalProductClienteIdInput.value);
+                        fetchAndRenderPedidos(); // Recarrega a tabela principal
+                    } else {
+                        modalProductMessageDiv.textContent = 'Erro ao remover produto: ' + result.message;
+                        modalProductMessageDiv.style.color = 'red';
+                    }
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    modalProductMessageDiv.textContent = 'Ocorreu um erro ao tentar remover o produto.';
+                    modalProductMessageDiv.style.color = 'red';
+                }
+            };
+
             modalEditProductForm.addEventListener('submit', function(event) {
                 event.preventDefault();
                 closeEditProductModal();
-                fetchAndRenderPedidos();
+                fetchAndRenderPedidos(); // Recarrega a tabela principal
             });
 
+            document.getElementById('modalAssignDeliveryForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const idPedido = modalDeliveryPedidoIdInput.value;
+                const novoStatus = modalDeliveryNewStatusInput.value;
+                const idEntregador = selectEntregadorDropdown.value;
 
-            // Anexar event listeners para botões (imprimir, editar endereço, editar produto)
-            attachEventListeners();
+                if (!idEntregador) {
+                    modalAssignMessageDiv.textContent = 'Por favor, selecione um entregador.';
+                    modalAssignMessageDiv.style.color = 'red';
+                    return;
+                }
 
-            // Event listener ÚNICO para mudança de status do pedido (delegação de eventos)
-            document.getElementById('pedidosTableBody').addEventListener('change', function(event) {
-                // Verifica se o evento veio de um select de status
-                if (event.target.classList.contains('status-select')) {
-                    const selectElement = event.target;
-                    const idPedido = selectElement.dataset.idPedido;
-                    const novoStatus = selectElement.value;
+                const selectElement = document.querySelector(`[data-id-pedido="${idPedido}"]`);
+                await updatePedidoStatus(idPedido, novoStatus, selectElement, idEntregador); // Espera a atualização
+                closeAssignDeliveryModal();
+                currentChangingPedidoId = null;
+                previousPedidoStatus = null;
+            });
 
-                    // Obtém o status antes da mudança atual
-                    const currentStatusBeforeChange = selectElement.dataset.initialStatus;
+            // Payment method change listener
+            selectPaymentMethod.addEventListener('change', function() {
+                if (this.value === 'Dinheiro') {
+                    trocoContainer.style.display = 'block';
+                    valorPagoInput.value = ''; // Clear value when switching to Dinheiro
+                    displayTroco.textContent = '0.00';
+                } else {
+                    trocoContainer.style.display = 'none';
+                }
+            });
 
-                    // Se o novo status é 'Concluido', mostra o modal de confirmação de conclusão
-                    if (novoStatus === 'Concluido') {
-                        currentChangingPedidoId = idPedido;
-                        previousPedidoStatus = currentStatusBeforeChange; // Armazena o status anterior
-                        openConfirmCompleteModal();
-                        // Reverte o select visualmente por enquanto, até ser confirmado
-                        selectElement.value = previousPedidoStatus;
-                        applyStatusColor(selectElement); // Reaplica a cor para o status anterior
-                    } else if (novoStatus === 'Cancelado') {
-                        // Se o novo status é 'Cancelado', mostra o modal de confirmação de cancelamento
-                        currentChangingPedidoId = idPedido;
-                        previousPedidoStatus = currentStatusBeforeChange; // Armazena o status anterior
-                        openConfirmCancelModal();
-                        // Reverte o select visualmente por enquanto, até ser confirmado
-                        selectElement.value = previousPedidoStatus;
-                        applyStatusColor(selectElement); // Reaplica a cor para o status anterior
+            // Valor Pago input listener for change calculation
+            valorPagoInput.addEventListener('input', function() {
+                const valorTotal = parseFloat(modalPaymentValorTotalInput.value);
+                const valorPago = parseFloat(this.value);
+                if (!isNaN(valorTotal) && !isNaN(valorPago)) {
+                    const troco = valorPago - valorTotal;
+                    displayTroco.textContent = troco.toFixed(2).replace('.', ',');
+                    if (troco < 0) {
+                        displayTroco.style.color = 'red';
                     } else {
-                        // Para outras mudanças de status, procede diretamente
-                        applyStatusColor(selectElement); // Aplica a cor imediatamente para feedback visual
-                        updatePedidoStatus(idPedido, novoStatus, selectElement);
+                        displayTroco.style.color = 'green';
                     }
+                } else {
+                    displayTroco.textContent = '0.00';
+                    displayTroco.style.color = 'inherit';
                 }
             });
 
-            // Event listener para o botão "Concluir" no modal de confirmação de conclusão
-            confirmCompleteButton.addEventListener('click', function() {
-                if (currentChangingPedidoId) {
-                    const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
-                    if (selectElement) {
-                        updatePedidoStatus(currentChangingPedidoId, 'Concluido', selectElement);
+            // Payment form submission
+            modalEditPaymentForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                modalPaymentMessage.textContent = '';
+
+                const idPedido = modalPaymentPedidoIdInput.value;
+                const formaPagamento = selectPaymentMethod.value;
+                let valorPago = null;
+
+                if (formaPagamento === 'Dinheiro') {
+                    valorPago = parseFloat(valorPagoInput.value);
+                    if (isNaN(valorPago) || valorPago < 0) {
+                        modalPaymentMessage.textContent = 'Por favor, insira um valor pago válido para pagamento em Dinheiro.';
+                        modalPaymentMessage.style.color = 'red';
+                        return;
                     }
-                    closeConfirmCompleteModal();
-                    currentChangingPedidoId = null;
-                    previousPedidoStatus = null;
+                    const valorTotal = parseFloat(modalPaymentValorTotalInput.value);
+                    if (valorPago < valorTotal) {
+                        modalPaymentMessage.textContent = 'O valor pago é menor que o valor total do pedido. Por favor, ajuste.';
+                        modalPaymentMessage.style.color = 'red';
+                        return;
+                    }
+                }
+
+                try {
+                    const response = await fetch('update_payment_details.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_pedido: idPedido,
+                            forma_pagamento: formaPagamento,
+                            valor_pago: valorPago
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        modalPaymentMessage.textContent = 'Pagamento atualizado com sucesso!';
+                        modalPaymentMessage.style.color = 'green';
+                        closeEditPaymentModal();
+                        fetchAndRenderPedidos(); // Reload table to reflect changes
+                    } else {
+                        modalPaymentMessage.textContent = 'Erro ao atualizar pagamento: ' + result.message;
+                        modalPaymentMessage.style.color = 'red';
+                    }
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    modalPaymentMessage.textContent = 'Ocorreu um erro ao tentar atualizar o pagamento.';
+                    modalPaymentMessage.style.color = 'red';
                 }
             });
 
-            // Event listener para o botão "Cancelar" no modal de confirmação de conclusão
-            cancelCompleteButton.addEventListener('click', function() {
-                if (currentChangingPedidoId) {
-                    const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
-                    if (selectElement && previousPedidoStatus) {
-                        selectElement.value = previousPedidoStatus; // Reverte para o status anterior
-                        applyStatusColor(selectElement); // Reaplica a cor
-                    }
+            // NEW: Edit Delivery Form Submission
+            modalEditDeliveryForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                modalEditDeliveryMessage.textContent = '';
+
+                const idPedido = modalEditDeliveryPedidoIdInput.value;
+                const idEntregador = selectEditEntregadorDropdown.value;
+
+                if (!idEntregador) {
+                    modalEditDeliveryMessage.textContent = 'Por favor, selecione um entregador.';
+                    modalEditDeliveryMessage.style.color = 'red';
+                    return;
                 }
-                closeConfirmCompleteModal();
-                currentChangingPedidoId = null;
-                previousPedidoStatus = null;
+
+                try {
+                    const response = await fetch('update_entregador_pedido.php', { // You'll need to create this PHP file
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_pedido: idPedido,
+                            id_entregador: idEntregador
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        modalEditDeliveryMessage.textContent = 'Entregador atualizado com sucesso!';
+                        modalEditDeliveryMessage.style.color = 'green';
+                        closeEditDeliveryModal();
+                        fetchAndRenderPedidos(); // Recarrega a tabela para ver a mudança
+                    } else {
+                        modalEditDeliveryMessage.textContent = 'Erro ao atualizar entregador: ' + result.message;
+                        modalEditDeliveryMessage.style.color = 'red';
+                    }
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    modalEditDeliveryMessage.textContent = 'Ocorreu um erro ao tentar atualizar o entregador.';
+                    modalEditDeliveryMessage.style.color = 'red';
+                }
             });
 
-            // NOVO: Event listener para o botão "Cancelar" no modal de confirmação de cancelamento
-            confirmCancelButton.addEventListener('click', function() {
-                if (currentChangingPedidoId) {
-                    const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
-                    if (selectElement) {
-                        updatePedidoStatus(currentChangingPedidoId, 'Cancelado', selectElement);
-                    }
-                    closeConfirmCancelModal();
-                    currentChangingPedidoId = null;
-                    previousPedidoStatus = null;
-                }
-            });
 
-            // NOVO: Event listener para o botão "Voltar" no modal de confirmação de cancelamento
-            backCancelButton.addEventListener('click', function() {
-                if (currentChangingPedidoId) {
-                    const selectElement = document.querySelector(`[data-id-pedido="${currentChangingPedidoId}"]`);
-                    if (selectElement && previousPedidoStatus) {
-                        selectElement.value = previousPedidoStatus; // Reverte para o status anterior
-                        applyStatusColor(selectElement); // Reaplica a cor
-                    }
-                }
-                closeConfirmCancelModal();
-                currentChangingPedidoId = null;
-                previousPedidoStatus = null;
-            });
+            async function updatePedidoStatus(idPedido, novoStatus, selectElement, idEntregador = null) {
+                selectElement.disabled = true; // Desabilita o select enquanto espera
 
+                try {
+                    const response = await fetch('atualizar_status_pedido.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_pedido=${encodeURIComponent(idPedido)}&status=${encodeURIComponent(novoStatus)}${idEntregador ? `&id_entregador=${encodeURIComponent(idEntregador)}` : ''}`
+                    });
+                    const data = await response.json();
 
-            // Função auxiliar para lidar com a chamada fetch real de atualização de status
-            function updatePedidoStatus(idPedido, status, selectElement) {
-                fetch('atualizar_status_pedido.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `id_pedido=${idPedido}&status=${status}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Resposta do servidor:', data);
                     if (data.success) {
-                        // Atualiza o atributo data-initial-status após a atualização bem-sucedida
-                        selectElement.dataset.initialStatus = status;
-
-                        if (status === 'Concluido' || status === 'Cancelado') {
-                            selectElement.disabled = true; // Desabilita o select se o status for Concluído ou Cancelado
-                            console.log(`Pedido ${status.toLowerCase()} com sucesso! O status não pode mais ser alterado.`);
-                        } else {
-                            console.log('Status atualizado com sucesso!');
+                        console.log('Status atualizado com sucesso:', data.message);
+                        selectElement.dataset.initialStatus = novoStatus;
+                        // Não é mais necessário re-renderizar individualmente aqui, pois fetchAndRenderPedidos() fará isso.
+                        // Apenas reabilita o select se não for um status final, para que o setInterval atualize.
+                        if (novoStatus !== 'Concluido' && novoStatus !== 'Cancelado') {
+                             selectElement.disabled = false;
                         }
-                        // Recarrega a página para refletir todas as mudanças (ex: estoque)
-                        fetchAndRenderPedidos();
-                        // Re-check pending orders after status update
-                        checkPendingOrdersAndPlaySound();
+                        fetchAndRenderPedidos(); // Recarrega a tabela principal para ver a mudança
                     } else {
                         console.error('Erro ao atualizar status: ' + data.message);
-                        // Se a atualização falhar, reverte o select para o seu status inicial
-                        selectElement.value = selectElement.dataset.initialStatus;
-                        applyStatusColor(selectElement);
+                        alert('Erro ao atualizar status: ' + data.message);
+                        selectElement.value = previousPedidoStatus;
+                        setStatusOptions(selectElement, previousPedidoStatus);
+                        selectElement.disabled = false; // Reabilita em caso de erro
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Erro na requisição:', error);
-                    console.error('Ocorreu um erro ao tentar atualizar o status.');
-                    // Reverte em caso de erro de rede também
-                    selectElement.value = selectElement.dataset.initialStatus;
-                    applyStatusColor(selectElement);
-                });
+                    alert('Ocorreu um erro de comunicação com o servidor ao tentar atualizar o status.');
+                    selectElement.value = previousPedidoStatus;
+                    setStatusOptions(selectElement, previousPedidoStatus);
+                    selectElement.disabled = false; // Reabilita em caso de erro
+                }
             }
 
-            // Aplica a cor do status a todos os selects existentes no carregamento da página
-            document.querySelectorAll('.status-select').forEach(selectElement => {
-                applyStatusColor(selectElement);
-            });
+            // --- Inicialização ---
 
-            // Initial check for pending orders when the page loads
-            checkPendingOrdersAndPlaySound();
+            // Chama a função pela primeira vez para carregar os pedidos iniciais
+            fetchAndRenderPedidos();
+
+            // Configura o intervalo para recarregar os pedidos a cada 5 segundos
+            setInterval(fetchAndRenderPedidos, 5000); // 5000 milissegundos = 5 segundos
 
         }); // Fim do DOMContentLoaded
     </script>

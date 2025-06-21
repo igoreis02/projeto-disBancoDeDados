@@ -1,88 +1,180 @@
 <?php
-$servername = "localhost:3307";
+header('Content-Type: application/json');
+
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";
 
-// Conexão com o banco de dados.
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verifica a conexão.
 if ($conn->connect_error) {
-    die("Erro na conexão com o banco de dados: " . $conn->connect_error);
+    echo json_encode(['success' => false, 'message' => 'Erro na conexão com o banco de dados: ' . $conn->connect_error]);
+    exit();
 }
 
-header('Content-Type: application/json');
+$id_pedido = $_POST['id_pedido'] ?? null;
+$status_novo = $_POST['status'] ?? null;
+$id_entregador_post = $_POST['id_entregador'] ?? null; // Entregador enviado via POST (se aplicável)
 
-$response = ['success' => false, 'message' => ''];
+if (!$id_pedido || !$status_novo) {
+    echo json_encode(['success' => false, 'message' => 'ID do pedido ou novo status não fornecidos.']);
+    exit();
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_pedido = isset($_POST['id_pedido']) ? intval($_POST['id_pedido']) : 0;
-    $novo_status = isset($_POST['status']) ? $_POST['status'] : '';
+// 1. Obter o status atual e o id_entregador atual do pedido no banco de dados para validação
+$current_status = null;
+$current_id_entregador = null;
 
-    if ($id_pedido > 0 && !empty($novo_status)) {
-        // Primeiro, obtenha o status atual do pedido para evitar deduções duplicadas
-        $sql_current_status = "SELECT status_pedido FROM pedidos WHERE id_pedido = ?";
-        $stmt_current_status = $conn->prepare($sql_current_status);
-        $stmt_current_status->bind_param("i", $id_pedido);
-        $stmt_current_status->execute();
-        $result_current_status = $stmt_current_status->get_result();
-        $current_status_row = $result_current_status->fetch_assoc();
-        $current_status = $current_status_row['status_pedido'];
-        $stmt_current_status->close();
+$sql_get_current_info = "SELECT status_pedido, id_entregador FROM pedidos WHERE id_pedido = ?";
+$stmt_get = $conn->prepare($sql_get_current_info);
+if ($stmt_get) {
+    $stmt_get->bind_param("i", $id_pedido);
+    $stmt_get->execute();
+    $stmt_get->bind_result($current_status, $current_id_entregador);
+    $stmt_get->fetch();
+    $stmt_get->close();
+} else {
+    echo json_encode(['success' => false, 'message' => 'Erro ao preparar a consulta de status atual: ' . $conn->error]);
+    exit();
+}
 
-        // Atualiza o status do pedido
-        $sql_update_pedido = "UPDATE pedidos SET status_pedido = ? WHERE id_pedido = ?";
-        $stmt_update_pedido = $conn->prepare($sql_update_pedido);
-        $stmt_update_pedido->bind_param("si", $novo_status, $id_pedido);
-
-        if ($stmt_update_pedido->execute()) {
-            $response['success'] = true;
-            $response['message'] = 'Status do pedido atualizado com sucesso.';
-
-            // Lógica para reduzir o estoque APENAS se o novo status for 'Concluido'
-            // e o status anterior NÃO ERA 'Concluido' (para evitar deduções duplicadas)
-            if ($novo_status === 'Concluido' && $current_status !== 'Concluido') {
-                // Obter os produtos e suas quantidades do pedido
-                $sql_itens_pedido = "SELECT id_produto, quantidade FROM itens_pedido WHERE id_pedido = ?";
-                $stmt_itens_pedido = $conn->prepare($sql_itens_pedido);
-                $stmt_itens_pedido->bind_param("i", $id_pedido);
-                $stmt_itens_pedido->execute();
-                $result_itens_pedido = $stmt_itens_pedido->get_result();
-
-                if ($result_itens_pedido->num_rows > 0) {
-                    while ($item = $result_itens_pedido->fetch_assoc()) {
-                        $id_produto = $item['id_produto'];
-                        $quantidade_vendida = $item['quantidade'];
-
-                        // Atualizar a quantidade em estoque do produto
-                        // Certifique-se de que o nome da coluna de estoque na tabela `produtos` está correto (ex: `quantidade_estoque`)
-                        $sql_update_estoque = "UPDATE produtos SET quantidade = quantidade - ? WHERE id_produtos = ?";
-                        $stmt_update_estoque = $conn->prepare($sql_update_estoque);
-                        $stmt_update_estoque->bind_param("ii", $quantidade_vendida, $id_produto);
-
-                        if (!$stmt_update_estoque->execute()) {
-                            $response['success'] = false;
-                            $response['message'] = 'Status atualizado, mas erro ao reduzir estoque do produto ' . $id_produto . ': ' . $stmt_update_estoque->error;
-                            // Você pode querer logar esse erro ou reverter o status do pedido, dependendo da sua regra de negócio
-                            break; // Pare de processar se houver um erro no estoque
-                        }
-                        $stmt_update_estoque->close();
-                    }
-                }
-                $stmt_itens_pedido->close();
-            }
-        } else {
-            $response['message'] = 'Erro ao atualizar o status do pedido: ' . $stmt_update_pedido->error;
+// Lógica de validação de transição de status
+switch ($current_status) {
+    case 'Pendente':
+        if ($status_novo === 'Entrega' && $id_entregador_post === null) {
+            echo json_encode(['success' => false, 'message' => 'Para colocar em "Em Entrega", um entregador deve ser selecionado.']);
+            exit();
         }
-        $stmt_update_pedido->close();
-    } else {
-        $response['message'] = 'Dados inválidos para atualização.';
+        break;
+    case 'Aceito':
+        if ($status_novo === 'Pendente') {
+            echo json_encode(['success' => false, 'message' => 'Não é possível voltar o status de "Aceito" para "Pendente".']);
+            exit();
+        }
+        if ($status_novo === 'Entrega' && $id_entregador_post === null) {
+            echo json_encode(['success' => false, 'message' => 'Para colocar em "Em Entrega", um entregador deve ser selecionado.']);
+            exit();
+        }
+        break;
+    case 'Entrega':
+        if ($status_novo === 'Pendente' || $status_novo === 'Aceito') {
+            echo json_encode(['success' => false, 'message' => 'Não é possível voltar o status de "Em Entrega" para "Pendente" ou "Aceito".']);
+            exit();
+        }
+        break;
+    case 'Concluido':
+    case 'Cancelado':
+        if ($status_novo !== $current_status) {
+            echo json_encode(['success' => false, 'message' => 'Não é possível alterar o status de um pedido "Concluído" ou "Cancelado".']);
+            exit();
+        }
+        break;
+}
+
+// Lógica para definir o id_entregador na atualização
+$id_entregador_para_salvar = $current_id_entregador;
+
+if ($status_novo === 'Entrega') {
+    $id_entregador_para_salvar = $id_entregador_post;
+} else if ($status_novo !== 'Entrega' && $status_novo !== 'Concluido') {
+    // Se não é Entrega e não é Concluido (ou seja, outro status), limpa o entregador
+    $id_entregador_para_salvar = null;
+}
+// Se for Concluido e não veio de Entrega, também deve ser NULL
+else if ($status_novo === 'Concluido' && $current_status !== 'Entrega') {
+    $id_entregador_para_salvar = null;
+}
+
+// AQUI COMEÇA A NOVA LÓGICA PARA REDUZIR O ESTOQUE
+if ($status_novo === 'Concluido' && $current_status === 'Entrega') {
+    // 2. Fetch order items
+    $sql_get_items = "SELECT id_produto, quantidade FROM itens_pedido WHERE id_pedido = ?";
+    $stmt_items = $conn->prepare($sql_get_items);
+    if ($stmt_items === false) {
+        echo json_encode(['success' => false, 'message' => 'Erro ao preparar a consulta de itens do pedido: ' . $conn->error]);
+        exit();
+    }
+    $stmt_items->bind_param("i", $id_pedido);
+    $stmt_items->execute();
+    $result_items = $stmt_items->get_result();
+
+    $products_to_update = [];
+    while ($item = $result_items->fetch_assoc()) {
+        $products_to_update[] = $item;
+    }
+    $stmt_items->close();
+
+    // 3. Update product quantities
+    $conn->begin_transaction(); // Inicia uma transação para garantir atomicidade
+
+    try {
+        $sql_update_product_qty = "UPDATE produtos SET quantidade = quantidade - ? WHERE id_produtos = ?";
+        $stmt_update_qty = $conn->prepare($sql_update_product_qty);
+
+        if ($stmt_update_qty === false) {
+            throw new Exception('Erro ao preparar a atualização de quantidade do produto: ' . $conn->error);
+        }
+
+        foreach ($products_to_update as $product_item) {
+            $quantidade_deduzir = $product_item['quantidade'];
+            $id_produto = $product_item['id_produto'];
+
+            // Opcional: Adicionar uma verificação se a quantidade em estoque é suficiente antes de deduzir
+            // Você pode adicionar uma SELECT aqui para pegar a quantidade atual e verificar
+            // Ex: SELECT quantidade FROM produtos WHERE id_produto = ?
+            // Se for menor, pode abortar ou logar um erro.
+            // Por simplicidade, faremos a dedução direta.
+
+            $stmt_update_qty->bind_param("ii", $quantidade_deduzir, $id_produto);
+            if (!$stmt_update_qty->execute()) {
+                throw new Exception('Erro ao deduzir quantidade do produto ' . $id_produto . ': ' . $stmt_update_qty->error);
+            }
+        }
+        $stmt_update_qty->close();
+
+        // Se tudo ocorreu bem com a atualização de estoque, agora atualiza o status do pedido
+        $sql_update_pedido = "UPDATE pedidos SET status_pedido = ?, id_entregador = ? WHERE id_pedido = ?";
+        $stmt_pedido = $conn->prepare($sql_update_pedido);
+        if ($stmt_pedido === false) {
+            throw new Exception('Erro ao preparar a atualização do pedido: ' . $conn->error);
+        }
+        $stmt_pedido->bind_param("sii", $status_novo, $id_entregador_para_salvar, $id_pedido);
+        if (!$stmt_pedido->execute()) {
+            throw new Exception('Erro ao atualizar status do pedido: ' . $stmt_pedido->error);
+        }
+        $stmt_pedido->close();
+
+        $conn->commit(); // Confirma todas as operações da transação
+        echo json_encode(['success' => true, 'message' => 'Status do pedido atualizado e estoque deduzido com sucesso!']);
+
+    } catch (Exception $e) {
+        $conn->rollback(); // Reverte todas as operações em caso de erro
+        error_log("Erro na transação de conclusão de pedido: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Erro ao concluir pedido e deduzir estoque: ' . $e->getMessage()]);
     }
 } else {
-    $response['message'] = 'Método de requisição inválido.';
+    // Lógica existente para outros status (sem dedução de estoque)
+    $sql_update = "UPDATE pedidos SET status_pedido = ?, id_entregador = ? WHERE id_pedido = ?";
+
+    $stmt = $conn->prepare($sql_update);
+    if ($stmt === false) {
+        echo json_encode(['success' => false, 'message' => 'Erro ao preparar a declaração SQL: ' . $conn->error]);
+        $conn->close();
+        exit();
+    }
+
+    $stmt->bind_param("sii", $status_novo, $id_entregador_para_salvar, $id_pedido);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Status do pedido atualizado com sucesso!']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Erro ao atualizar status do pedido: ' . $stmt->error]);
+    }
+
+    $stmt->close();
 }
 
 $conn->close();
-echo json_encode($response);
+
 ?>

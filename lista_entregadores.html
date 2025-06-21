@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Entregadores</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Regras de estilo específicas para esta página, se necessário */
+
+        /* Estilo para o contêiner principal, combinado de .container e .card.tamanho-tabela de lista_pedidos.php */
+        .card.tamanho-tabela {
+            max-width: 1200px;
+            margin: 20px auto; /* Centraliza e adiciona margem vertical */
+            padding: 20px; /* Padding geral */
+            padding-top: 50px; /* Padding específico do topo, para mover o conteúdo abaixo do cabeçalho */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Necessário para posicionamento absoluto de outros elementos se houver */
+        }
+
+        /* Para o card no modal não ter o pseudo-elemento ::before */
+        .card::before {
+            content: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: absolute; /* Posiciona o cabeçalho acima do padding-top do .card.tamanho-tabela */
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 20px; /* Ajuste o padding conforme necessário */
+            box-sizing: border-box; /* Garante que o padding não adicione largura */
+            background-color: #fff; /* Fundo para o cabeçalho para não vazar por baixo */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            z-index: 10; /* Garante que o cabeçalho fique por cima */
+        }
+
+
+        .header h1 {
+            color: var(--cor-titulo);
+            margin: 0;
+        }
+
+        .add-button {
+            background-color: var(--cor-principal);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Adiciona um espaço abaixo do cabeçalho fixo */
+        }
+
+        .add-button:hover {
+            background-color: var(--cor-secundario);
+        }
+
+        .voltar-menu-btn-right {
+            background-color: var(--cor-titulo);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            /* margin-left: auto; */ /* Removido para ser controlado pelo flexbox do .header */
+            /* margin-right: 10px; */ /* Removido para ser controlado pelo flexbox do .header */
+            /* align-self: flex-end; */ /* Removido para ser controlado pelo flexbox do .header */
+            /* margin-bottom: 20px; */ /* Removido */
+        }
+        .voltar-menu-btn-right:hover {
+            opacity: 0.9;
+        }
+
+        .tabela-container {
+            overflow-x: auto;
+            margin-top: 20px; /* Adiciona espaço entre o botão e a tabela */
+        }
+
+        .tamanho-tabela { /* Refere-se à tabela, não ao contêiner principal */
+            width: 100%; /* Ajustado para 100% para ser responsivo */
+            border-collapse: collapse;
+            margin-top: 0; /* Removido, pois a margem já está no tabela-container */
+        }
+
+        .tamanho-tabela th,
+        .tamanho-tabela td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .tamanho-tabela th {
+            background-color: var(--cor-fundo-header-tabela);
+            color: var(--cor-texto-header-tabela);
+            text-transform: uppercase;
+        }
+
+        .tamanho-tabela tr:nth-child(even) {
+            background-color: var(--cor-fundo-linha-par);
+        }
+
+        .tamanho-tabela tr:hover {
+            background-color: var(--cor-fundo-linha-hover);
+        }
+
+        /* Botões de Ação na Tabela */
+        .edit-btn, .delete-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Estilos do Modal (adaptados de lista_pedidos.php) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Estilos do Formulário no Modal (adaptados de lista_pedidos.php) */
+        .modal-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--cor-principal);
+        }
+
+        .modal-form input[type="text"],
+        .modal-form input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .modal-form-button {
+            background-color: var(--cor-principal);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 18px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-form-button.cancel {
+            background-color: #6c757d;
+        }
+
+        .modal-form-button:hover {
+            opacity: 0.9;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="card tamanho-tabela">
+        <div class="header">
+            <h1>Lista de Entregadores</h1>
+            <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
+        </div>
+
+        <button id="addEntregadorBtn" class="add-button">Adicionar Novo Entregador</button>
+
+        <div class="tabela-container">
+            <table id="entregadorTable" class="tamanho-tabela">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Data de Nascimento</th>
+                        <th>Telefone</th>
+                        <th>CNH</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="entregadorModal" class="modal">
+        <div class="modal-content card">
+            <span class="close">&times;</span>
+            <h2>Cadastrar Entregador</h2>
+            <form id="entregadorForm" class="modal-form">
+                <input type="hidden" id="entregadorId" name="entregadorId">
+
+                <label for="nomeEntregador">Nome:</label>
+                <input type="text" id="nomeEntregador" name="nomeEntregador" required><br>
+
+                <label for="cpfEntregador">CPF:</label>
+                <input type="text" id="cpfEntregador" name="cpfEntregador"><br>
+
+                <label for="dataNascimentoEntregador">Data de Nascimento:</label>
+                <input type="date" id="dataNascimentoEntregador" name="dataNascimentoEntregador" required><br>
+
+                <label for="telefoneEntregador">Telefone:</label>
+                <input type="text" id="telefoneEntregador" name="telefoneEntregador" required><br>
+
+                <label for="cnhEntregador">CNH:</label>
+                <input type="text" id="cnhEntregador" name="cnhEntregador"><br>
+
+                <button type="submit" class="modal-form-button">Salvar Entregador</button>
+                <button type="button" id="cancelEntregadorModalBtn" class="modal-form-button cancel" style="margin-top: 10px;">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+
+    <script src="js/lista-entregadores.js"></script>
+</body>
+
+</html>

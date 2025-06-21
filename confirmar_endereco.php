@@ -10,7 +10,7 @@ $primeiroNome = ucwords($primeiroNome);
 
 
 // Conexão com o banco de dados para buscar o endereço completo
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

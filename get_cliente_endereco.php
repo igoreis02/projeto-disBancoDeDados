@@ -3,7 +3,7 @@
 // É crucial que não haja NADA (nem mesmo espaços ou linhas em branco) antes desta tag PHP.
 header('Content-Type: application/json');
 
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

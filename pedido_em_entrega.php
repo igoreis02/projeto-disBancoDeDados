@@ -15,7 +15,7 @@ $troco = 0.00;
 $endereco_completo_formatado = 'Endereço não disponível.';
 
 // Conexão com o banco de dados
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

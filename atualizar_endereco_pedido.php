@@ -9,7 +9,7 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1); // Loga os erros para um arquivo de log do PHP.
 error_reporting(E_ALL);
 
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

@@ -61,7 +61,8 @@
         <div class="menu-buttons">
             <button class="menu-button" id="clientes">Clientes</button>
             <button class="menu-button" id="produtos">Produtos</button>
-            <button class="menu-button" id="pedidos">Pedidos</button> </div>
+            <button class="menu-button" id="pedidos">Pedidos</button>
+            <button class="menu-button" id="entregadores">Entregadores</button> </div>
         <a href="index.html" class="voltar-btn">Sair</a>
     </div>
     <div class="footer">
@@ -69,18 +70,20 @@
     </div>
     <script>
         document.getElementById('clientes').addEventListener('click', function() {
-            //  Redirecionar para a página de clientes
-            window.location.href = 'lista-clientes.html'; //  Mude para o caminho correto
+            window.location.href = 'lista-clientes.html';
         });
 
         document.getElementById('produtos').addEventListener('click', function() {
-            //  Redirecionar para a página de produtos
-            window.location.href = 'lista-produto.html'; //  Mude para o caminho correto
+            window.location.href = 'lista-produto.html';
         });
 
-        // Novo evento para o botão "Pedidos"
         document.getElementById('pedidos').addEventListener('click', function() {
-            window.location.href = 'lista_pedidos.php'; // Redireciona para a nova página de pedidos
+            window.location.href = 'lista_pedidos.php';
+        });
+
+        // NEW EVENT LISTENER FOR ENTREGADORES
+        document.getElementById('entregadores').addEventListener('click', function() {
+            window.location.href = 'lista_entregadores.html';
         });
     </script>
 </body>

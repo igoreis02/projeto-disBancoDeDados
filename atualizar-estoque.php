@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";
@@ -9,34 +9,53 @@ $dbname = "cadastro";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-    die(json_encode(array("success" => false, "message" => "Erro na conexão com o banco de dados: " . $conn->connect_error)));
+    echo json_encode(['success' => false, 'message' => 'Erro na conexão com o banco de dados: ' . $conn->connect_error]);
+    exit();
 }
 
-if (isset($_POST['id_produtos']) && isset($_POST['quantidade'])) {
-    $id = $_POST['id_produtos'];
-    $quantidade = $_POST['quantidade'];
+$id_pedido = $_POST['id_pedido'] ?? null;
+$status_novo = $_POST['status'] ?? null;
+$id_entregador = $_POST['id_entregador'] ?? null; // Obtém o id_entregador
 
-    $sql_select = "SELECT quantidade FROM produtos WHERE id_produtos = $id";
-    $result_select = $conn->query($sql_select);
+if (!$id_pedido || !$status_novo) {
+    echo json_encode(['success' => false, 'message' => 'ID do pedido ou novo status não fornecidos.']);
+    exit();
+}
 
-    if ($result_select->num_rows > 0) {
-        $row_select = $result_select->fetch_assoc();
-        $quantidade_atual = $row_select['quantidade'];
+// Prepara a query de atualização
+$sql_update = "UPDATE pedidos SET status_pedido = ?";
+$types = "s"; // Tipo para o status
 
-        $nova_quantidade = $quantidade_atual + $quantidade;
-
-        $sql_update = "UPDATE produtos SET quantidade = $nova_quantidade WHERE id_produtos = $id";
-        if ($conn->query($sql_update) === TRUE) {
-            echo json_encode(array("success" => true, "message" => "Estoque atualizado com sucesso."));
-        } else {
-            echo json_encode(array("success" => false, "message" => "Erro ao atualizar o estoque: " . $conn->error));
-        }
-    } else {
-        echo json_encode(array("success" => false, "message" => "Produto não encontrado."));
-    }
+// Se o status for 'Entrega' e um entregador foi fornecido, adicione a coluna id_entregador
+if ($status_novo === 'Entrega' && $id_entregador !== null) {
+    $sql_update .= ", id_entregador = ?";
+    $types .= "i"; // Tipo para o id_entregador (inteiro)
 } else {
-    echo json_encode(array("success" => false, "message" => "Dados de entrada inválidos."));
+    // Se o status NÃO for 'Entrega' ou nenhum entregador foi fornecido, garanta que id_entregador seja NULL
+    // Isso evita que um entregador fique associado se o pedido não estiver em 'Entrega'
+    $sql_update .= ", id_entregador = NULL";
 }
 
+$sql_update .= " WHERE id_pedido = ?";
+$types .= "i"; // Tipo para o id_pedido
+
+$stmt = $conn->prepare($sql_update);
+
+// Bind dos parâmetros dinamicamente
+if ($status_novo === 'Entrega' && $id_entregador !== null) {
+    $stmt->bind_param($types, $status_novo, $id_entregador, $id_pedido);
+} else {
+    // Se não há id_entregador para bind (ou é NULL), apenas status e id_pedido
+    $stmt->bind_param($types, $status_novo, $id_pedido);
+}
+
+
+if ($stmt->execute()) {
+    echo json_encode(['success' => true, 'message' => 'Status do pedido atualizado com sucesso.']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Erro ao atualizar status: ' . $stmt->error]);
+}
+
+$stmt->close();
 $conn->close();
 ?>

@@ -6,6 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <title>Cadastro</title>
+    <style>
+        .form-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .form-buttons button, .form-buttons a {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            display: block; /* Garante que ocupem a largura total */
+            width: 100%; /* Garante que ocupem a largura total */
+            box-sizing: border-box; /* Inclui padding e borda na largura total */
+        }
+        .form-buttons .edit-button {
+            background-color: var(--cor-principal);
+        }
+        .form-buttons .edit-button:hover {
+            background-color: var(--cor-secundaria);
+        }
+        .form-buttons .exit-button {
+            background-color:   #eb9f25; /* Vermelho para sair */
+        }
+        .form-buttons .exit-button:hover {
+            background-color: rgb(197, 133, 31);
+        }
+    </style>
 </head>
 
 <body>
@@ -62,10 +95,17 @@
                 Li e aceito os &nbsp;<a href="TermoSorteio.html" class="link" target="_blank">Termos do Sorteio</a>
             </div>
             <span id="error"></span>
-            <button type="submit">Finalizar</button>
+            <div id="mensagem"></div>
+            <div class="form-buttons">
+                <div>  
+                    <button type="submit" class="edit-button">Finalizar cadastro</button>
+                </div>
+                <div>   
+                    <a href="index.html" class="exit-button">Volta para o inicio</a>
+                </div>
+            </div>
         </form>
-        <div id="mensagem"></div>
-        <a href="index.html" class="">Volta para o inicio</a>
+        
     </div>
     <div class="footer">
         <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>

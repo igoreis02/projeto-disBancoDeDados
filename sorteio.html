@@ -14,10 +14,36 @@
             padding: 15px;
             margin: 20px auto;
             max-width: 400px;
-            text-align: left;
+            text-align: center;
         }
         .pedido-details strong {
             color: var(--cor-principal);
+        }
+        .form-buttons button, .form-buttons a {
+            margin: 10px 0;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            display: block; /* Garante que ocupem a largura total */
+            width: 100%; /* Garante que ocupem a largura total */
+            box-sizing: border-box; /* Inclui padding e borda na largura total */
+        }
+        .form-buttons .edit-button {
+            background-color: var(--cor-principal);
+        }
+        .form-buttons .edit-button:hover {
+            background-color: var(--cor-secundaria);
+        }
+        .form-buttons .exit-button {
+            background-color:   #eb9f25; /* Vermelho para sair */
+        }
+        .form-buttons .exit-button:hover {
+            background-color: rgb(197, 133, 31);
         }
     </style>
 </head>
@@ -28,18 +54,23 @@
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <img class="imagem" src="imagens/boneco.png" alt="">
 
+        <h1>Olá, <span id="nomeCadastrado"></span></h1>
         <div class="pedido-details">
-            <h1>Olá, <span id="nomeCadastrado"></span>!</h1>
-            <div class="confirmacao_numero">
-                <p class="paragrafo">Seu número da sorte é:</p>
+            
+            <div class="">
+                <p class="">Seu número da sorte é:</p>
                 <span id="numeroSorteado"></span>
             </div>
             <p>Agora é só esperar o dia do sorteio e torcer para você ganhar! Até breve.</p>
-            <button class="botao">Data dos sorteios</button>
             
         </div>
+        <div class="form-buttons">   
         <div>
-                <button class="botao_Voltar">Voltar para o início</button>
+            <button id="botao" class="edit-button">Data dos sorteios</button>
+        </div>
+        <div>
+                <button id="botao_Voltar" class="exit-button">Voltar para o início</button>
+        </div>
         </div>
     </div>
     <div class="footer">
@@ -55,8 +86,9 @@
             const numeroSorteadoSpan = document.getElementById('numeroSorteado');
 
             if (nomeCompletoParam && numeroSorteadoParam) {
-                // O nome já deve vir como o primeiro nome capitalizado do PHP
-                nomeCadastradoSpan.textContent = decodeURIComponent(nomeCompletoParam);
+                // O nome já deve vir como o primeiro nome capitalizado do 
+                const primeiroNome = nomeCompletoParam.split(' ')[0].toUpperCase();
+                nomeCadastradoSpan.textContent = decodeURIComponent(primeiroNome);
                 numeroSorteadoSpan.textContent = decodeURIComponent(numeroSorteadoParam);
             } else {
                 nomeCadastradoSpan.textContent = 'Cliente';
@@ -66,11 +98,11 @@
                 // window.location.href = 'index.html';
             }
 
-            document.querySelector('.botao').addEventListener('click', function() {
+            document.querySelector('#botao').addEventListener('click', function() {
                 alert('A data dos sorteios será divulgada em breve!');
             });
 
-            document.querySelector('.botao_Voltar').addEventListener('click', function() {
+            document.querySelector('#botao_Voltar').addEventListener('click', function() {
                 window.location.href = 'index.html';
             });
         });

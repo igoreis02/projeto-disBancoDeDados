@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json'); // Responde sempre com JSON
 
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";
@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!$stmt_pedido) {
                 throw new Exception("Erro ao preparar a inserção do pedido: " . $conn->error);
             }
-            $stmt_pedido->bind_param("iddsd", $id_cliente, $valor_total, $forma_pagamento, $status_inicial, $valor_pago); // 's' para status_pedido
+            $stmt_pedido->bind_param("idssd", $id_cliente, $valor_total, $forma_pagamento, $status_inicial, $valor_pago); // 's' para status_pedido
             if (!$stmt_pedido->execute()) {
                 throw new Exception("Erro ao executar a inserção do pedido: " . $stmt_pedido->error);
             }
@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = 'Pedido finalizado e salvo com sucesso!';
         $redirect_url = 'confirmacao_sem_sorteio.html?nome=' . urlencode(explode(' ', $nome_cliente)[0]);
 
-        if ($has_gas_product) { // Se o pedido contém um produto de gás
+        if ($has_gas_product && $id_pedido_existente == 0) { // Se o pedido contém um produto de gás
             $min = 100;
             $max = 10000;
             

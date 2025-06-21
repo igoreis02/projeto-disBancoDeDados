@@ -3,7 +3,7 @@
 // Isso garante que o cabeçalho Content-Type seja enviado corretamente antes de qualquer outra saída.
 header('Content-Type: application/json');
 
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

@@ -22,7 +22,7 @@ $valor_pago_formatado = ($valor_pago !== null) ? number_format($valor_pago, 2, '
 $troco_formatado = number_format($troco, 2, ',', '.');
 
 // Conexão com o banco de dados para buscar o endereço completo
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";

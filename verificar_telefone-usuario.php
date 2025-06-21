@@ -1,6 +1,6 @@
 <?php
 // conexao.php (Inclua seu arquivo de conexão)
-$servername = "localhost:3307";
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "cadastro";
