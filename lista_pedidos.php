@@ -347,7 +347,7 @@ $conn->close();
 </head>
 <body>
     <audio id="pendingOrderSound" src="audio/novo_pedido.mp3" preload="auto" loop></audio>
-
+        <div class="background"></div>
     <div class="card tamanho-tabela">
         <div class="header">
             <h1>Lista de Pedidos</h1>
@@ -1630,7 +1630,7 @@ $conn->close();
             fetchAndRenderPedidos();
 
             // Configura o intervalo para recarregar os pedidos a cada 5 segundos
-            setInterval(fetchAndRenderPedidos, 5000); // 5000 milissegundos = 5 segundos
+            setInterval(fetchAndRenderPedidos, 10000); // 5000 milissegundos = 5 segundos
 
         }); // Fim do DOMContentLoaded
     </script>
