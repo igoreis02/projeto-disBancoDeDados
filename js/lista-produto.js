@@ -11,6 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const entradaEstoqueForm = document.getElementById('entradaEstoqueForm');
     const produtoEstoqueSelect = document.getElementById('produtoEstoque');
 
+    // Referências aos grupos de campos de imagem e quantidade
+    const quantidadeGroup = document.getElementById('quantidadeGroup'); //
+    const imagemGroup = document.getElementById('imagemGroup');     //
+
+    // Referências diretas aos inputs de imagem e quantidade para required
+    const inputImagem = document.getElementById('imagem');
+    const inputQuantidade = document.getElementById('quantidade');
+
    
     // Função para abrir o modal de entrada de estoque
     entradaEstoqueBtn.addEventListener('click', () => {
@@ -57,7 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        fetch('atualizar-estoque.php', {
+        // MUDANÇA AQUI: Aponta para o novo arquivo PHP de atualização de estoque
+        fetch('atualizar_estoque_produto.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -87,15 +96,19 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Erro ao atualizar estoque:', error));
     });
 
-    // Função para abrir o modal
+    // Função para abrir o modal de adição de produto
     addProdutoBtn.addEventListener('click', () => {
         modal.style.display = 'block';
-        document.getElementById('id').value = ''; // Limpa o ID
-        document.getElementById('nome').value = '';
-        document.getElementById('preco').value = '';
-        document.getElementById('quantidade').value = '';
-        document.getElementById('imagem').value = '';
+        document.getElementById('id').value = ''; // Limpa o ID para indicar nova adição
+        form.reset(); // Limpa o formulário
         document.querySelector('#produtoModal h2').textContent = 'Adicionar Produto';
+
+        // Oculta o campo de quantidade e mostra o campo de imagem para adição
+        quantidadeGroup.style.display = 'none';
+        inputQuantidade.required = false; // Remove o required quando oculto
+
+        imagemGroup.style.display = 'block'; // Mostra o campo de imagem
+        inputImagem.required = false; // Imagem não é obrigatória na adição (conforme HTML)
     });
 
     // Função para fechar o modal
@@ -142,13 +155,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         let btnEditar = document.createElement('button');
                         btnEditar.textContent = 'Editar';
                         btnEditar.classList.add('edit-btn');
-                        btnEditar.addEventListener('click', () => editarProduto(produto));
+                        // Passa o id_produto para a função editarProduto
+                        btnEditar.addEventListener('click', () => editarProduto(produto.id_produtos));
                         tdAcoes.appendChild(btnEditar);
 
                         let btnExcluir = document.createElement('button');
                         btnExcluir.textContent = 'Excluir';
                         btnExcluir.classList.add('delete-btn');
-                        btnExcluir.addEventListener('click', () => excluirProduto(produto.id));
+                        btnExcluir.addEventListener('click', () => excluirProduto(produto.id_produtos)); // Corrigido para id_produtos
                         tdAcoes.appendChild(btnExcluir);
                     });
                 } else {
@@ -162,14 +176,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Função para editar um produto
-    function editarProduto(produto) {
-        modal.style.display = 'block';
-        document.getElementById('id').value = produto.id_produto;
-        document.getElementById('nome').value = produto.nome;
-        document.getElementById('preco').value = produto.preco;
-        document.getElementById('quantidade').value = produto.quantidade;
-        document.querySelector('#produtoModal h2').textContent = 'Editar Produto';
+    function editarProduto(id_produto) {
+        // Primeiro, busca os dados do produto específico para preencher o formulário
+        fetch(`buscar-produto.php?id=${id_produto}`) // CRIE ESTE ARQUIVO
+            .then(response => response.json())
+            .then(produto => {
+                if (produto.success) {
+                    modal.style.display = 'block';
+                    document.getElementById('id').value = produto.data.id_produtos; // Preenche o ID
+                    document.getElementById('nome').value = produto.data.nome;
+                    document.getElementById('preco').value = produto.data.preco;
+                    
+                    // Oculta os campos de quantidade e imagem para edição e remove o atributo 'required'
+                    quantidadeGroup.style.display = 'none';
+                    inputQuantidade.required = false; // REMOVE O ATRIBUTO 'REQUIRED' PARA EDIÇÃO
+
+                    imagemGroup.style.display = 'none';
+                    inputImagem.required = false; // Garante que não é obrigatório ao editar
+
+                    document.querySelector('#produtoModal h2').textContent = 'Editar Produto';
+                } else {
+                    alert(produto.message);
+                }
+            })
+            .catch(error => console.error('Erro ao buscar produto para edição:', error));
     }
+
 
     // Função para excluir um produto
     function excluirProduto(id) {
@@ -198,9 +230,30 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const formData = new FormData(form);
+        const id = document.getElementById('id').value; // Pega o ID (se estiver editando)
+        const nome = document.getElementById('nome').value;
+        const preco = document.getElementById('preco').value;
+        // A quantidade e imagem só serão pegas se os campos estiverem visíveis
+        const quantidade = inputQuantidade.value;
+        const imagemFile = inputImagem.files[0];
 
-        fetch('adicionar-produto.php', {
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('nome', nome);
+        formData.append('preco', preco);
+        
+        // Só adiciona quantidade e imagem se o grupo estiver visível
+        if (quantidadeGroup.style.display !== 'none') {
+            formData.append('quantidade', quantidade);
+        }
+        if (imagemGroup.style.display !== 'none' && imagemFile) {
+            formData.append('imagem', imagemFile);
+        }
+
+        // Determina qual script PHP usar com base no ID
+        const url = id ? 'editar-produto.php' : 'adicionar-produto.php';
+
+        fetch(url, {
             method: 'POST',
             body: formData
         })

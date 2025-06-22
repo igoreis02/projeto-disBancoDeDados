@@ -27,6 +27,10 @@ body {
     .card {
         margin: 0;
         width: 360px;
+        padding:10px;
+    }
+    .form {
+        width: 100%;
     }
 }
 

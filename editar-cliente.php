@@ -24,7 +24,6 @@ if (isset($_POST['id'])) {
     $complemento = $_POST['complemento'];
     $cidade = $_POST['cidade'];
     $sexo = $_POST['sexo'];
-    $termoSorteio = $_POST['termoSorteio'];
 
     // Validação (mantenha sua validação como está)
     $sql = "UPDATE clientes SET 
@@ -37,12 +36,11 @@ if (isset($_POST['id'])) {
             setor = ?,
             complemento = ?,
             cidade = ?,
-            sexo = ?,
-            termoSorteio = ?
+            sexo = ?
             WHERE id = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssssssssi", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $termoSorteio, $id);
+    $stmt->bind_param("sssssssssss", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $id);
 
     // Executa a consulta
     if ($stmt->execute()) {

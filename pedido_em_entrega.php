@@ -111,6 +111,26 @@ if ($conn->connect_error) {
 $valor_total_formatado = number_format($valor_total, 2, ',', '.');
 $valor_pago_formatado = ($valor_pago !== null) ? number_format($valor_pago, 2, ',', '.') : '';
 $troco_formatado = number_format($troco, 2, ',', '.');
+
+// Construir a mensagem do WhatsApp
+$whatsapp_message = "Olá, meu nome é " . $primeiroNome . "!%0A";
+$whatsapp_message .= "Gostaria de saber sobre o meu pedido em entrega:%0A%0A";
+$whatsapp_message .= "Endereço: " . strip_tags($endereco_completo_formatado) . "%0A"; // Remove HTML tags for WhatsApp
+$whatsapp_message .= "Produtos: " . $produtos_detalhes . "%0A";
+$whatsapp_message .= "Valor Total: R$ " . $valor_total_formatado . "%0A";
+$whatsapp_message .= "Forma de Pagamento: " . ucwords($forma_pagamento);
+
+if ($forma_pagamento === 'dinheiro' && $valor_pago !== null) {
+    $whatsapp_message .= " (R$ " . $valor_pago_formatado . ")%0A";
+    $whatsapp_message .= "Troco: R$ " . $troco_formatado . "%0A";
+} else {
+    $whatsapp_message .= "%0A";
+}
+
+// Número de WhatsApp da empresa (substitua pelo seu número)
+$whatsapp_number = "5562993997054"; // Exemplo: 55 DDD NÚMERO (sem espaços ou hifens)
+$whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_message;
+
 ?>
 
 <!DOCTYPE html>
@@ -173,6 +193,22 @@ $troco_formatado = number_format($troco, 2, ',', '.');
         .form-buttons .exit-button:hover {
             background-color:rgb(197, 133, 31);
         }
+
+
+        .form-buttons .contato-btn {
+            background-color: var(--cor-principal);
+            color: white;
+        }
+
+        .form-buttons .contato-btn:hover {
+            background-color: var(--cor-secundaria);
+        }
+        .whatsapp-icon {
+            width: 24px; /* Ajuste o tamanho conforme necessário */
+            height: 24px;
+            vertical-align: middle; /* Alinha o ícone com o texto */
+            margin-right: 8px; /* Espaço entre o ícone e o texto */
+        }
     </style>
 </head>
 <body>
@@ -181,7 +217,7 @@ $troco_formatado = number_format($troco, 2, ',', '.');
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1>Olá, <?php echo $primeiroNome; ?>!</h1>
         <p class="message-paragraph">Seu pedido está em entrega. Acompanhe os detalhes:</p>
-        
+
         <div class="pedido-details">
             <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p>
             <p><strong>Produtos:</strong> <?php echo $produtos_detalhes; ?></p>
@@ -197,6 +233,7 @@ $troco_formatado = number_format($troco, 2, ',', '.');
         </div>
 
         <div class="form-buttons">
+            <a href="<?php echo $whatsapp_link; ?>" class="contato-btn" target="_blank"><img src="imagens/whatsapp_icon.webp" alt="WhatsApp" class="whatsapp-icon">Entrar em contato</a>
             <a href="index.html" class="exit-button">Sair</a>
         </div>
     </div>

@@ -7,37 +7,263 @@
     <title>Lista de Clientes</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Regra para remover o pseudo-elemento ::before da classe .card nesta página */
+        /* Regras de estilo específicas para esta página, se necessário */
+
+        /* Estilo para o contêiner principal, combinado de .container e .card.tamanho-tabela de lista_pedidos.php */
+        .card.tamanho-tabela {
+            max-width: 1200px;
+            margin: 20px auto;
+            /* Centraliza e adiciona margem vertical */
+            padding: 20px;
+            /* Padding geral */
+            padding-top: 50px;
+            /* Padding específico do topo, para mover o conteúdo abaixo do cabeçalho */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            /* Necessário para posicionamento absoluto de outros elementos se houver */
+        }
+
+        /* Para o card no modal não ter o pseudo-elemento ::before */
         .card::before {
             content: none;
         }
-        .tamanho-tabela{
-            width: 80%;
-            border-collapse: collapse;
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            position: absolute;
+            /* Posiciona o cabeçalho acima do padding-top do .card.tamanho-tabela */
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 20px;
+            /* Ajuste o padding conforme necessário */
+            box-sizing: border-box;
+            /* Garante que o padding não adicione largura */
+            background-color: #fff;
+            /* Fundo para o cabeçalho para não vazar por baixo */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            z-index: 10;
+            /* Garante que o cabeçalho fique por cima */
         }
+
+
+        .header h1 {
+            color: var(--cor-titulo);
+            margin: 0;
+        }
+
+        .header-buttons {
+            display: flex;
+            justify-content: flex-start;
+            /* Alinha os botões à direita */
+            align-items: center;
+        }
+
+        /* Estilos do botão Adicionar Novo Entregador */
+        .add-button-entregador {
+            background-color: var(--cor-principal);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            margin-top: 40px;
+            /* Espaço entre o botão e o cabeçalho */
+        }
+
+
+        .add-button-entregador:hover {
+            opacity: 0.9;
+        }
+
+        /* Estilos do botão Voltar ao Menu */
         .voltar-menu-btn-right {
-            background-color: var(--cor-titulo); 
+            background-color: var(--cor-titulo);
             color: white;
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-decoration: none; 
-            display: inline-block; 
-            margin-left: auto; 
-            margin-right: 10px; 
-            align-self: flex-end;/* Aligns itself to the end of the flex container */
-            margin-bottom: 20px; /* Space below the button */
+            text-decoration: none;
+            display: inline-block;
         }
+
         .voltar-menu-btn-right:hover {
             opacity: 0.9;
+            /* Mantém a opacidade para este botão se for o desejado */
         }
-         .card.tamanho-tabela .header-buttons {
+
+        .tabela-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            /* Adiciona espaço entre o botão e a tabela */
+        }
+
+        .tamanho-tabela {
+            /* Refere-se à tabela, não ao contêiner principal */
             width: 100%;
-            display: flex;
-            justify-content: space-between; /* Distribute items with space between them */
+            /* Ajustado para 100% para ser responsivo */
+            border-collapse: collapse;
+            margin-top: 0;
+            /* Removido, pois a margem já está no tabela-container */
+        }
+
+        .tamanho-tabela th,
+        .tamanho-tabela td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .tamanho-tabela th {
+            background-color: var(--cor-fundo-header-tabela);
+            color: var(--cor-texto-header-tabela);
+            text-transform: uppercase;
+        }
+
+        .tamanho-tabela tr:nth-child(even) {
+            background-color: var(--cor-fundo-linha-par);
+        }
+
+        .tamanho-tabela tr:hover {
+            background-color: var(--cor-fundo-linha-hover);
+        }
+
+        /* Botões de Ação na Tabela */
+        .edit-btn,
+        .delete-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: var(--cor-titulo);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: rgb(197, 133, 31);
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Estilos do Modal (adaptados de lista_pedidos.php) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+
+        @keyframes animatetop {
+            from {
+                top: -300px;
+                opacity: 0
+            }
+
+            to {
+                top: 0;
+                opacity: 1
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Estilos do Formulário no Modal (adaptados de lista_pedidos.php) */
+        .modal-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--cor-principal);
+        }
+
+        .modal-form input[type="text"],
+        .modal-form input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .modal-form-button {
+            background-color: var(--cor-principal);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 18px;
+            width: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-form-button.cancel {
+            background-color: #6c757d;
+        }
+
+        .modal-form-button:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -45,8 +271,14 @@
 <body>
     <div class="background"></div>
     <div class="card  tamanho-tabela">
-        <h1 class="titulo-tabela">Lista de Clientes</h1>
-        <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
+        <div class="header">
+            <h1>Lista de Clientes</h1>
+
+            <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
+        </div>
+        <div class="header-buttons">
+            <button id="exportBtn" class="add-button-entregador">Exportar para Excel</button>
+        </div>
         <div class="table-container">
             <table id="clientTable">
                 <thead>
@@ -55,14 +287,8 @@
                         <th>Nome</th>
                         <th>Data de Nascimento</th>
                         <th>Endereço</th>
-                        <th>Quadra</th>
-                        <th>Lote</th>
-                        <th>Setor</th>
-                        <th>Complemento</th>
-                        <th>Cidade</th>
                         <th>Sexo</th>
                         <th>Termo Sorteio</th>
-                        <th>Número Sorteado</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -70,17 +296,17 @@
                 </tbody>
             </table>
         </div>
-        
+
     </div>
     <div class="footer">
         <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
     </div>
 
     <div id="editModal" class="modal">
-        <div class="card">
+        <div class="modal-content card">
             <span class="close">&times;</span>
             <h2>Editar Cliente</h2>
-            <form id="editForm" class="form">
+            <form id="editForm" class="modal-form">
                 <input type="hidden" id="editId">
 
                 <label for="editTelefone">Telefone:</label><input type="text" id="editTelefone" name="editTelefone">
@@ -92,45 +318,29 @@
                     name="editDt_nascimento">
 
                 <label for="editEndereco">Endereço:</label><input type="text" id="editEndereco" name="editEndereco">
-
-                <div class="conteiner-quadra-lote">
-                    <div class="form qd-lt">
-                        <label for="editQuadra">Quadra:</label><input type="text" id="editQuadra" name="editQuadra">
-                    </div>
-                    <div class="form qd-lt">
-                        <label for="editLote">Lote:</label><input type="text" id="editLote" name="editLote">
-                    </div>
-                </div>
-
-
-
-
+                
                 <label for="editSetor">Setor:</label><input type="text" id="editSetor" name="editSetor">
                 <label for="editComplemento">Complemento:</label><input type="text" id="editComplemento"
                     name="editComplemento">
                 <label for="editCidade">Cidade:</label><input type="text" id="editCidade" name="editCidade">
+                <label for="editQuadra">Quadra:</label><input type="text" id="editQuadra" name="editQuadra">
+                <label for="editLote">Lote:</label><input type="text" id="editLote" name="editLote">
 
 
                 <label for="editSexo">Sexo:</label>
-            <div class="conteiner-quadra-lote">
-                <div class="masculino_feminino">
-                    <label for="editSexo">Masculino:</label>
-                    <input type="radio" name="editSexo" id="editSexo" value="Masculino">
+                <div class="modal-form">
+                    <div class="conteiner-quadra-lote">
+                        <div class="masculino_feminino">
+                            <label for="editSexo">Masculino:</label>
+                            <input type="radio" name="editSexo" id="editSexo" value="Masculino">
+                        </div>
+                        <div class="masculino_feminino">
+                            <label for="editSexo">Feminino:</label>
+                            <input type="radio" name="editSexo" id="editSexo" value="Feminino">
+                        </div>
+                    </div>
                 </div>
-                <div class="masculino_feminino">
-                    <label for="editSexo">Feminino:</label>
-                    <input type="radio" name="editSexo" id="editSexo" value="Feminino">
-                </div>
-            </div>
-
-                
-                
-                <label for="editTermoSorteio">Termo Sorteio:</label>
-                <select id="editTermoSorteio" name="editTermoSorteio">
-                    <option value="1">Sim</option>
-                    <option value="0">Não</option>
-                </select><br>
-                <button type="submit">Salvar</button>
+                <button type="submit" class="modal-form-button">Salvar</button>
             </form>
         </div>
     </div>

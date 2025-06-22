@@ -12,7 +12,8 @@
  
  $nome = $_POST['nome'];
  $preco = $_POST['preco'];
- $quantidade = $_POST['quantidade'];
+ // Use um valor padrão para quantidade se não for fornecida (ex: 0)
+ $quantidade = $_POST['quantidade'] ?? 0; // Se 'quantidade' não for postado, define como 0
  
  // Processamento do upload da imagem
  $imagem = "";
@@ -28,14 +29,20 @@
          exit;
      }
  }
+ // Se a imagem não for enviada (porque o campo está oculto), $imagem permanece vazio.
+ // Você pode verificar se a imagem já existe no caso de edição, mas para adicionar, vazio é o padrão.
  
- $sql = "INSERT INTO produtos (nome, preco, quantidade, imagem) VALUES ('$nome', $preco, $quantidade, '$imagem')";
+ // Usando prepared statements para segurança
+ $sql = "INSERT INTO produtos (nome, preco, quantidade, imagem) VALUES (?, ?, ?, ?)";
+ $stmt = $conn->prepare($sql);
+ $stmt->bind_param("sdis", $nome, $preco, $quantidade, $imagem); // s: string, d: double, i: integer, s: string
  
- if ($conn->query($sql) === TRUE) {
+ if ($stmt->execute()) {
      echo json_encode(array("success" => true, "message" => "Produto adicionado com sucesso."));
  } else {
-     echo json_encode(array("success" => false, "message" => "Erro ao adicionar produto: " . $conn->error));
+     echo json_encode(array("success" => false, "message" => "Erro ao adicionar produto: " . $stmt->error));
  }
  
+ $stmt->close();
  $conn->close();
  ?>

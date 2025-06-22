@@ -31,6 +31,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            margin-top: 20px;
             position: absolute; /* Posiciona o cabeçalho acima do padding-top do .card.tamanho-tabela */
             top: 0;
             left: 0;
@@ -48,23 +49,32 @@
             color: var(--cor-titulo);
             margin: 0;
         }
+        .header-buttons {
+            display: flex;
+            justify-content: flex-start; /* Alinha os botões à direita */
+            align-items: center;
+        }
 
-        .add-button {
+        /* Estilos do botão Adicionar Novo Entregador */
+        .add-button-entregador {
             background-color: var(--cor-principal);
             color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            margin-right: 10px;
+            font-size: 18px;
             transition: background-color 0.3s ease;
-            margin-top: 20px; /* Adiciona um espaço abaixo do cabeçalho fixo */
+            margin-top: 40px; /* Espaço entre o botão e o cabeçalho */
         }
 
-        .add-button:hover {
-            background-color: var(--cor-secundario);
+        
+        .add-button-entregador:hover {   
+            opacity: 0.9;
         }
 
+        /* Estilos do botão Voltar ao Menu */
         .voltar-menu-btn-right {
             background-color: var(--cor-titulo);
             color: white;
@@ -74,13 +84,9 @@
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            /* margin-left: auto; */ /* Removido para ser controlado pelo flexbox do .header */
-            /* margin-right: 10px; */ /* Removido para ser controlado pelo flexbox do .header */
-            /* align-self: flex-end; */ /* Removido para ser controlado pelo flexbox do .header */
-            /* margin-bottom: 20px; */ /* Removido */
         }
         .voltar-menu-btn-right:hover {
-            opacity: 0.9;
+            opacity: 0.9; /* Mantém a opacidade para este botão se for o desejado */
         }
 
         .tabela-container {
@@ -127,12 +133,12 @@
         }
 
         .edit-btn {
-            background-color: #007bff;
+            background-color: var(--cor-titulo);
             color: white;
         }
 
         .edit-btn:hover {
-            background-color: #0056b3;
+            background-color: rgb(197, 133, 31);
         }
 
         .delete-btn {
@@ -222,7 +228,7 @@
             cursor: pointer;
             margin-right: 10px;
             font-size: 18px;
-            width: 100%;
+            width: 50%;
             transition: background-color 0.3s ease;
         }
 
@@ -244,8 +250,9 @@
             <h1>Lista de Entregadores</h1>
             <a href="menu.html" class="voltar-menu-btn-right">Voltar ao Menu</a>
         </div>
-
-        <button id="addEntregadorBtn" class="add-button">Adicionar Novo Entregador</button>
+        <div class="header-buttons">
+            <button id="addEntregadorBtn" class="add-button-entregador">Adicionar Novo Entregador</button>
+        </div>
 
         <div class="tabela-container">
             <table id="entregadorTable" class="tamanho-tabela">

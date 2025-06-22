@@ -53,6 +53,29 @@
         .pedido-details strong {
             color: var(--cor-principal);
         }
+        .contato-btn {
+            background-color: var(--cor-principal);
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: block; /* Garante que ocupem a largura total */
+            width: 100%; /* Garante que ocupem a largura total */
+            box-sizing: border-box; /* Inclui padding e borda na largura total */
+            margin-bottom: 10px;
+        }
+        .contato-btn:hover {
+            background-color: var(--cor-secundaria);
+        }
+        .whatsapp-icon {
+            width: 24px; /* Ajuste o tamanho conforme necessário */
+            height: 24px;
+            vertical-align: middle; /* Alinha o ícone com o texto */
+            margin-right: 8px; /* Espaço entre o ícone e o texto */
+        }
     </style>
 </head>
 
@@ -68,6 +91,7 @@
 
         </div>
         <div>
+            <button id="botao_salvar_contato" class="contato-btn"><img src="imagens/whatsapp_icon.webp" alt="WhatsApp" class="whatsapp-icon">Salve nosso contato</button>
             <button class="botao_Voltar">Sair</button>
         </div>
     </div>
@@ -90,6 +114,12 @@
 
             document.querySelector('.botao_Voltar').addEventListener('click', function () {
                 window.location.href = 'index.html';
+            });
+            document.querySelector('#botao_salvar_contato').addEventListener('click', function() {
+                const whatsappNumber = '62993997054';
+                // This link attempts to open WhatsApp and then allows saving the contact.
+                // The behavior might vary across devices/browsers.
+                window.open(`https://wa.me/${whatsappNumber}?text=Olá!%20Gostaria%20de%20salvar%20o%20contato%20de%20vocês.`, '_blank');
             });
         });
     </script>

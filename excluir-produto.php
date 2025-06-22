@@ -12,7 +12,7 @@
  
  $id = $_POST['id'];
  
- $sql = "DELETE FROM produtos WHERE id_produto = $id";
+ $sql = "DELETE FROM produtos WHERE id_produtos = $id";
  
  if ($conn->query($sql) === TRUE) {
      echo json_encode(array("success" => true, "message" => "Produto excluído com sucesso."));
