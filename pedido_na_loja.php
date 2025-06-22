@@ -79,7 +79,7 @@ if ($conn->connect_error) {
     <title>Pedido na Loja</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-                .card {
+        .card {
             text-align: center;
             padding: 30px;
         }
@@ -90,9 +90,12 @@ if ($conn->connect_error) {
         }
         /* Estilo para a frase específica */
         .card .message-paragraph {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 1.1em;
-            margin-top: 25px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+            font-size: 1.4em;
+            font-weight: 900;
+            margin-top: 15px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+            color:var(--cor-principal);
         }
         .pedido-details {
             background-color: #f9f9f9;
@@ -137,6 +140,32 @@ if ($conn->connect_error) {
         .form-buttons .exit-button:hover {
             background-color: rgb(197, 133, 31);
         }
+        @media (max-width: 480px) {
+    body {
+        padding: 5px; /* Padding for smaller screens */
+        margin: 0;
+        align-items: center; /* Center content */
+        justify-content: center; /* Center content */
+        display: flex; /* Use flexbox for centering */
+        height: 100vh; /* Full viewport height */
+        
+    }
+    
+    .card, .cardPedido { /* Styles for larger screens */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff; /* Background color for the card */
+        margin: 0; /* Or auto to center */
+        width: 95%; /* Fixed width for larger screens */
+        height: auto; /* Adjust height as needed */
+        padding: 10px; /* Restore original padding for larger screens */
+        margin: auto;
+    }
+    .form {
+        width: 100%;
+    }
+}
     </style>
 </head>
 <body>
@@ -144,7 +173,7 @@ if ($conn->connect_error) {
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1>Olá, <?php echo $primeiroNome; ?>!</h1>
-        <p class="message-paragraph">Você tem um pedido que está na Loja esperando para sair:</p>
+        <p class="message-paragraph">Você tem um pedido que está na Loja esperando para sair.</p>
         
         <div class="pedido-details">
             <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p> <p><strong>Produtos:</strong> <?php echo $produtos_detalhes; ?></p>

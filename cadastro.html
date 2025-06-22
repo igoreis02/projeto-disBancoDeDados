@@ -38,6 +38,75 @@
         .form-buttons .exit-button:hover {
             background-color: rgb(197, 133, 31);
         }
+          @media (max-width: 480px) {
+    body {
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        padding: 5px; /* Padding for smaller screens */
+        margin: 0;
+        align-items: center; /* Center content */
+        justify-content: center; /* Center content */
+        display: flex; /* Use flexbox for centering */
+        height: 100vh; /* Full viewport height */
+        
+    }
+    
+    .card, .cardPedido { /* Styles for larger screens */
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff; /* Background color for the card */
+        margin: 0; /* Or auto to center */
+        width: auto; /* Fixed width for larger screens */
+        height: auto; /* Adjust height as needed */
+        padding: 10px; /* Restore original padding for larger screens */
+        margin: auto;
+    }
+    .card>h2 {
+    font-size: 35px;
+    font-weight: 800;
+    margin: 130px 0 10px;
+    color: var(--cor-titulo);
+}
+    .footer {
+      display: none;
+    }
+   .form {
+    display: flex;
+    flex-direction: column; /* Empilha os elementos do formulário verticalmente */
+    width: 100%; /* Largura total para telas menores */
+    padding: 10px; /* Preenchimento (padding) para telas menores */
+    height: auto; /* Ajusta a altura conforme necessário */
+    margin: 0; /* Remove a margem para telas menores */
+    gap: 10px; /* Espaço entre os elementos do formulário */
+    font-size: 1.2em; /* Aumenta o tamanho da fonte para melhor legibilidade */
+    overflow-x: hidden; /* Previne estouro horizontal (rolagem horizontal) */
+    border-radius: 8px; /* Cantos arredondados para o formulário */
+    margin-top: 0; /* Espaço acima do formulário */
+    margin-bottom: 20px; /* Espaço abaixo do formulário */
+}
+
+.conteiner-quadra-lote {
+    display: flex;
+    flex-direction: row; /* Empilha os elementos horizontalmente */
+    width: 100%;
+
+}
+.form>input {
+    justify-content: center;
+    height: 100%; /* Altura dos campos de entrada */
+    border: 0;
+    padding: 10px; /* Preenchimento interno dos campos */
+    color: var(--cor-principal);
+    background: #ededed;
+    border-radius: 8px;
+    /* Adicionado para consistência visual */
+    font-size: 17px;
+    max-width: 100%;
+}
+
+}
     </style>
 </head>
 
@@ -45,7 +114,7 @@
     <div class="background"></div>
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
-        <h2>Insira seus dados:</h2>
+        <h2 class="titulo_cadastro">Insira seus dados:</h2>
         <form class="form" id="formularioCadastro" action="cadastrar_usuario.php" method="POST">
             <input type="hidden" id="telefoneCadastro" name="telefone" readonly>
 

@@ -152,9 +152,12 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
         }
         /* Estilo para a frase específica */
         .card .message-paragraph {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 1.1em;
-            margin-top: 25px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+            font-size: 1.4em;
+            font-weight: 900;
+            margin-top: 15px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
+            color:var(--cor-principal);
         }
         .pedido-details {
             background-color: #f9f9f9;
@@ -209,6 +212,32 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
             vertical-align: middle; /* Alinha o ícone com o texto */
             margin-right: 8px; /* Espaço entre o ícone e o texto */
         }
+               @media (max-width: 480px) {
+    body {
+        padding: 5px; /* Padding for smaller screens */
+        margin: 0;
+        align-items: center; /* Center content */
+        justify-content: center; /* Center content */
+        display: flex; /* Use flexbox for centering */
+        height: 100vh; /* Full viewport height */
+        
+    }
+    
+    .card, .cardPedido { /* Styles for larger screens */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff; /* Background color for the card */
+        margin: 0; /* Or auto to center */
+        width: 95%; /* Fixed width for larger screens */
+        height: auto; /* Adjust height as needed */
+        padding: 10px; /* Restore original padding for larger screens */
+        margin: auto;
+    }
+    .form {
+        width: 100%;
+    }
+}
     </style>
 </head>
 <body>

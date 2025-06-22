@@ -14,26 +14,54 @@ body {
     gap: 30px;
     margin: 0;
     height: 20%;
-    padding: 0 32px;
+    /* Remove padding: 0 32px; from here for small screens */
     background: #eff9ff;
     font-family: var(--font-family);
 }
 
-@media (width >=500px) {
-    body {
-        padding: 0;
-    }
+/* Base styles for card and cardPedido for mobile-first approach */
+.card, .cardPedido {
+    overflow: hidden;
+    position: relative;
+    z-index: 3;
+    margin: 0.5% 20px; /* Set a consistent 20px margin on sides for spacing from screen edges */
+    padding: 140px 25px 50px; /* Adjust padding for mobile content spacing, slightly more than before */
+    border-radius: 24px;
+    background: #ffffff;
+    text-align: center;
+    box-shadow: 0 100px 100px rgb(0 0 0 / 10%);
+    color: var(--cor-principal);
+    width: auto; /* Allow card to take full available width */
+    max-width: 100%; /* Ensure it respects its own margins */
+    box-sizing: border-box; /* Include padding in element's total width */
+}
 
-    .card {
+      @media (max-width: 480px) {
+    body {
+        padding: 5px; /* Padding for smaller screens */
         margin: 0;
-        width: 360px;
-        padding:10px;
+        align-items: center; /* Center content */
+        justify-content: center; /* Center content */
+        display: flex; /* Use flexbox for centering */
+        height: 100vh; /* Full viewport height */
+        
+    }
+    
+    .card, .cardPedido { /* Styles for larger screens */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff; /* Background color for the card */
+        margin: 0; /* Or auto to center */
+        width: 95%; /* Fixed width for larger screens */
+        height: auto; /* Adjust height as needed */
+        padding: 10px; /* Restore original padding for larger screens */
+        margin: auto;
     }
     .form {
         width: 100%;
     }
 }
-
 .background {
     position: fixed;
     top: -50vmin;
@@ -43,32 +71,6 @@ body {
     border-radius:
         47% 53% 61% 39% / 45% 51% 49% 55%;
     background: var(--cor-secundaria);
-}
-
-.card {
-    overflow: hidden;
-    position: relative;
-    z-index: 3;
-    margin: 0.5% 30px;
-    padding: 140px 65px 50px;
-    border-radius: 24px;
-    background: #ffffff;
-    text-align: center;
-    box-shadow: 0 100px 100px rgb(0 0 0 / 10%);
-    color: var(--cor-principal);
-}
-
-.cardPedido {
-    overflow: hidden;
-    position: relative;
-    z-index: 3;
-    margin: 0.5% 30px;
-    padding: 140px 65px 50px;
-    border-radius: 24px;
-    background: #ffffff;
-    text-align: center;
-    box-shadow: 0 100px 100px rgb(0 0 0 / 10%);
-    color: var(--cor-principal);
 }
 
 .card::before {
@@ -107,6 +109,7 @@ body {
 }
 
 .card.logo {
+    display: inline-block;
     position: absolute;
     left: 50%;
     translate: -50% 0;
@@ -135,6 +138,14 @@ body {
     width: 35%;
 }
 
+.titulo-nome {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--cor-titulo);
+    margin: 0;
+    text-align: center;
+}
+
 
 .titulo-2 {
     padding: 0;
@@ -146,6 +157,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: row;
     color: var(--cor-principal);
     align-items: center;
 }
@@ -154,9 +166,6 @@ body {
     height: 0px;
 
 }
-
-
-
 
 .card>h2 {
     font-size: 35px;
@@ -218,6 +227,7 @@ label {
     font-weight: bold;
 }
 
+
 #hidden {
     display: none;
 }
@@ -256,7 +266,7 @@ label {
 }
 
 #numeroSorteado {
-    font-size: 30px;
+    font-size: 40px;
     font-weight: 800;
     color: var(--cor-titulo);
     text-align: center;

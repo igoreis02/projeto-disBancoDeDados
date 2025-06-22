@@ -24,8 +24,16 @@
             margin-bottom: 15px;
         }
 
+        .titulo-nome {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--cor-titulo);
+            margin: 0;
+            text-align: center;
+        }
+
         .botao_Voltar {
-             padding: 12px 25px;
+            padding: 12px 25px;
             font-size: 1.1em;
             border: none;
             border-radius: 5px;
@@ -33,14 +41,20 @@
             text-decoration: none;
             color: white;
             transition: background-color 0.3s ease;
-            display: block; /* Garante que ocupem a largura total */
-            width: 100%; /* Garante que ocupem a largura total */
-            box-sizing: border-box; /* Inclui padding e borda na largura total */
-            background-color:   #eb9f25; /* Vermelho para sair */
+            display: block;
+            /* Garante que ocupem a largura total */
+            width: 100%;
+            /* Garante que ocupem a largura total */
+            box-sizing: border-box;
+            /* Inclui padding e borda na largura total */
+            background-color: #eb9f25;
+            /* Vermelho para sair */
         }
+
         .botao_Voltar:hover {
             background-color: rgb(197, 133, 31);
         }
+
         .pedido-details {
             background-color: #f9f9f9;
             border: 1px solid #ddd;
@@ -50,9 +64,11 @@
             max-width: 400px;
             text-align: center;
         }
+
         .pedido-details strong {
             color: var(--cor-principal);
         }
+
         .contato-btn {
             background-color: var(--cor-principal);
             color: white;
@@ -62,19 +78,77 @@
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
-            display: block; /* Garante que ocupem a largura total */
-            width: 100%; /* Garante que ocupem a largura total */
-            box-sizing: border-box; /* Inclui padding e borda na largura total */
+            display: block;
+            /* Garante que ocupem a largura total */
+            width: 100%;
+            /* Garante que ocupem a largura total */
+            box-sizing: border-box;
+            /* Inclui padding e borda na largura total */
             margin-bottom: 10px;
         }
+
         .contato-btn:hover {
             background-color: var(--cor-secundaria);
         }
+
         .whatsapp-icon {
-            width: 24px; /* Ajuste o tamanho conforme necessário */
+            width: 24px;
+            /* Ajuste o tamanho conforme necessário */
             height: 24px;
-            vertical-align: middle; /* Alinha o ícone com o texto */
-            margin-right: 8px; /* Espaço entre o ícone e o texto */
+            vertical-align: middle;
+            /* Alinha o ícone com o texto */
+            margin-right: 8px;
+            /* Espaço entre o ícone e o texto */
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+                /* Padding for smaller screens */
+                margin: 0;
+                align-items: center;
+                /* Center content */
+                justify-content: center;
+                /* Center content */
+                display: flex;
+                /* Use flexbox for centering */
+                height: 100vh;
+                /* Full viewport height */
+
+            }
+
+            .card,
+            .cardPedido {
+                /* Styles for larger screens */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                background-color: #fff;
+                /* Background color for the card */
+                margin: 0;
+                /* Or auto to center */
+                width: 95%;
+                /* Fixed width for larger screens */
+                height: auto;
+                /* Adjust height as needed */
+                padding: 10px;
+                /* Restore original padding for larger screens */
+                margin: auto;
+            }
+            .titulo-nome {
+                margin: 120px auto 0 auto;  
+            }
+            .imagem {
+                display: none;
+            }
+            .form {
+                width: 100%;
+            }
+
+            .footer {
+                display: none;
+            }
+
         }
     </style>
 </head>
@@ -83,15 +157,16 @@
     <div class="background"></div>
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
-        <img class="imagem" src="imagens/boneco.png" alt="">
-        <h1>Olá, <span id="nomeCadastrado"></span></h1>
+        <img class="imagem" src="imagens/boneco.png" alt="Boneco">
+        <h1 class="titulo-nome">Olá, <span id="nomeCadastrado"></span>!</h1>
         <div class="pedido-details">
             <p class="">Seu pedido foi concluído com sucesso, logo estará chegando na sua residência.</p>
             <p class="">Obrigado pela preferência!</p>
 
         </div>
         <div>
-            <button id="botao_salvar_contato" class="contato-btn"><img src="imagens/whatsapp_icon.webp" alt="WhatsApp" class="whatsapp-icon">Salve nosso contato</button>
+            <button id="botao_salvar_contato" class="contato-btn"><img src="imagens/whatsapp_icon.webp" alt="WhatsApp"
+                    class="whatsapp-icon">Salve nosso contato</button>
             <button class="botao_Voltar">Sair</button>
         </div>
     </div>
@@ -115,7 +190,7 @@
             document.querySelector('.botao_Voltar').addEventListener('click', function () {
                 window.location.href = 'index.html';
             });
-            document.querySelector('#botao_salvar_contato').addEventListener('click', function() {
+            document.querySelector('#botao_salvar_contato').addEventListener('click', function () {
                 const whatsappNumber = '62993997054';
                 // This link attempts to open WhatsApp and then allows saving the contact.
                 // The behavior might vary across devices/browsers.
