@@ -80,12 +80,116 @@
         .form-buttons .exit-button:hover {
             background-color: rgb(197, 133, 31);
         }
+            @media (max-width: 480px) {
+            body {
+                display: flex;
+                flex-direction: column;
+                padding: 5px;
+                margin: 0;
+                align-items: center;
+                justify-content: flex-start;
+                min-height: 100vh;
+                overflow-y: auto; /* Garante que o body role verticalmente */
+            }
+
+            .card {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                justify-content: flex-start;
+                background-color: #fff;
+                margin: 0 auto;
+                width: 100%; 
+                max-width: 480px; 
+                height: auto; /* Card se expande verticalmente com o conteúdo */
+                padding: 10px;
+                padding-top: 20px; /* RESTAURADO: Valor original ou mais espaçoso */
+                gap: 15px; /* RESTAURADO: Valor original ou mais espaçoso */
+                margin-bottom: 20px; /* RESTAURADO: Valor original ou mais espaçoso */
+                box-sizing: border-box;
+                /* MANTER: Controla o overflow separadamente para horizontal e vertical */
+                overflow-x: hidden; /* Esconde qualquer coisa que passe das laterais (como o ::before) */
+                overflow-y: visible; /* Permite que o conteúdo vertical (o formulário) se estenda e force a rolagem do body */
+            }
+
+            .card>h2 {
+                font-size: 30px; /* RESTAURADO: Valor original */
+                font-weight: 800;
+                margin: 0; 
+                color: var(--cor-titulo);
+                margin-top: 120px;
+            }
+
+            .footer {
+                display: none;
+            }
+
+            .form { 
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%; 
+                padding: 10px;
+                height: auto; /* Formulário se expande verticalmente com o conteúdo */
+                margin: 0;
+                gap: 10px; /* RESTAURADO: Valor original */
+                font-size: 1.2em; /* RESTAURADO: Valor original */
+                border-radius: 8px;
+                margin-top: 0;
+                margin-bottom: 20px; /* RESTAURADO: Valor original */
+                box-sizing: border-box; 
+            }
+
+            .form>input {
+                justify-content: center;
+                height: 40px;
+                border: 0;
+                padding: 12px; /* RESTAURADO: Valor original */
+                color: var(--cor-principal);
+                background: #ededed;
+                border-radius: 8px;
+                font-size: 1.2em; /* RESTAURADO: Valor original */
+                max-width: 100%;
+            }
+            
+            .form label.titulo { 
+                font-size: 1.2em; /* RESTAURADO: Valor original */
+            }
+
+            .form-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 15px; /* RESTAURADO: Valor original */
+                margin-top: 30px; /* RESTAURADO: Valor original */
+            }
+            .form-buttons button,
+            .form-buttons a {
+                padding: 12px 25px; /* RESTAURADO: Valor original */
+                font-size: 1.1em; /* RESTAURADO: Valor original */
+            }
+
+            .conteiner-quadra-lote {
+                display: flex;
+                flex-direction: row;
+                width: 50%;
+            }
+
+            .form .qd-lt { 
+                gap: 5px; /* Mantido, pois este era um ajuste mais interno */
+            }
+            #map {
+            height: 200px;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        }
     </style>
 </head>
 
 <body>
     <div class="background"></div>
-    <div class="card">
+    <div class="card tamanho-tabela">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1 class="titulo-tabela" id="tituloPedido">Realizar Pedido</h1>
         <div class="pedido-details">

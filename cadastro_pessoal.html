@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Cadastro Pessoal</title>
+    <style>
+        .form-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .form-buttons button,
+        .form-buttons a {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-buttons .edit-button {
+            background-color: var(--cor-principal);
+        }
+
+        .form-buttons .edit-button:hover {
+            background-color: var(--cor-secundaria);
+        }
+
+        .form-buttons .exit-button {
+            background-color: #eb9f25;
+        }
+
+        .form-buttons .exit-button:hover {
+            background-color: rgb(197, 133, 31);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                display: flex;
+                flex-direction: column;
+                padding: 5px;
+                margin: 0;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+            }
+
+            .card {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                justify-content: center;
+                background-color: #fff;
+                margin: 0;
+                width: 95%;
+                height: auto;
+                padding: 10px;
+                margin: auto;
+            }
+
+            .card>h2 {
+                font-size: 35px;
+                font-weight: 800;
+                margin: 130px 0 10px;
+                color: var(--cor-titulo);
+            }
+
+            .footer {
+                display: none;
+            }
+
+            .form {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                padding: 10px;
+                height: auto;
+                margin: 0;
+                gap: 10px;
+                font-size: 1.2em;
+                overflow-x: hidden;
+                border-radius: 8px;
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            .conteiner-quadra-lote {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+            }
+
+            .form>input {
+                justify-content: center;
+                height: 100%;
+                border: 0;
+                padding: 10px;
+                color: var(--cor-principal);
+                background: #ededed;
+                border-radius: 8px;
+                font-size: 17px;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="card">
+        <img class="logo" src="imagens/logo.png" alt="Logo" />
+        <h2 class="titulo_cadastro">Insira seus dados:</h2>
+
+        <form class="form" id="formularioCadastroPessoal">
+            <input type="hidden" id="telefonePessoal" name="telefone" readonly>
+
+            <label for="nome" class="titulo">Nome Completo:</label>
+            <input type="text" name="nome" id="nomePessoal" />
+
+            <label for="dt_nascimento" class="titulo">Data de Nascimento:</label>
+            <input type="date" name="dt_nascimento" id="dt_NascimentoPessoal" />
+
+            <label for="sexo" class="titulo">Sexo:<br></label>
+            <div class="conteiner-quadra-lote">
+                <div class="masculino_feminino">
+                    <label for="sexo_masculino">Masculino:</label>
+                    <input type="radio" name="sexo" id="sexo_masculinoPessoal" value="Masculino">
+                </div>
+                <div class="masculino_feminino">
+                    <label for="sexo_feminino">Feminino:</label>
+                    <input type="radio" name="sexo" id="sexo_femininoPessoal" value="Feminino">
+                </div>
+            </div>
+
+            <div class="checkbox">
+                <input type="checkbox" name="termoSorteio" id="sorteioPessoal" class="check" value="1">
+                Li e aceito os &nbsp;<a href="TermoSorteio.html" class="link" target="_blank">Termos do Sorteio</a>
+            </div>
+            <div id="mensagemPessoal" class="mensagem"></div>
+            <div class="form-buttons">
+                <button type="submit" class="edit-button" id="btnCadastrarEndereco">Cadastrar Endereço</button>
+                <a href="index.html" class="exit-button">Voltar para o Início</a>
+            </div>
+        </form>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    </div>
+    <script src="js/cadastro_pessoal.js"></script>
+</body>
+
+</html>

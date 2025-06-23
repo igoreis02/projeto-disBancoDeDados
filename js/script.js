@@ -117,8 +117,8 @@ verificarForm.addEventListener('submit', function (event) {
                     window.location.href = `confirmar_endereco.php?telefone=${encodeURIComponent(telefone)}&nome=${encodeURIComponent(data.nome)}`;
                 }
             } else {
-                // Se o telefone não existe, redireciona para cadastro
-                window.location.href = `cadastro.html?telefone=${telefone}`;
+               // Se o telefone não existe, redireciona para cadastro pessoal
+                window.location.href = `cadastro_pessoal.html?telefone=${telefone}`;
             }
         })
         .catch(error => {

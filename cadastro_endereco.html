@@ -24,18 +24,14 @@
         .form-buttons {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            /* Valor original */
-            margin-top: 30px;
-            /* Valor original */
+            gap: 15px; /* Valor original */
+            margin-top: 30px; /* Valor original */
         }
 
         .form-buttons button,
         .form-buttons a {
-            padding: 12px 25px;
-            /* Valor original */
-            font-size: 1.1em;
-            /* Valor original */
+            padding: 12px 25px; /* Valor original */
+            font-size: 1.1em; /* Valor original */
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -72,8 +68,7 @@
                 align-items: center;
                 justify-content: flex-start;
                 min-height: 100vh;
-                overflow-y: auto;
-                /* Garante que o body role verticalmente */
+                overflow-y: auto; /* Garante que o body role verticalmente */
             }
 
             .card {
@@ -83,30 +78,23 @@
                 justify-content: flex-start;
                 background-color: #fff;
                 margin: 0 auto;
-                width: 100%;
-                max-width: 480px;
-                height: auto;
-                /* Card se expande verticalmente com o conteúdo */
+                width: 100%; 
+                max-width: 480px; 
+                height: auto; /* Card se expande verticalmente com o conteúdo */
                 padding: 10px;
-                padding-top: 20px;
-                /* RESTAURADO: Valor original ou mais espaçoso */
-                gap: 15px;
-                /* RESTAURADO: Valor original ou mais espaçoso */
-                margin-bottom: 20px;
-                /* RESTAURADO: Valor original ou mais espaçoso */
+                padding-top: 20px; /* RESTAURADO: Valor original ou mais espaçoso */
+                gap: 15px; /* RESTAURADO: Valor original ou mais espaçoso */
+                margin-bottom: 20px; /* RESTAURADO: Valor original ou mais espaçoso */
                 box-sizing: border-box;
                 /* MANTER: Controla o overflow separadamente para horizontal e vertical */
-                overflow-x: hidden;
-                /* Esconde qualquer coisa que passe das laterais (como o ::before) */
-                overflow-y: visible;
-                /* Permite que o conteúdo vertical (o formulário) se estenda e force a rolagem do body */
+                overflow-x: hidden; /* Esconde qualquer coisa que passe das laterais (como o ::before) */
+                overflow-y: visible; /* Permite que o conteúdo vertical (o formulário) se estenda e force a rolagem do body */
             }
 
             .card>h2 {
-                font-size: 30px;
-                /* RESTAURADO: Valor original */
+                font-size: 30px; /* RESTAURADO: Valor original */
                 font-weight: 800;
-                margin: 0;
+                margin: 0; 
                 color: var(--cor-titulo);
                 margin-top: 120px;
             }
@@ -115,60 +103,48 @@
                 display: none;
             }
 
-            .form {
+            .form { 
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                width: 100%;
+                width: 100%; 
                 padding: 10px;
-                height: auto;
-                /* Formulário se expande verticalmente com o conteúdo */
+                height: auto; /* Formulário se expande verticalmente com o conteúdo */
                 margin: 0;
-                gap: 10px;
-                /* RESTAURADO: Valor original */
-                font-size: 1.2em;
-                /* RESTAURADO: Valor original */
+                gap: 10px; /* RESTAURADO: Valor original */
+                font-size: 1.2em; /* RESTAURADO: Valor original */
                 border-radius: 8px;
                 margin-top: 0;
-                margin-bottom: 20px;
-                /* RESTAURADO: Valor original */
-                box-sizing: border-box;
+                margin-bottom: 20px; /* RESTAURADO: Valor original */
+                box-sizing: border-box; 
             }
 
             .form>input {
                 justify-content: center;
                 height: 40px;
                 border: 0;
-                padding: 12px;
-                /* RESTAURADO: Valor original */
+                padding: 12px; /* RESTAURADO: Valor original */
                 color: var(--cor-principal);
                 background: #ededed;
                 border-radius: 8px;
-                font-size: 1.2em;
-                /* RESTAURADO: Valor original */
+                font-size: 1.2em; /* RESTAURADO: Valor original */
                 max-width: 100%;
             }
-
-            .form label.titulo {
-                font-size: 1.2em;
-                /* RESTAURADO: Valor original */
+            
+            .form label.titulo { 
+                font-size: 1.2em; /* RESTAURADO: Valor original */
             }
 
             .form-buttons {
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
-                /* RESTAURADO: Valor original */
-                margin-top: 30px;
-                /* RESTAURADO: Valor original */
+                gap: 15px; /* RESTAURADO: Valor original */
+                margin-top: 30px; /* RESTAURADO: Valor original */
             }
-
             .form-buttons button,
             .form-buttons a {
-                padding: 12px 25px;
-                /* RESTAURADO: Valor original */
-                font-size: 1.1em;
-                /* RESTAURADO: Valor original */
+                padding: 12px 25px; /* RESTAURADO: Valor original */
+                font-size: 1.1em; /* RESTAURADO: Valor original */
             }
 
             .conteiner-quadra-lote {
@@ -177,17 +153,15 @@
                 width: 50%;
             }
 
-            .form .qd-lt {
-                gap: 5px;
-                /* Mantido, pois este era um ajuste mais interno */
+            .form .qd-lt { 
+                gap: 5px; /* Mantido, pois este era um ajuste mais interno */
             }
-
             #map {
-                height: 200px;
-                width: 100%;
-                margin-bottom: 20px;
-                border-radius: 8px;
-            }
+            height: 200px;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
         }
     </style>
 </head>
@@ -233,9 +207,8 @@
 
                 <div id="mensagemEndereco"></div>
                 <div class="form-buttons">
-                    <button type="submit" id="atualizarEndereco" class="edit-button">Atualizar Endereço</button>
-                    <a href="confirmar_endereco.php?telefone=<?php echo htmlspecialchars($telefone); ?>&nome=<?php echo htmlspecialchars($nome); ?>"
-                        class="exit-button">Voltar</a>
+                    <button type="submit" class="edit-button">Finalizar Cadastro</button>
+                    <a href="index.html" class="exit-button">Voltar para o Início</a>
                 </div>
             </div>
         </form>

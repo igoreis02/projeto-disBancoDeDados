@@ -77,8 +77,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //$numeroUnico = sortearNumeroUnico($conn, $min, $max);
 
     // Insere os dados do cliente
-    $stmt_cliente = $conn->prepare("INSERT INTO clientes (telefone, nome, dt_nascimento, endereco, quadra, lote, setor, complemento, cidade, sexo, termoSorteio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt_cliente->bind_param("sssssssssss", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $termoSorteio);
+   $sql_cliente = "INSERT INTO clientes (telefone, nome, dt_nascimento, endereco, quadra, lote, setor, complemento, cidade, sexo, termoSorteio, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt_cliente = $conn->prepare($sql_cliente);
+
+    if ($stmt_cliente === false) {
+        die("Erro na preparação da consulta do cliente: " . $conn->error);
+    }
+
+    $stmt_cliente->bind_param("ssssssssssdss", $telefone, $nome, $dt_nascimento, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $sexo, $termoSorteio, $latitude, $longitude);
     $stmt_cliente->execute();
     // Verifica se a inserção foi bem-sucedida
     if ($stmt_cliente->error) {
