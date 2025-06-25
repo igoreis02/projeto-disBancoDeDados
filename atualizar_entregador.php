@@ -1,7 +1,19 @@
 <?php
-require_once 'conexao.php'; // Include your database connection
 
-header('Content-Type: application/json');
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "cadastro";
+
+// nova conexão mysqli
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Verifica a conexão
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'Erro na conexão com o banco de dados: ' . $conn->connect_error]));
+}
+
+header('Content-Type: application/json'); // Define o cabeçalho para JSON
 
 $response = array('success' => false, 'message' => '');
 

@@ -84,18 +84,16 @@ if ($conn->connect_error) {
             padding: 30px;
         }
         .card h1 {
-            color: var(--cor-titulo);
+            color: var(--cor-principal);
             margin-bottom: 0;
             padding-top: 90px; /* Adicionado para espaçamento superior */
         }
         /* Estilo para a frase específica */
         .card .message-paragraph {
-            margin-bottom: 5px;
             font-size: 1.1em;
             font-size: 1.4em;
             font-weight: 900;
-            margin-top: 15px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
-            color:var(--cor-principal);
+            color:var(--cor-titulo);
         }
         .pedido-details {
             background-color: #f9f9f9;
@@ -109,6 +107,15 @@ if ($conn->connect_error) {
         .pedido-details strong {
             color: var(--cor-principal);
         }
+        .pedido-info{
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+            margin: 20px auto;
+            max-width: 400px;
+            text-align:center;
+        }
         .form-buttons {
             display: flex;
             flex-direction: column;
@@ -119,7 +126,7 @@ if ($conn->connect_error) {
             padding: 12px 25px;
             font-size: 1.1em;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             text-decoration: none;
             color: white;
@@ -128,19 +135,35 @@ if ($conn->connect_error) {
             width: 100%; /* Garante que ocupem a largura total */
             box-sizing: border-box; /* Inclui padding e borda na largura total */
         }
+        .form-buttons .exit-button {
+            background-color:  #eb9f25; /* Vermelho para sair */
+        }
+        .form-buttons .exit-button:hover {
+            background-color:rgb(197, 133, 31);
+        }
+
         .form-buttons .edit-button {
             background-color: var(--cor-principal);
         }
         .form-buttons .edit-button:hover {
             background-color: var(--cor-secundaria);
         }
-        .form-buttons .exit-button {
-            background-color:   #eb9f25; /* Vermelho para sair */
+
+        .form-buttons .contato-btn {
+            background-color: var(--cor-principal);
+            color: white;
         }
-        .form-buttons .exit-button:hover {
-            background-color: rgb(197, 133, 31);
+
+        .form-buttons .contato-btn:hover {
+            background-color: var(--cor-secundaria);
         }
-        @media (max-width: 480px) {
+        .whatsapp-icon {
+            width: 24px; /* Ajuste o tamanho conforme necessário */
+            height: 24px;
+            vertical-align: middle; /* Alinha o ícone com o texto */
+            margin-right: 8px; /* Espaço entre o ícone e o texto */
+        }
+               @media (max-width: 480px) {
     body {
         padding: 5px; /* Padding for smaller screens */
         margin: 0;
@@ -173,8 +196,9 @@ if ($conn->connect_error) {
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1>Olá, <?php echo $primeiroNome; ?>!</h1>
+        <div class="pedido-info">   
         <p class="message-paragraph">Você tem um pedido que está na Loja esperando para sair.</p>
-        
+        </div>
         <div class="pedido-details">
             <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p> <p><strong>Produtos:</strong> <?php echo $produtos_detalhes; ?></p>
             <p><strong>Valor Total:</strong> R$ <?php echo $valor_total_formatado; ?></p>

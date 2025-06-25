@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos em Entrega</title>
+    <link rel="stylesheet" href="css/style.css"> <style>
+        /* Estilos básicos para o corpo e contêiner */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Evita rolagem horizontal indesejada no corpo */
+        }
+        .header {
+            background-color: var(--cor-principal);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        /* Contêiner principal para os pedidos - ROLAGEM HORIZONTAL */
+        .pedidos-container {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 15px;
+            gap: 15px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .pedidos-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Ajuste para quando há apenas um card, ele centraliza */
+        .pedidos-container.single-card {
+            justify-content: center;
+        }
+
+        /* Estilo para cada card de pedido - ALINHAMENTO DOS BOTÕES */
+        .pedido-card {
+            flex: 0 0 85%;
+            max-width: 350px;
+            scroll-snap-align: start;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-left: 5px solid var(--cor-principal);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Área de conteúdo do card */
+        .pedido-content {
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .pedido-card h3 {
+            margin-top: 0;
+            color: var(--cor-principal);
+            font-size: 1.3em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .pedido-detail {
+            margin-bottom: 8px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .pedido-detail strong {
+            color: #333;
+            display: inline-block;
+        }
+
+        .pedido-detail .produtos-list {
+            margin-top: 5px;
+            padding-left: 15px;
+            border-left: 2px solid #eee;
+        }
+        .produto-item {
+            margin-bottom: 3px;
+        }
+
+        /* Estilos para os botões de ação do card */
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+
+        .open-map-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .open-map-button:hover {
+            background-color: #45a049;
+        }
+
+        .mark-delivered-button {
+            background-color: #007bff;
+            color: white;
+        }
+        .mark-delivered-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* ESTILO NOVO: Botão Devolver Pedido */
+        .return-order-button {
+            background-color: #ffc107; /* Amarelo/Laranja */
+            color: #333;
+        }
+        .return-order-button:hover {
+            background-color: #e0a800;
+        }
+
+        /* Estilo para mensagem de carregamento/erro */
+        .mensagem-info-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100px;
+        }
+        .mensagem-info {
+            text-align: center;
+            padding: 20px;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        /* --- Estilos para os Modals de Confirmação (reutilizados) --- */
+        .modal {
+            display: none; /* Agora os modals começam hidden por padrão */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+            -webkit-animation-name: fadeIn;
+            -webkit-animation-duration: 0.4s;
+            animation-name: fadeIn;
+            animation-duration: 0.4s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            -webkit-animation-name: slideIn;
+            -webkit-animation-duration: 0.4s;
+            animation-name: slideIn;
+            animation-duration: 0.4s;
+            text-align: left;
+        }
+
+        .modal-content h4 {
+            margin-top: 0;
+            color: var(--cor-principal);
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .modal-body strong {
+            color: #333;
+        }
+
+        .modal-body ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        .modal-body ul li {
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border: 1px solid #eee;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .modal-footer button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-footer .btn-confirm {
+            background-color: #28a745; /* Verde para Concluir */
+            color: white;
+        }
+        .modal-footer .btn-confirm:hover {
+            background-color: #218838;
+        }
+
+        .modal-footer .btn-cancel {
+            background-color: #dc3545; /* Vermelho para Cancelar */
+            color: white;
+        }
+        .modal-footer .btn-cancel:hover {
+            background-color: #c82333;
+        }
+
+        /* ESTILO NOVO: Botão Devolver dentro do modal */
+        .modal-footer .btn-devolver {
+            background-color: #ffc107; /* Amarelo/Laranja igual ao botão do card */
+            color: #333; /* Texto escuro para contraste */
+        }
+        .modal-footer .btn-devolver:hover {
+            background-color: #e0a800;
+        }
+
+
+        /* Animações */
+        @-webkit-keyframes slideIn {
+            from {bottom: -300px; opacity: 0}
+            to {bottom: 0; opacity: 1}
+        }
+        @keyframes slideIn {
+            from {bottom: -300px; opacity: 0}
+            to {bottom: 0; opacity: 1}
+        }
+        @-webkit-keyframes fadeIn {
+            from {opacity: 0}
+            to {opacity: 1}
+        }
+        @keyframes fadeIn {
+            from {opacity: 0}
+            to {opacity: 1}
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Pedidos em Entrega</h1>
+    </div>
+
+    <div class="pedidos-container" id="pedidosContainer">
+        <div class="mensagem-info-wrapper" id="initialMessageWrapper">
+            <p class="mensagem-info">Carregando pedidos...</p>
+        </div>
+        </div>
+
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h4>Confirmar Entrega</h4>
+            <div class="modal-body">
+                <p>Pedido: <strong id="modalPedidoId"></strong></p>
+                <p>Cliente: <strong id="modalClienteNome"></strong></p>
+                <p>Produtos:</p>
+                <ul id="modalProdutosList">
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-confirm" id="confirmDeliveryBtn">Concluído</button>
+                <button class="btn-cancel" id="cancelDeliveryBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="returnConfirmationModal" class="modal">
+        <div class="modal-content">
+            <h4>Confirmar Devolução</h4>
+            <div class="modal-body">
+                <p>Pedido: <strong id="modalReturnPedidoId"></strong></p>
+                <p>Cliente: <strong id="modalReturnClienteNome"></strong></p>
+                <p>Produtos:</p>
+                <ul id="modalReturnProdutosList">
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-devolver" id="confirmReturnBtn">Devolver</button>
+                <button class="btn-cancel" id="cancelReturnBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pedidosContainer = document.getElementById('pedidosContainer');
+
+            // Elementos do Modal de Entrega
+            const confirmationModal = document.getElementById('confirmationModal');
+            const modalPedidoId = document.getElementById('modalPedidoId');
+            const modalClienteNome = document.getElementById('modalClienteNome');
+            const modalProdutosList = document.getElementById('modalProdutosList');
+            const confirmDeliveryBtn = document.getElementById('confirmDeliveryBtn');
+            const cancelDeliveryBtn = document.getElementById('cancelDeliveryBtn');
+
+            // NOVOS Elementos do Modal de Devolução
+            const returnConfirmationModal = document.getElementById('returnConfirmationModal');
+            const modalReturnPedidoId = document.getElementById('modalReturnPedidoId');
+            const modalReturnClienteNome = document.getElementById('modalReturnClienteNome');
+            const modalReturnProdutosList = document.getElementById('modalReturnProdutosList');
+            const confirmReturnBtn = document.getElementById('confirmReturnBtn');
+            const cancelReturnBtn = document.getElementById('cancelReturnBtn');
+
+
+            let currentPedidoData = null; // Para armazenar os dados do pedido clicado
+
+            function displayMessage(messageText) {
+                pedidosContainer.innerHTML = '';
+                const msgWrapper = document.createElement('div');
+                msgWrapper.classList.add('mensagem-info-wrapper');
+                const msg = document.createElement('p');
+                msg.classList.add('mensagem-info');
+                msg.textContent = messageText;
+                msgWrapper.appendChild(msg);
+                pedidosContainer.appendChild(msgWrapper);
+            }
+
+            function fetchPedidosEmEntrega() {
+                displayMessage('Carregando pedidos...');
+
+                fetch('lista_pedidos_em_entrega.php')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        pedidosContainer.innerHTML = ''; // Limpa o conteúdo atual
+
+                        if (data.success && data.pedidos.length > 0) {
+                            data.pedidos.forEach(pedido => {
+                                const pedidoCard = document.createElement('div');
+                                pedidoCard.classList.add('pedido-card');
+                                pedidoCard.dataset.idPedido = pedido.id_pedido;
+
+                                const pedidoContent = document.createElement('div');
+                                pedidoContent.classList.add('pedido-content');
+
+                                let produtosHtml = '';
+                                if (pedido.produtos && pedido.produtos.length > 0) {
+                                    produtosHtml += '<div class="produtos-list">';
+                                    pedido.produtos.forEach(produto => {
+                                        produtosHtml += `<div class="produto-item">
+                                            ${produto.quantidade}x <strong>${produto.nome_produto}</strong> - R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}
+                                        </div>`;
+                                    });
+                                    produtosHtml += '</div>';
+                                } else {
+                                    produtosHtml = 'Nenhum produto associado.';
+                                }
+
+                                const dataPedidoFormatada = new Date(pedido.data_pedido).toLocaleDateString('pt-BR');
+                                const valorTotalFormatado = parseFloat(pedido.valor_total).toFixed(2).replace('.', ',');
+
+                                const enderecoCompleto = `
+                                    <span class="pedido-detail"><strong>Endereço:</strong> ${pedido.endereco_cliente}</span><br>
+                                    <span class="pedido-detail"><strong>(Qd):</strong> ${pedido.quadra_cliente} <strong>(Lt):</strong> ${pedido.lote_cliente}</span><br>
+                                    ${pedido.complemento_cliente ? `<span class="pedido-detail"><strong>Comp.:</strong> ${pedido.complemento_cliente}</span><br>` : ''}
+                                    <span class="pedido-detail"><strong>Setor:</strong> ${pedido.setor_cliente}</span><br>
+                                    <span class="pedido-detail"><strong>Cidade:</strong> ${pedido.cidade_cliente}</span>
+                                `;
+
+                                pedidoContent.innerHTML = `
+                                    <h3>Pedido #${pedido.id_pedido}</h3>
+                                    <div class="pedido-detail"><strong>Telefone:</strong> ${pedido.telefone_cliente}</div>
+                                    <div class="pedido-detail"><strong>Cliente:</strong> ${pedido.nome_cliente}</div>
+                                    ${enderecoCompleto}
+                                    <div class="pedido-detail"><strong>Data:</strong> ${dataPedidoFormatada}</div>
+                                    <div class="pedido-detail"><strong>Produtos:</strong></div>
+                                    ${produtosHtml}
+                                    <div class="pedido-detail"><strong>Valor Total:</strong> R$ ${valorTotalFormatado}</div>
+                                    <div class="pedido-detail"><strong>Pagamento:</strong> ${pedido.forma_pagamento}</div>
+                                `;
+                                pedidoCard.appendChild(pedidoContent);
+
+                                const buttonsContainer = document.createElement('div');
+                                buttonsContainer.innerHTML = `
+                                    <button class="action-button open-map-button" data-lat="${pedido.latitude_cliente}" data-lon="${pedido.longitude_cliente}">
+                                        Abrir Localização do Pedido
+                                    </button>
+                                    <button class="action-button mark-delivered-button" data-id-pedido="${pedido.id_pedido}">
+                                        Pedido Entregue
+                                    </button>
+                                    <button class="action-button return-order-button" data-id-pedido="${pedido.id_pedido}">
+                                        Devolver Pedido
+                                    </button>
+                                `;
+                                pedidoCard.appendChild(buttonsContainer);
+
+                                pedidosContainer.appendChild(pedidoCard);
+                            });
+
+                            if (data.pedidos.length === 1) {
+                                pedidosContainer.classList.add('single-card');
+                            } else {
+                                pedidosContainer.classList.remove('single-card');
+                            }
+
+                            // Event listener para Abrir Localização
+                            document.querySelectorAll('.open-map-button').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const lat = this.dataset.lat;
+                                    const lon = this.dataset.lon;
+
+                                    if (lat && lon && lat != 0 && lon != 0) {
+                                        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+                                        window.open(mapUrl, '_blank');
+                                    } else {
+                                        alert('Localização não disponível ou inválida para este pedido.');
+                                    }
+                                });
+                            });
+
+                            // Event listener para abrir o MODAL DE ENTREGA
+                            document.querySelectorAll('.mark-delivered-button').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const idPedido = this.dataset.idPedido;
+                                    currentPedidoData = data.pedidos.find(p => p.id_pedido == idPedido);
+
+                                    if (currentPedidoData) {
+                                        modalPedidoId.textContent = currentPedidoData.id_pedido;
+                                        modalClienteNome.textContent = currentPedidoData.nome_cliente.split(' ')[0]; // Primeiro nome
+
+                                        modalProdutosList.innerHTML = '';
+                                        if (currentPedidoData.produtos && currentPedidoData.produtos.length > 0) {
+                                            currentPedidoData.produtos.forEach(produto => {
+                                                const li = document.createElement('li');
+                                                li.textContent = `${produto.quantidade}x ${produto.nome_produto} - R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}`;
+                                                modalProdutosList.appendChild(li);
+                                            });
+                                        } else {
+                                            const li = document.createElement('li');
+                                            li.textContent = 'Nenhum produto associado.';
+                                            modalProdutosList.appendChild(li);
+                                        }
+                                        confirmationModal.style.display = 'flex'; // Exibe o modal
+                                    }
+                                });
+                            });
+
+                            // NOVO: Event listener para abrir o MODAL DE DEVOLUÇÃO
+                            document.querySelectorAll('.return-order-button').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const idPedido = this.dataset.idPedido;
+                                    currentPedidoData = data.pedidos.find(p => p.id_pedido == idPedido);
+
+                                    if (currentPedidoData) {
+                                        modalReturnPedidoId.textContent = currentPedidoData.id_pedido;
+                                        modalReturnClienteNome.textContent = currentPedidoData.nome_cliente.split(' ')[0]; // Primeiro nome
+
+                                        modalReturnProdutosList.innerHTML = '';
+                                        if (currentPedidoData.produtos && currentPedidoData.produtos.length > 0) {
+                                            currentPedidoData.produtos.forEach(produto => {
+                                                const li = document.createElement('li');
+                                                li.textContent = `${produto.quantidade}x ${produto.nome_produto} - R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}`;
+                                                modalReturnProdutosList.appendChild(li);
+                                            });
+                                        } else {
+                                            const li = document.createElement('li');
+                                            li.textContent = 'Nenhum produto associado.';
+                                            modalReturnProdutosList.appendChild(li);
+                                        }
+                                        returnConfirmationModal.style.display = 'flex'; // Exibe o modal de devolução
+                                    }
+                                });
+                            });
+
+
+                        } else if (data.pedidos && data.pedidos.length === 0) {
+                            displayMessage('Nenhum pedido em entrega encontrado.');
+                        } else {
+                            displayMessage(`Erro ao carregar pedidos: ${data.message || 'Erro desconhecido.'}`);
+                            console.error('Erro na resposta do PHP:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar pedidos:', error);
+                        displayMessage(`Erro de comunicação com o servidor: ${error.message}`);
+                    });
+            }
+
+            // Eventos para os botões do MODAL DE ENTREGA
+            confirmDeliveryBtn.addEventListener('click', function() {
+                if (currentPedidoData) {
+                    const idPedido = currentPedidoData.id_pedido;
+                    fetch('atualizar_status_pedido.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `id_pedido=${idPedido}&status=Concluido`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            const cardParaRemover = document.querySelector(`.pedido-card[data-id-pedido="${idPedido}"]`);
+                            if (cardParaRemover) {
+                                cardParaRemover.remove();
+                            }
+                            if (pedidosContainer.children.length === 0) {
+                                displayMessage('Nenhum pedido em entrega encontrado.');
+                            } else if (pedidosContainer.children.length === 1) {
+                                pedidosContainer.classList.add('single-card');
+                            }
+                            confirmationModal.style.display = 'none'; // Esconde o modal
+                        } else {
+                            alert(data.message);
+                            console.error('Erro ao atualizar status:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Erro de comunicação com o servidor ao finalizar pedido.');
+                        console.error('Erro na requisição para finalizar pedido:', error);
+                    });
+                }
+            });
+
+            cancelDeliveryBtn.addEventListener('click', function() {
+                confirmationModal.style.display = 'none'; // Esconde o modal
+            });
+
+            // NOVO: Eventos para os botões do MODAL DE DEVOLUÇÃO
+            confirmReturnBtn.addEventListener('click', function() {
+                if (currentPedidoData) {
+                    const idPedido = currentPedidoData.id_pedido;
+                    fetch('atualizar_status_pedido.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `id_pedido=${idPedido}&status=Aceito` // Altera para status "Aceito"
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            const cardParaRemover = document.querySelector(`.pedido-card[data-id-pedido="${idPedido}"]`);
+                            if (cardParaRemover) {
+                                cardParaRemover.remove();
+                            }
+                            if (pedidosContainer.children.length === 0) {
+                                displayMessage('Nenhum pedido em entrega encontrado.');
+                            } else if (pedidosContainer.children.length === 1) {
+                                pedidosContainer.classList.add('single-card');
+                            }
+                            returnConfirmationModal.style.display = 'none'; // Esconde o modal de devolução
+                        } else {
+                            alert(data.message);
+                            console.error('Erro ao devolver pedido:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Erro de comunicação com o servidor ao devolver pedido.');
+                        console.error('Erro na requisição para devolver pedido:', error);
+                    });
+                }
+            });
+
+            cancelReturnBtn.addEventListener('click', function() {
+                returnConfirmationModal.style.display = 'none'; // Esconde o modal de devolução
+            });
+
+
+            // Fechar modal clicando fora dele (geral para ambos os modals)
+            window.addEventListener('click', function(event) {
+                if (event.target == confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                }
+                if (event.target == returnConfirmationModal) {
+                    returnConfirmationModal.style.display = 'none';
+                }
+            });
+
+
+            fetchPedidosEmEntrega();
+        });
+    </script>
+</body>
+</html>

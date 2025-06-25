@@ -26,10 +26,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sexo = strtolower(trim($_POST['sexo']));
     $termoSorteio = isset($_POST['termoSorteio']) ? 1 : 0;
 
+    // Defina valores padrão para campos de endereço que são NOT NULL
+    // e serão preenchidos em uma etapa posterior (cadastro_endereco.html)
+    $endereco = '';
+    $quadra = '';
+    $lote = '';
+    $setor = '';
+    $complemento = '';
+    $cidade = '';
+
+    // Latitude e Longitude podem ser NULL conforme o esquema
+    $latitude = NULL;
+    $longitude = NULL;
+
+
     // Validação básica (pode ser mais robusta)
     $erros = array();
     if (empty($telefone)) {
-        $erros[] = "Telefone é obrigatório."; // Adicionei validação para telefone
+        $erros[] = "Telefone é obrigatório.";
     }
     if (empty($nome)) {
         $erros[] = "Nome é obrigatório.";
@@ -56,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // AQUI: Verifique se o telefone já existe ANTES de tentar inserir
+    // Verifique se o telefone já existe ANTES de tentar inserir
     $sql_check_telefone = "SELECT COUNT(*) FROM clientes WHERE telefone = ?";
     $stmt_check = $conn->prepare($sql_check_telefone);
     $stmt_check->bind_param("s", $telefone);
@@ -74,8 +88,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insere os dados pessoais na tabela 'clientes'
-    // Endereço, quadra, lote, setor, complemento, cidade, latitude, longitude serão nulos inicialmente
-    $sql_cliente = "INSERT INTO clientes (telefone, nome, dt_nascimento, sexo, termoSorteio, endereco, quadra, lote, setor, complemento, cidade, latitude, longitude) VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+    // Incluímos todos os campos NOT NULL com valores vazios ou NULL, conforme o esquema e o fluxo
+    $sql_cliente = "INSERT INTO clientes (telefone, nome, dt_nascimento, sexo, termoSorteio, endereco, quadra, lote, setor, complemento, cidade, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_cliente = $conn->prepare($sql_cliente);
 
     if ($stmt_cliente === false) {
@@ -84,7 +98,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $stmt_cliente->bind_param("ssssi", $telefone, $nome, $dt_nascimento, $sexo, $termoSorteio);
+    // Assinatura do bind_param: s (telefone), s (nome), s (dt_nascimento), s (sexo), i (termoSorteio)
+    // Seguido por sssss (endereco, quadra, lote, setor, complemento, cidade)
+    // E dd (latitude, longitude)
+    $stmt_cliente->bind_param("ssssissssssdd", $telefone, $nome, $dt_nascimento, $sexo, $termoSorteio, $endereco, $quadra, $lote, $setor, $complemento, $cidade, $latitude, $longitude);
 
     if ($stmt_cliente->execute()) {
         // Retorna o telefone como identificador, em vez de um ID autoincrementado

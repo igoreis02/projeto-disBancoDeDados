@@ -109,8 +109,24 @@ $conn->close();
             max-width: 400px;
             text-align: left;
         }
+        .pedido-summary-header {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px auto;
+            max-width: 400px;
+            text-align: left;
+        }
+        .pedido-summary-header  {
+            font-size: 1.2em;
+        }
+
         .pedido-summary strong {
             color: var(--cor-principal);
+        }
+        .pedido-summary-title{
+            color: var(--cor-titulo);
         }
         .form-buttons {
             display: flex;
@@ -149,10 +165,14 @@ $conn->close();
     <div class="background"></div>
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
-        <p class="message-paragraph">Olá, <strong class="nome-cliente"><?php echo htmlspecialchars(ucwords(explode(' ', $cliente_nome)[0])); ?></strong>! Por favor, confirme os detalhes do seu pedido:</p>
+        <p class="message-paragraph">Olá, <strong class="nome-cliente"><?php echo htmlspecialchars(ucwords(explode(' ', $cliente_nome)[0])); ?></strong>! <br/>Por favor, confirme os detalhes do seu pedido:</p>
         
         <div class="pedido-summary">
-            <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p>
+            <div class="pedido-summary-header">
+            <strong class="pedido-summary-title">Endereço:</strong> 
+            <p><?php echo $endereco_completo_formatado; ?></p>
+            </div>
+            <div class="pedido-summary-header">
             <p><strong>Produtos:</strong></p>
             <ul>
                 <?php foreach ($produtos_selecionados as $produto): ?>
@@ -160,11 +180,15 @@ $conn->close();
                 <?php endforeach; ?>
             </ul>
             <p><strong>Total:</strong> R$ <?php echo number_format($total_pedido, 2, ',', '.'); ?></p>
-            <p><strong>Forma de Pagamento:</strong> <?php echo htmlspecialchars(ucwords($forma_pagamento)); ?></p>
+            </div>
+            <div class="pedido-summary-header">
+            <strong>Forma de Pagamento:</strong> 
+            <p><?php echo htmlspecialchars(ucwords($forma_pagamento)); ?></p>
             <?php if ($forma_pagamento === 'dinheiro' && $valor_pago !== null): ?>
                 <p><strong>Valor Pago:</strong> R$ <?php echo number_format($valor_pago, 2, ',', '.'); ?></p>
                 <p><strong>Troco:</strong> R$ <?php echo number_format($troco, 2, ',', '.'); ?></p>
             <?php endif; ?>
+            </div>
         </div>
 
         <div class="form-buttons">

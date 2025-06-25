@@ -204,14 +204,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Função para excluir um produto
-    function excluirProduto(id) {
+    function excluirProduto(id_produtos) {
+        console.log("Attempting to delete product with ID:", id_produtos); // Add this line
+        // Confirmação antes de excluir
         if (confirm("Tem certeza que deseja excluir este produto?")) {
             fetch('excluir-produto.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `id=${id}`
+                body: `id_produtos=${id_produtos}`
             })
                 .then(response => response.json())
                 .then(data => {

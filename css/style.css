@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500&display=swap');
 
 :root {
@@ -24,7 +25,7 @@ body {
     overflow: hidden;
     position: relative;
     z-index: 3;
-    margin: 0.5% 20px; /* Set a consistent 20px margin on sides for spacing from screen edges */
+    margin: 0.5% 0; /* Set a consistent 20px margin on sides for spacing from screen edges */
     padding: 140px 25px 50px; /* Adjust padding for mobile content spacing, slightly more than before */
     border-radius: 24px;
     background: #ffffff;
@@ -36,32 +37,7 @@ body {
     box-sizing: border-box; /* Include padding in element's total width */
 }
 
-      @media (max-width: 480px) {
-    body {
-        padding: 5px; /* Padding for smaller screens */
-        margin: 0;
-        align-items: center; /* Center content */
-        justify-content: center; /* Center content */
-        display: flex; /* Use flexbox for centering */
-        height: 100vh; /* Full viewport height */
-        
-    }
     
-    .card, .cardPedido { /* Styles for larger screens */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background-color: #fff; /* Background color for the card */
-        margin: 0; /* Or auto to center */
-        width: 95%; /* Fixed width for larger screens */
-        height: auto; /* Adjust height as needed */
-        padding: 10px; /* Restore original padding for larger screens */
-        margin: auto;
-    }
-    .form {
-        width: 100%;
-    }
-}
 .background {
     position: fixed;
     top: -50vmin;
@@ -321,7 +297,7 @@ a:visited {
 
 .tamanho-tabela {
     width: 40%;
-    margin: 20px auto;
+    margin: 20px auto;  
     padding: 20px;
     border-radius: 8px;
     overflow: hidden;
@@ -330,8 +306,7 @@ a:visited {
 .titulo-tabela {
     text-align: center;
     font-size: 24px;
-    color: var(--cor-titulo);
-    margin: 0;
+    color: var(--cor-titulo); 
 }
 
 .table-container {
@@ -693,3 +668,4 @@ tr:hover {
 .editar-entregador-btn:hover {
     background-color: #0056b3;
 }
+

@@ -40,10 +40,11 @@ if ($stmt_get) {
 }
 
 // Lógica de validação de transição de status
+// Removendo a restrição de "Entrega" para "Aceito" para permitir a devolução
 switch ($current_status) {
     case 'Pendente':
         if ($status_novo === 'Entrega' && $id_entregador_post === null) {
-            echo json_encode(['success' => false, 'message' => 'Para colocar em "Em Entrega", um entregador deve ser selecionado.']);
+            echo json_encode(['success' => false, 'message' => 'Para colocar em "Entrega", um entregador deve ser selecionado.']);
             exit();
         }
         break;
@@ -52,16 +53,20 @@ switch ($current_status) {
             echo json_encode(['success' => false, 'message' => 'Não é possível voltar o status de "Aceito" para "Pendente".']);
             exit();
         }
+        // Já verificamos se $status_novo === 'Entrega' e $id_entregador_post === null acima, essa é a validação
+        // de que um entregador deve ser selecionado para ir para 'Entrega' a partir de 'Aceito'.
         if ($status_novo === 'Entrega' && $id_entregador_post === null) {
-            echo json_encode(['success' => false, 'message' => 'Para colocar em "Em Entrega", um entregador deve ser selecionado.']);
-            exit();
+             echo json_encode(['success' => false, 'message' => 'Para colocar em "Entrega", um entregador deve ser selecionado.']);
+             exit();
         }
         break;
     case 'Entrega':
-        if ($status_novo === 'Pendente' || $status_novo === 'Aceito') {
-            echo json_encode(['success' => false, 'message' => 'Não é possível voltar o status de "Em Entrega" para "Pendente" ou "Aceito".']);
+        // Permitir a transição de "Entrega" para "Aceito"
+        if ($status_novo === 'Pendente') {
+            echo json_encode(['success' => false, 'message' => 'Não é possível voltar o status de "Entrega" para "Pendente".']);
             exit();
         }
+        // Não há restrição para ir de "Entrega" para "Aceito" agora.
         break;
     case 'Concluido':
     case 'Cancelado':
@@ -76,15 +81,24 @@ switch ($current_status) {
 $id_entregador_para_salvar = $current_id_entregador;
 
 if ($status_novo === 'Entrega') {
+    // Se o novo status é 'Entrega', use o id_entregador enviado no POST
     $id_entregador_para_salvar = $id_entregador_post;
-} else if ($status_novo !== 'Entrega' && $status_novo !== 'Concluido') {
-    // Se não é Entrega e não é Concluido (ou seja, outro status), limpa o entregador
+} else if ($status_novo === 'Aceito' && $current_status === 'Entrega') {
+    // Se o novo status é 'Aceito' E o status anterior era 'Entrega' (devolução),
+    // o entregador deve ser removido.
     $id_entregador_para_salvar = null;
 }
-// Se for Concluido e não veio de Entrega, também deve ser NULL
-else if ($status_novo === 'Concluido' && $current_status !== 'Entrega') {
+else if ($status_novo === 'Concluido') {
+    // Se o novo status é 'Concluido', o entregador deve ser removido
     $id_entregador_para_salvar = null;
 }
+// Para qualquer outro status que não seja 'Entrega', 'Aceito' (vindo de Entrega) ou 'Concluido',
+// o entregador deve ser nulo se nenhum foi explicitamente enviado.
+// Por exemplo, de "Pendente" para "Aceito", não deve ter entregador.
+else if ($id_entregador_post === null && $status_novo !== 'Entrega') {
+    $id_entregador_para_salvar = null;
+}
+
 
 // AQUI COMEÇA A NOVA LÓGICA PARA REDUZIR O ESTOQUE
 if ($status_novo === 'Concluido' && $current_status === 'Entrega') {
@@ -120,12 +134,6 @@ if ($status_novo === 'Concluido' && $current_status === 'Entrega') {
             $quantidade_deduzir = $product_item['quantidade'];
             $id_produto = $product_item['id_produto'];
 
-            // Opcional: Adicionar uma verificação se a quantidade em estoque é suficiente antes de deduzir
-            // Você pode adicionar uma SELECT aqui para pegar a quantidade atual e verificar
-            // Ex: SELECT quantidade FROM produtos WHERE id_produto = ?
-            // Se for menor, pode abortar ou logar um erro.
-            // Por simplicidade, faremos a dedução direta.
-
             $stmt_update_qty->bind_param("ii", $quantidade_deduzir, $id_produto);
             if (!$stmt_update_qty->execute()) {
                 throw new Exception('Erro ao deduzir quantidade do produto ' . $id_produto . ': ' . $stmt_update_qty->error);
@@ -139,7 +147,18 @@ if ($status_novo === 'Concluido' && $current_status === 'Entrega') {
         if ($stmt_pedido === false) {
             throw new Exception('Erro ao preparar a atualização do pedido: ' . $conn->error);
         }
-        $stmt_pedido->bind_param("sii", $status_novo, $id_entregador_para_salvar, $id_pedido);
+        // Handle id_entregador_para_salvar for NULL
+        if ($id_entregador_para_salvar === null) {
+            $sql_update_pedido = "UPDATE pedidos SET status_pedido = ?, id_entregador = NULL WHERE id_pedido = ?";
+            $stmt_pedido = $conn->prepare($sql_update_pedido);
+            if ($stmt_pedido === false) {
+                throw new Exception('Erro ao preparar a atualização do pedido (NULL entregador): ' . $conn->error);
+            }
+            $stmt_pedido->bind_param("si", $status_novo, $id_pedido);
+        } else {
+            $stmt_pedido->bind_param("sii", $status_novo, $id_entregador_para_salvar, $id_pedido);
+        }
+
         if (!$stmt_pedido->execute()) {
             throw new Exception('Erro ao atualizar status do pedido: ' . $stmt_pedido->error);
         }
@@ -154,17 +173,29 @@ if ($status_novo === 'Concluido' && $current_status === 'Entrega') {
         echo json_encode(['success' => false, 'message' => 'Erro ao concluir pedido e deduzir estoque: ' . $e->getMessage()]);
     }
 } else {
-    // Lógica existente para outros status (sem dedução de estoque)
-    $sql_update = "UPDATE pedidos SET status_pedido = ?, id_entregador = ? WHERE id_pedido = ?";
+    // Lógica para outros status (sem dedução de estoque)
 
-    $stmt = $conn->prepare($sql_update);
-    if ($stmt === false) {
-        echo json_encode(['success' => false, 'message' => 'Erro ao preparar a declaração SQL: ' . $conn->error]);
-        $conn->close();
-        exit();
+    // Handle id_entregador_para_salvar for NULL
+    if ($id_entregador_para_salvar === null) {
+        $sql_update = "UPDATE pedidos SET status_pedido = ?, id_entregador = NULL WHERE id_pedido = ?";
+        $stmt = $conn->prepare($sql_update);
+        if ($stmt === false) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao preparar a declaração SQL (NULL entregador): ' . $conn->error]);
+            $conn->close();
+            exit();
+        }
+        $stmt->bind_param("si", $status_novo, $id_pedido);
+    } else {
+        $sql_update = "UPDATE pedidos SET status_pedido = ?, id_entregador = ? WHERE id_pedido = ?";
+        $stmt = $conn->prepare($sql_update);
+        if ($stmt === false) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao preparar a declaração SQL (com entregador): ' . $conn->error]);
+            $conn->close();
+            exit();
+        }
+        $stmt->bind_param("sii", $status_novo, $id_entregador_para_salvar, $id_pedido);
     }
 
-    $stmt->bind_param("sii", $status_novo, $id_entregador_para_salvar, $id_pedido);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Status do pedido atualizado com sucesso!']);

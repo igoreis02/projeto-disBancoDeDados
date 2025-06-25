@@ -146,18 +146,16 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
             padding: 30px;
         }
         .card h1 {
-            color: var(--cor-titulo);
+            color: var(--cor-principal);
             margin-bottom: 0;
             padding-top: 90px; /* Adicionado para espaçamento superior */
         }
         /* Estilo para a frase específica */
         .card .message-paragraph {
-            margin-bottom: 5px;
             font-size: 1.1em;
             font-size: 1.4em;
             font-weight: 900;
-            margin-top: 15px; /* Aumentado o ajuste para empurrar o parágrafo para baixo */
-            color:var(--cor-principal);
+            color:var(--cor-titulo);
         }
         .pedido-details {
             background-color: #f9f9f9;
@@ -170,6 +168,15 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
         }
         .pedido-details strong {
             color: var(--cor-principal);
+        }
+        .pedido-info{
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+            margin: 20px auto;
+            max-width: 400px;
+            text-align:center;
         }
         .form-buttons {
             display: flex;
@@ -197,6 +204,12 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
             background-color:rgb(197, 133, 31);
         }
 
+        .form-buttons .edit-button {
+            background-color: var(--cor-principal);
+        }
+        .form-buttons .edit-button:hover {
+            background-color: var(--cor-secundaria);
+        }
 
         .form-buttons .contato-btn {
             background-color: var(--cor-principal);
@@ -245,8 +258,9 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
     <div class="card">
         <img class="logo" src="imagens/logo.png" alt="Logo" />
         <h1>Olá, <?php echo $primeiroNome; ?>!</h1>
+        <div class="pedido-info">
         <p class="message-paragraph">Seu pedido está em entrega. Acompanhe os detalhes:</p>
-
+        </div>
         <div class="pedido-details">
             <p><strong>Endereço:</strong> <?php echo $endereco_completo_formatado; ?></p>
             <p><strong>Produtos:</strong> <?php echo $produtos_detalhes; ?></p>
