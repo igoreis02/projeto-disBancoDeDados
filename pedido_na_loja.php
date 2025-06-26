@@ -214,7 +214,7 @@ if ($conn->connect_error) {
 
         <div class="form-buttons">
             <a href="pedido.html?telefone=<?php echo $telefone; ?>&id_pedido=<?php echo $id_pedido; ?>&nome=<?php echo $primeiroNome; ?>" class="edit-button">Editar Pedido</a>
-            <a href="index.html" class="exit-button">Sair</a>
+            <a href="pedido_cliente.html" class="exit-button">Sair</a>
         </div>
     </div>
 </body>

@@ -35,13 +35,14 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Se o login foi bem-sucedido
-                if (data.redefinir_senha) {
-                    // Se a redefinicao de senha e obrigatoria, redireciona para menu.php
-                    // menu.php lidara com a exibicao do modal devido a flag de sessao
+                // Se o login foi bem-sucedido, use a URL de redirecionamento fornecida pelo PHP
+                if (data.redirect) {
+                    window.location.href = data.redirect; 
+                } else if (data.redefinir_senha) {
+                    // Fallback para a lógica de redefinição de senha, embora 'redirect' deva ser preferencial
                     window.location.href = `menu.php`; 
                 } else {
-                    // Login bem-sucedido e senha ja redefinida, redireciona para menu.php
+                    // Fallback se nenhum redirecionamento específico for fornecido (raro com a nova lógica PHP)
                     window.location.href = `menu.php`;
                 }
             } else {

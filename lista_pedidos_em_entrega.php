@@ -3,6 +3,20 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Inicia ou resume a sessão para acessar o ID do usuário logado
+session_start();
+
+// Verifica se o usuário está logado e se é um entregador.
+// Se não estiver logado ou não for um entregador, você pode decidir redirecionar ou retornar um erro.
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'entregador') {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Acesso negado. Apenas entregadores logados podem visualizar esta página.']);
+    exit();
+}
+
+// O ID do usuário logado da sessão é o id_entregador a ser usado na consulta de pedidos
+$id_entregador_logado = $_SESSION['user_id']; 
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -19,12 +33,13 @@ if ($conn->connect_error) {
 header('Content-Type: application/json');
 
 // Consulta SQL para obter pedidos em entrega com dados do cliente e produtos
+// Adiciona a condição para filtrar pelo id_entregador
 $sql = "
 SELECT
     p.id_pedido,
-    c.telefone AS telefone_cliente, -- Pegamos o telefone da tabela clientes
+    c.telefone AS telefone_cliente,
     p.data_pedido,
-    p.status_pedido, -- Coluna atualizada para 'status_pedido'
+    p.status_pedido,
     p.forma_pagamento,
     p.valor_total,
     c.nome AS nome_cliente,
@@ -49,13 +64,13 @@ SELECT
 FROM
     pedidos p
 JOIN
-    clientes c ON p.id_cliente = c.id -- JOIN agora usa id_cliente = id
+    clientes c ON p.id_cliente = c.id
 LEFT JOIN
     itens_pedido ip ON p.id_pedido = ip.id_pedido
 LEFT JOIN
     produtos pr ON ip.id_produto = pr.id_produtos
 WHERE
-    p.status_pedido = 'Entrega' -- Filtra apenas pedidos com status 'Em Entrega', usando 'status_pedido'
+    p.status_pedido = 'Entrega' AND p.id_entregador = ? -- Filtra pelo id_entregador logado
 GROUP BY
     p.id_pedido, c.telefone, p.data_pedido, p.status_pedido, p.forma_pagamento, p.valor_total,
     c.nome, c.endereco, c.quadra, c.lote, c.setor, c.complemento, c.cidade, c.latitude, c.longitude
@@ -63,7 +78,17 @@ ORDER BY
     p.data_pedido ASC;
 ";
 
-$result = $conn->query($sql);
+// Prepara a consulta para evitar injeção de SQL e para vincular o parâmetro id_entregador
+$stmt = $conn->prepare($sql);
+if ($stmt === false) {
+    echo json_encode(['success' => false, 'message' => 'Erro ao preparar a consulta SQL: ' . $conn->error]);
+    exit();
+}
+
+// Vincula o id_entregador logado como um parâmetro inteiro
+$stmt->bind_param("i", $id_entregador_logado);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $pedidos = [];
 if ($result) {
@@ -76,18 +101,19 @@ if ($result) {
                     $produtos[] = json_decode($produto_item, true);
                 }
             }
-            $row['produtos'] = $produtos; // Adiciona o array de produtos ao objeto do pedido
-            unset($row['produtos_json']); // Remove a string JSON bruta
+            $row['produtos'] = $produtos;
+            unset($row['produtos_json']);
 
             $pedidos[] = $row;
         }
         echo json_encode(['success' => true, 'pedidos' => $pedidos]);
     } else {
-        echo json_encode(['success' => true, 'pedidos' => [], 'message' => 'Nenhum pedido em entrega encontrado.']);
+        echo json_encode(['success' => true, 'pedidos' => [], 'message' => 'Nenhum pedido em entrega encontrado para este entregador.']);
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Erro na consulta SQL: ' . $conn->error]);
+    echo json_encode(['success' => false, 'message' => 'Erro na execução da consulta SQL: ' . $stmt->error]);
 }
 
+$stmt->close();
 $conn->close();
 ?>

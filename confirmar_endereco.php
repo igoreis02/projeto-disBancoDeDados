@@ -228,7 +228,7 @@ if ($conn->connect_error) {
                 <input type="hidden" name="nome" value="<?php echo htmlspecialchars($nome); ?>">  
                 <button type="submit" class="edit-button">Confirmar Endereço</button>
             </form>
-            <a href="index.html" class="exit-button">Sair</a>
+            <a href="pedido_cliente.html" class="exit-button">Sair</a>
         </div>
     </div>
 

@@ -4,6 +4,6 @@ session_unset(); // Remove todas as variáveis de sessão registradas
 session_destroy(); // Destrói a sessão atual
 
 // Redireciona o usuário para a página de login
-header('Location: login.html');
+header('Location: index.html');
 exit(); // Termina a execução do script
 ?>

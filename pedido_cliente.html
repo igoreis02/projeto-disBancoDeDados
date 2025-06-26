@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Souza Gás e Água</title>
+  <style>
+    .form-buttons button,
+    .form-buttons a {
+      padding: 12px 25px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      transition: background-color 0.3s ease;
+      display: block;
+      /* Garante que ocupem a largura total */
+      width: 100%;
+      /* Garante que ocupem a largura total */
+      box-sizing: border-box;
+      /* Inclui padding e borda na largura total */
+    }
+
+    .form-buttons .edit-button {
+      background-color: var(--cor-principal);
+    }
+
+    .form-buttons .edit-button:hover {
+      background-color: var(--cor-secundaria);
+    }
+          @media (max-width: 480px) {
+    body {
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        padding: 5px; /* Padding for smaller screens */
+        margin: 0;
+        align-items: center; /* Center content */
+        justify-content: center; /* Center content */
+        display: flex; /* Use flexbox for centering */
+        height: 100vh; /* Full viewport height */
+        
+    }
+    
+    .card, .cardPedido { /* Styles for larger screens */
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #fff; /* Background color for the card */
+        margin: 0; /* Or auto to center */
+        width: 95%; /* Fixed width for larger screens */
+        height: 95%; /* Adjust height as needed */
+        padding: 10px; /* Restore original padding for larger screens */
+        margin: auto;
+    }
+    .footer {
+      display: none;
+    }
+    .form {
+        width: 100%;
+    }
+}
+  </style>
+</head>
+
+<body>
+  <div class="background"></div>
+  <div class="card">
+    <img class="logo" src="imagens/logo.png" alt="Logo" />
+    <h2>Faça seu pedido</h2>
+    <img class="imagem" src="imagens/boneco.png" alt="">
+
+    <form class="form" id="formulario">
+      <label class="titulo-label" for="telefone">Digite seu telefone:</label>
+      <input type="tel" name="telefone" id="telefone" placeholder="Telefone" />
+      <input id="hidden" type="password" name="senha" placeholder="Senha" />
+      <div class="checkbox">
+        <input type="checkbox" id="privacidade" name="privacidade"/>
+        <label for="privacidade" id="termoPrivacidade">Li e aceito a &nbsp;<a href="TermoPrivacidade.html" class="link"
+            target="_blank">política de privacidade</a></label>
+      </div>
+      <div id="mensagem"></div>
+      <div class="form-buttons">
+        <button class="edit-button" type="submit" id="pesquisaTelefone">Próximo</button>
+      </div>
+    </form>
+    
+  </div>
+  <div class="footer">
+    <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+
+</html>

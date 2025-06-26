@@ -7,8 +7,17 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_email = $_SESSION['user_email'];
 
+// Se o tipo de usuário for 'entregador', redirecione-o para a página de entrega,
+// pois ele não deveria ter acesso direto ao menu.php.
+if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'entregador') {
+    header('Location: lista_pedidos_em_entrega.html');
+    exit();
+}
+
 // Verifica se a redefinição de senha é obrigatória
 $redefinir_senha_obrigatoria = isset($_SESSION['redefinir_senha_obrigatoria']) && $_SESSION['redefinir_senha_obrigatoria'] === true;
+
+
 
 ?>
 <!DOCTYPE html>

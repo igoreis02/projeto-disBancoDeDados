@@ -277,7 +277,7 @@ $whatsapp_link = "https://wa.me/" . $whatsapp_number . "?text=" . $whatsapp_mess
 
         <div class="form-buttons">
             <a href="<?php echo $whatsapp_link; ?>" class="contato-btn" target="_blank"><img src="imagens/whatsapp_icon.webp" alt="WhatsApp" class="whatsapp-icon">Entrar em contato</a>
-            <a href="index.html" class="exit-button">Sair</a>
+            <a href="pedido_cliente.html" class="exit-button">Sair</a>
         </div>
     </div>
 </body>

@@ -23,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Adiciona 'senha_alterada' na seleção
-    $stmt = $conn->prepare("SELECT id_usuario, senha, senha_alterada FROM usuarios WHERE email = ?");
+    // Adiciona 'tipo_usuario' na seleção
+    $stmt = $conn->prepare("SELECT id_usuario, senha, senha_alterada, tipo_usuario FROM usuarios WHERE email = ?");
     if ($stmt === false) {
         echo json_encode(['success' => false, 'message' => 'Erro na preparação da consulta: ' . $conn->error]);
         $conn->close();
@@ -38,24 +38,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
         $stored_password_hash = $user['senha'];
-        $senha_ja_alterada = $user['senha_alterada']; // Novo campo
+        $senha_ja_alterada = $user['senha_alterada'];
+        $tipo_usuario = $user['tipo_usuario']; // Obtém o tipo de usuário
 
         if (password_verify($senha, $stored_password_hash)) {
             session_start();
             $_SESSION['user_id'] = $user['id_usuario'];
             $_SESSION['user_email'] = $email;
+            $_SESSION['tipo_usuario'] = $tipo_usuario; // Armazena o tipo de usuário na sessão
 
-            // ***** LÓGICA ATUALIZADA AQUI *****
-            // Verifica se a senha usada é a senha padrão '12345' E se ela ainda não foi alterada
-            // Se o usuário digitou '12345' E a flag 'senha_alterada' é 0
+            // Lógica de redefinição de senha obrigatória
             if ($senha === '12345' && $senha_ja_alterada == 0) {
                  $_SESSION['redefinir_senha_obrigatoria'] = true;
             } else {
                  $_SESSION['redefinir_senha_obrigatoria'] = false;
             }
-            // **********************************
 
-            echo json_encode(['success' => true, 'message' => 'Login bem-sucedido!']);
+            // Determine a página de redirecionamento com base no tipo_usuario
+            $redirect_page = '';
+            if ($tipo_usuario === 'entregador') {
+                $redirect_page = 'lista_pedidos_em_entrega.html';
+            } else {
+                $redirect_page = 'menu.php';
+            }
+            
+            // Inclui a URL de redirecionamento na resposta JSON
+            echo json_encode(['success' => true, 'message' => 'Login bem-sucedido!', 'redirect' => $redirect_page]);
+
         } else {
             echo json_encode(['success' => false, 'message' => 'E-mail ou senha inválidos.']);
         }

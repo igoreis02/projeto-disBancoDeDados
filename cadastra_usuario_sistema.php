@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // 'ssssiiss' - Tipos dos parâmetros: 
         // s: string (nome, telefone, senha, email, tipo_usuario, status_usuario, endereco)
         // i: integer (senha_alterada)
-        $stmt->bind_param("sssssiss", 
+        $stmt->bind_param("ssssisss", 
             $nome, 
             $telefone, 
             $hash_senha_padrao, 

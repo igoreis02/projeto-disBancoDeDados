@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
-  <title>Souza Gás e Água</title>
+  <title>Login de Usuário - Souza Gás e Água</title>
   <style>
     .form-buttons button,
     .form-buttons a {
@@ -36,24 +36,11 @@
     body {
         display: flex;
         flex-direction: column; /* Stack elements vertically */
-        padding: 5px; /* Padding for smaller screens */
-        margin: 0;
-        align-items: center; /* Center content */
-        justify-content: center; /* Center content */
-        display: flex; /* Use flexbox for centering */
-        height: 100vh; /* Full viewport height */
-        
+        padding: 10px; /* Adjust padding for smaller screens */
     }
-    
-    .card, .cardPedido { /* Styles for larger screens */
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: center;
-        background-color: #fff; /* Background color for the card */
-        margin: 0; /* Or auto to center */
-        width: 95%; /* Fixed width for larger screens */
-        height: 95%; /* Adjust height as needed */
+    .card {
+        width: 100%; /* Full width on smaller screens */
+        height: auto; /* Or auto to center */
         padding: 10px; /* Restore original padding for larger screens */
         margin: auto;
     }
@@ -71,29 +58,26 @@
   <div class="background"></div>
   <div class="card">
     <img class="logo" src="imagens/logo.png" alt="Logo" />
-    <h2>Faça seu pedido</h2>
+    <h2>Acesso ao Sistema</h2>
     <img class="imagem" src="imagens/boneco.png" alt="">
 
-    <form class="form" id="formulario">
-      <label class="titulo-label" for="telefone">Digite seu telefone:</label>
-      <input type="tel" name="telefone" id="telefone" placeholder="Telefone" />
-      <input id="hidden" type="password" name="senha" placeholder="Senha" />
-      <div class="checkbox">
-        <input type="checkbox" id="privacidade" name="privacidade"/>
-        <label for="privacidade" id="termoPrivacidade">Li e aceito a &nbsp;<a href="TermoPrivacidade.html" class="link"
-            target="_blank">política de privacidade</a></label>
-      </div>
-      <div id="mensagem"></div>
+    <form class="form" id="formularioLogin">
+      <label class="titulo-label" for="emailLogin">E-mail:</label>
+      <input type="email" name="email" id="emailLogin" placeholder="E-mail" required />
+      
+      <label class="titulo-label" for="senhaLogin">Senha:</label>
+      <input type="password" name="senha" id="senhaLogin" placeholder="Senha" required />
+      
+      <div id="mensagemLogin"></div>
       <div class="form-buttons">
-        <button class="edit-button" type="submit" id="pesquisaTelefone">Próximo</button>
+        <button type="submit" class="edit-button" id="acessarSistemaBtn">Entrar</button>
+        <a href="index.html" class="exit-button">Voltar para o Pedido</a>
       </div>
     </form>
-    
   </div>
   <div class="footer">
-    <p>&copy; 2025 Souza Gás. Todos os direitos reservados.</p>
+    <p>Desenvolvido por <a href="https://github.com/Gabriel-Borges-dev" target="_blank">Gabriel Borges</a></p>
   </div>
-  <script src="js/script.js"></script>
+  <script src="js/login.js"></script>
 </body>
-
 </html>
