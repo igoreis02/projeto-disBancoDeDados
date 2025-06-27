@@ -147,4 +147,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+        if (camposValidos) {
+            // Submit the form
+            const formData = new FormData(formularioCadastroEndereco);
+
+            fetch('atualizar_endereco.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Check if the response is a redirect (status 3xx)
+                if (response.redirected) {
+                    // This means the PHP script successfully redirected to pedido.html
+                    // Replace the current history state to prevent going back to cadastro_pessoal.html
+                    // The new URL in the history will be pedido.html
+                    window.history.replaceState(null, '', response.url);
+                    window.location.replace(response.url); // Actually navigate to the redirected URL
+                } else {
+                    // If not a redirect, read the response as text and display error
+                    return response.text().then(text => {
+                        mensagemDivEndereco.innerHTML = text; // Display the error message from PHP
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                mensagemDivEndereco.textContent = 'Erro de comunicação com o servidor ao finalizar o cadastro.';
+            });
+        }
 });

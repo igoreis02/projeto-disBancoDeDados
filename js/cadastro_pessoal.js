@@ -3,24 +3,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const mensagemDivPessoal = document.getElementById('mensagemPessoal');
     const urlParams = new URLSearchParams(window.location.search);
     const telefone = urlParams.get('telefone');
+    const exitButton = document.querySelector('.exit-button');
 
-    // Preenche o campo de telefone hidden
     document.getElementById('telefonePessoal').value = telefone;
 
     formularioCadastroPessoal.addEventListener('submit', function (event) {
-        event.preventDefault(); // Impede o envio do formulário padrão
+        event.preventDefault();
 
-        // Recupera os valores dos campos
         const nomeInput = document.getElementById('nomePessoal');
         const dataNascimentoInput = document.getElementById('dt_NascimentoPessoal');
         const sexoInput = document.querySelector('input[name="sexo"]:checked');
         const termosSorteioInput = document.getElementById('sorteioPessoal').checked;
 
         let camposValidos = true;
-        mensagemDivPessoal.textContent = ''; // Limpa mensagens anteriores
+        mensagemDivPessoal.textContent = '';
         mensagemDivPessoal.style.color = 'red';
 
-        // Validação dos campos pessoais
         if (nomeInput.value.trim() === '') {
             mensagemDivPessoal.textContent = 'Por favor, preencha seu nome completo.';
             camposValidos = false;
@@ -39,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (camposValidos) {
-            // Se os campos são válidos, envie os dados pessoais via AJAX
             const formData = new FormData(formularioCadastroPessoal);
 
             fetch('salvar_dados_pessoais.php', {
@@ -49,10 +46,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // AQUI: Usamos data.telefone_cliente para o redirecionamento
-                    window.location.href = `cadastro_endereco.html?telefone=${encodeURIComponent(data.telefone_cliente)}`;
+                    // Use history.replaceState and then location.replace to avoid adding to history
+                    const newUrl = `cadastro_endereco.html?id_cliente=${encodeURIComponent(data.telefone)}`; // assuming id_cliente is the correct parameter here.
+                    window.history.replaceState(null, '', newUrl); // Replace current history entry
+                    window.location.replace(newUrl); // Navigate without adding to history
                 } else {
-                    // Exibe a mensagem de erro retornada pelo PHP
                     mensagemDivPessoal.textContent = data.message || 'Erro ao cadastrar dados pessoais.';
                 }
             })
@@ -62,4 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+
+    
 });

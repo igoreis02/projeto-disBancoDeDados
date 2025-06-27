@@ -1,10 +1,17 @@
 <?php
 header('Content-Type: application/json'); // Garante que a resposta é JSON
 
-$servername = "localhost";
+
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
+
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
 $username = "root";
-$password = "";
-$dbname = "cadastro";
+$password = ""; // Assumindo nenhuma senha para o usuário "cadastrosouza" com base nos dados fornecidos.
+$dbname = "cadastrosouza";
+
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -35,6 +42,9 @@ if ($result_cliente->num_rows > 0) {
     $response['setor'] = $cliente['setor'];
     $response['complemento'] = $cliente['complemento'];
     $response['cidade'] = $cliente['cidade'];
+
+    // Adiciona verificação se o campo 'endereco' está nulo ou vazio
+    $response['endereco_vazio'] = (empty($cliente['endereco']));
 
     // Agora, verifica se há pedidos pendentes, aceitos ou em entrega para este cliente
     $sql_pedido = "
