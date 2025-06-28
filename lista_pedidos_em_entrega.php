@@ -17,10 +17,15 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['tipo_usuario']) || $_SESSI
 // O ID do usuário logado da sessão é o id_entregador a ser usado na consulta de pedidos
 $id_entregador_logado = $_SESSION['user_id']; 
 
-$servername = "localhost";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
+
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
 $username = "root";
-$password = "";
-$dbname = "cadastro";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

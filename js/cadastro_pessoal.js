@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.success) {
                     // Use history.replaceState and then location.replace to avoid adding to history
-                    const newUrl = `cadastro_endereco.html?id_cliente=${encodeURIComponent(data.telefone)}`; // assuming id_cliente is the correct parameter here.
+                    const newUrl = `cadastro_endereco.html?telefone=${encodeURIComponent(data.telefone_cliente)}`; // assuming telefone is the correct parameter here.
                     window.history.replaceState(null, '', newUrl); // Replace current history entry
                     window.location.replace(newUrl); // Navigate without adding to history
                 } else {

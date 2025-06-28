@@ -1,9 +1,14 @@
 <?php
 // conexao.php (Inclua seu arquivo de conexão)
-$servername = "localhost";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
+
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
 $username = "root";
-$password = "";
-$dbname = "cadastro";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

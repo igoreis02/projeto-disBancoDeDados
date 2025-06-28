@@ -3,11 +3,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "cadastro";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
 
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
+$username = "root";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 // nova conexão mysqli
 $conn = new mysqli($servername, $username, $password, $dbname);
 

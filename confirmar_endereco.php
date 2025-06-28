@@ -9,11 +9,15 @@ $primeiroNome = explode(' ', $nome)[0];
 $primeiroNome = ucwords($primeiroNome);
 
 
-// Conexão com o banco de dados para buscar o endereço completo
-$servername = "localhost";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
+
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
 $username = "root";
-$password = "";
-$dbname = "cadastro";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -219,23 +223,21 @@ if ($conn->connect_error) {
        
 
         <div class="form-buttons">
-            <form action="editar_endereco.php" method="GET">
-                <input type="hidden" name="telefone" value="<?php echo htmlspecialchars($telefone); ?>">
-                <button type="submit" class="edit-button">Editar Endereço</button>
-            </form>
-            <form action="pedido.html?" method="GET">
-                <input type="hidden" name="telefone" value="<?php echo htmlspecialchars($telefone); ?>">   
-                <input type="hidden" name="nome" value="<?php echo htmlspecialchars($nome); ?>">  
-                <button type="submit" class="edit-button">Confirmar Endereço</button>
-            </form>
+            <button type="button" class="edit-button" id="editarEnderecoBtn">Editar Endereço</button>
+
+            <button type="button" class="edit-button" id="confirmarEnderecoBtn">Confirmar Endereço</button>
+
             <a href="pedido_cliente.html" class="exit-button">Sair</a>
         </div>
+
     </div>
 
-    <script>
+       <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButton = document.getElementById('toggleLotteryNumbers');
             const lotteryNumbersDisplay = document.getElementById('lotteryNumbersDisplay');
+            const editarEnderecoBtn = document.getElementById('editarEnderecoBtn'); // Novo
+            const confirmarEnderecoBtn = document.getElementById('confirmarEnderecoBtn'); // Novo
 
             if (toggleButton && lotteryNumbersDisplay) {
                 toggleButton.addEventListener('click', function() {
@@ -248,7 +250,29 @@ if ($conn->connect_error) {
                     }
                 });
             }
+
+            // Lógica para o botão "Editar Endereço"
+            if (editarEnderecoBtn) {
+                editarEnderecoBtn.addEventListener('click', function() {
+                    const telefone = "<?php echo htmlspecialchars($telefone); ?>";
+                    const url = `editar_endereco.php?telefone=${telefone}`;
+                    // Usa window.location.replace para substituir a entrada atual do histórico
+                    window.location.replace(url);
+                });
+            }
+
+            // Lógica para o botão "Confirmar Endereço"
+            if (confirmarEnderecoBtn) {
+                confirmarEnderecoBtn.addEventListener('click', function() {
+                    const telefone = "<?php echo htmlspecialchars($telefone); ?>";
+                    const nome = "<?php echo htmlspecialchars($nome); ?>";
+                    const url = `pedido.html?telefone=${telefone}&nome=${nome}`;
+                    // Usa window.location.replace para substituir a entrada atual do histórico
+                    window.location.replace(url);
+                });
+            }
         });
     </script>
+
 </body>
 </html>

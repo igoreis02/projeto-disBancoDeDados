@@ -2,11 +2,15 @@
 header('Content-Type: application/json');
 
 // Conexão com o banco de dados
-$servername = "localhost";
-$username = "root"; // Altere se o seu usuário do banco de dados for diferente
-$password = "";     // Altere se sua senha do banco de dados for diferente
-$dbname = "cadastro";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
 
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
+$username = "root";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verifica a conexão

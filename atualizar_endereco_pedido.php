@@ -9,10 +9,15 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1); // Loga os erros para um arquivo de log do PHP.
 error_reporting(E_ALL);
 
-$servername = "localhost";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
+
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
 $username = "root";
-$password = "";
-$dbname = "cadastro";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 
 // Conexão com o banco de dados.
 $conn = new mysqli($servername, $username, $password, $dbname);

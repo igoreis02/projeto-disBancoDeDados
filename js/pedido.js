@@ -1,4 +1,15 @@
-document.addEventListener('DOMContentLoaded', function() {
+// Adiciona uma entrada no histórico para que o botão de voltar leve à página de login
+// Isso é feito apenas se a página atual não for já a pedido_cliente.html
+if (window.history.length > 0 && !document.referrer.includes('pedido_cliente.html')) {
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+        // Redireciona para pedido_cliente.html e SUBSTITUI a entrada atual no histórico.
+        window.location.replace('pedido_cliente.html');
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
     const sliderTrack = document.getElementById('productSliderTrack');
     const prevBtn = document.querySelector('.prev-btn');
     const nextBtn = document.querySelector('.next-btn');
@@ -208,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 targetPosition = 0; // Se tudo cabe, não precisa rolar
             }
         }
-         // Adicionalmente, garantimos que o targetPosition não seja negativo se houver poucos itens
+        // Adicionalmente, garantimos que o targetPosition não seja negativo se houver poucos itens
         if (targetPosition > 0) {
             targetPosition = 0;
         }
@@ -246,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Check if the selected product is a "gas" product (case-insensitive)
-            if (productName && productName.toLowerCase().includes('gás') && quantidade > 0) {
+            if (productName && (productName.toLowerCase().includes('gás') || productName.toLowerCase().includes('gas')) && quantidade > 0) {
                 gasProductSelected = true; // Set flag to true if a gas product is found
             }
         });
@@ -289,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    paymentOptions.addEventListener('change', function(event) {
+    paymentOptions.addEventListener('change', function (event) {
         if (event.target.name === 'payment') {
             if (event.target.value === 'dinheiro') {
                 trocoField.style.display = 'block';
@@ -310,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
 
-    confirmarPedidoBtn.addEventListener('click', function() {
+    confirmarPedidoBtn.addEventListener('click', function () {
         const selectedProducts = [];
         const quantityInputs = document.querySelectorAll('.quantity-input-group input[type="number"]');
         let hasSelectedProducts = false;
@@ -386,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (idPedidoExistente) {
             params.append('id_pedido_existente', idPedidoExistente);
         }
-        
+
         // Use the updated value from the hidden input
         const hasGasProduct = hasGasProductInput.value;
         params.append('has_gas_product', hasGasProduct);

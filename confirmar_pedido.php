@@ -1,9 +1,13 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "cadastro";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
 
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
+$username = "root";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 // Conexão com o banco de dados
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -198,6 +202,7 @@ $conn->close();
     </div>
 
     <script>
+
         document.getElementById('finalizarPedidoBtn').addEventListener('click', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const telefoneCliente = "<?php echo htmlspecialchars($telefone); ?>";
@@ -240,7 +245,7 @@ $conn->close();
                     .then(data => {
                         if (data.success) {
                             console.log(data.message);
-                            window.location.href = data.redirect_url; // Usa a URL de redirecionamento do PHP
+                            window.location.replace(data.redirect_url);
                         } else {
                             console.log('Erro ao finalizar o pedido: ' + data.message);
                         }

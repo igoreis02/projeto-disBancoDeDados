@@ -22,10 +22,15 @@ $valor_pago_formatado = ($valor_pago !== null) ? number_format($valor_pago, 2, '
 $troco_formatado = number_format($troco, 2, ',', '.');
 
 // Conexão com o banco de dados para buscar o endereço completo
-$servername = "localhost";
+//$servername = "myshared2380";
+//$username = "cadastrosouza";
+//$password = "Souza@7498"; 
+//$dbname = "cadastrosouza";
+
+$servername = "localhost"; // Use "localhost" se estiver rodando localmente ou o nome do servidor se for remoto
 $username = "root";
-$password = "";
-$dbname = "cadastro";
+$password = ""; // Assuming no password for the user "cadastrosouza" based on the provided data.
+$dbname = "cadastrosouza";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -213,9 +218,33 @@ if ($conn->connect_error) {
         </div>
 
         <div class="form-buttons">
-            <a href="pedido.html?telefone=<?php echo $telefone; ?>&id_pedido=<?php echo $id_pedido; ?>&nome=<?php echo $primeiroNome; ?>" class="edit-button">Editar Pedido</a>
+            <a href="#" class="edit-button" id="editarPedidoBtn">Editar Pedido</a>
             <a href="pedido_cliente.html" class="exit-button">Sair</a>
         </div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editarPedidoBtn = document.getElementById('editarPedidoBtn');
+        if (editarPedidoBtn) {
+            editarPedidoBtn.addEventListener('click', function(event) {
+                event.preventDefault(); // Impede o comportamento padrão do link
+
+                const telefone = "<?php echo htmlspecialchars($telefone); ?>";
+                const id_pedido = "<?php echo htmlspecialchars($id_pedido); ?>";
+                const status_pedido = "<?php echo htmlspecialchars($status_pedido); ?>";
+                const valor_total = "<?php echo htmlspecialchars($valor_total); ?>";
+                const produtos_detalhes = "<?php echo urlencode($produtos_detalhes); ?>";
+                const forma_pagamento = "<?php echo urlencode($forma_pagamento); ?>";
+                const valor_pago = "<?php echo htmlspecialchars($valor_pago); ?>";
+                const troco = "<?php echo htmlspecialchars($troco); ?>";
+
+                const url = `pedido.html?telefone=${telefone}&id_pedido=${id_pedido}&status_pedido=${status_pedido}&valor_total=${valor_total}&produtos_detalhes=${produtos_detalhes}&forma_pagamento=${forma_pagamento}&valor_pago=${valor_pago}&troco=${troco}`;
+
+                // Redireciona para a página de edição do pedido
+                window.location.replace(url);
+            });
+        }
+    });
+</script>
 </body>
 </html>
