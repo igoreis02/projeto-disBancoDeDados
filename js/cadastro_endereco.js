@@ -158,11 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 // Check if the response is a redirect (status 3xx)
                 if (response.redirected) {
-                    // This means the PHP script successfully redirected to pedido.html
-                    // Replace the current history state to prevent going back to cadastro_pessoal.html
-                    // The new URL in the history will be pedido.html
-                    window.history.replaceState(null, '', response.url);
-                    window.location.replace(response.url); // Actually navigate to the redirected URL
+                     window.location.replace(data.redirect_url || `pedido.html?telefone=${encodeURIComponent(telefone)}`); 
                 } else {
                     // If not a redirect, read the response as text and display error
                     return response.text().then(text => {

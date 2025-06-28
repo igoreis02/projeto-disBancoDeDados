@@ -48,8 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     // Use history.replaceState and then location.replace to avoid adding to history
                     const newUrl = `cadastro_endereco.html?telefone=${encodeURIComponent(data.telefone_cliente)}`; // assuming telefone is the correct parameter here.
-                    window.history.replaceState(null, '', newUrl); // Replace current history entry
-                    window.location.replace(newUrl); // Navigate without adding to history
+                    window.location.replace(newUrl);
                 } else {
                     mensagemDivPessoal.textContent = data.message || 'Erro ao cadastrar dados pessoais.';
                 }
